@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Miscuartos — Tu coach financiero de bolsillo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="wordmark"><span class="dot"></span>miscuartos</div>
+  <div class="eyebrow">Presupuesto en minutos</div>
+  <h1>¿Cuánto entra este mes?</h1>
+  <p class="sub">Marca en qué piensas gastar, ingresa tu ingreso, y te sugerimos cuánto destinar a cada cosa. Ajusta cualquier cifra a mano — el resto se acomoda solo.</p>
+
+  <div class="video-card" id="videoCard">
+    <div class="video-play">▶</div>
+    <div class="video-card-text">
+      <div class="video-card-title">Cómo sacarle el jugo a la app</div>
+      <div class="video-card-sub">Video · 2 min</div>
+    </div>
+  </div>
+
+  <div class="income-card">
+    <div class="type-toggle" id="typeToggle">
+      <div class="type-btn active" data-type="fijo">Ingreso fijo</div>
+      <div class="type-btn" data-type="variable">Ingreso variable</div>
+    </div>
+    <div class="income-label">Ingreso total del mes</div>
+    <div class="income-input-row">
+      <span class="currency">$</span>
+      <input type="number" id="income" placeholder="0" inputmode="decimal">
+    </div>
+    <div class="variable-banner" id="variableBanner">Con ingreso variable, te conviene calcular con el mes más bajo de los últimos 3, no con el promedio — así el presupuesto aguanta los meses flojos. Por eso también subimos un poco tu sugerencia de ahorro.</div>
+  </div>
+
+  <div class="extra-card">
+    <div class="extra-label">¿Tuviste una chiripa o ingreso extra este mes? (opcional)</div>
+    <div class="extra-row">
+      <span class="amt-currency">$</span>
+      <input type="number" id="extraIncome" placeholder="0" inputmode="decimal">
+    </div>
+    <div class="extra-tip" id="extraTip"></div>
+  </div>
+
+  <div class="leak-card">
+    <div class="leak-toggle" id="leakToggle">
+      <div>
+        <div class="leak-toggle-text">🔍 Encuentra tu dinero oculto</div>
+        <div class="leak-toggle-sub">5 preguntas rápidas, 1 minuto</div>
+      </div>
+      <span class="leak-chevron" id="leakChevron">▾</span>
+    </div>
+    <div class="leak-body" id="leakBody">
+      <div id="leakItems"></div>
+      <div class="leak-result" id="leakResult">
+        <div class="amount" id="leakAmount">$0</div>
+        <div class="msg" id="leakMsg"></div>
+      </div>
+      <div class="leak-disclaimer">Estimados de referencia según hábitos comunes — no es dinero garantizado, es dinero que podrías estar dejando ir.</div>
+    </div>
+  </div>
+
+  <div class="afp-card">
+    <div class="leak-toggle" id="afpToggle">
+      <div>
+        <div class="leak-toggle-text">📚 Entiende tu AFP</div>
+        <div class="leak-toggle-sub">Lo que sí puedes hacer con ese dinero</div>
+      </div>
+      <span class="leak-chevron" id="afpChevron">▾</span>
+    </div>
+    <div class="leak-body" id="afpBody">
+      <div class="afp-intro">Datos verificados según la Ley 87-01 y la Superintendencia de Pensiones (SIPEN) — sin opiniones, solo lo que dice la norma.</div>
+
+      <div class="afp-video-btn" id="videoCard2">
+        <div class="video-play">▶</div>
+        <div class="video-card-text">
+          <div class="video-card-title">Tu AFP explicada sin rodeos</div>
+          <div class="video-card-sub">Video · 6 min</div>
+        </div>
+      </div>
+
+      <div class="afp-fact">
+        <div class="afp-fact-q">¿Cuánto te descuentan y por qué?</div>
+        <div class="afp-fact-a">Cada mes se retiene un <b>2.87%</b> de tu salario cotizable para tu pensión. Tu empleador aporta otro <b>7.10%</b> adicional — ese dinero no sale de tu bolsillo.</div>
+      </div>
+      <div class="afp-fact">
+        <div class="afp-fact-q">¿Cuándo puedes acceder a ese dinero?</div>
+        <div class="afp-fact-a">Por vejez: 60 años + 360 meses cotizados. Anticipada: 55 años, si el fondo alcanza. Ingreso tardío (empezaste a cotizar con 44-45+ años): puedes pedir la devolución total a los 60 si estás desempleado. Enfermedad terminal: devolución del saldo a cualquier edad, evaluada por el CNSS/SIPEN.</div>
+      </div>
+      <div class="afp-fact">
+        <div class="afp-fact-q">Si el titular fallece, ¿el dinero se pierde?</div>
+        <div class="afp-fact-a">No. Según la propia SIPEN, ese dinero <b>"es una herencia para la familia"</b> — cónyuge, hijos u otros herederos legales pueden reclamarlo, sin importar cuánto tiempo haya pasado. Solo en 2026 se han entregado más de RD$855 millones a familias que no sabían que podían reclamarlo.</div>
+      </div>
+
+      <div class="afp-sim">
+        <div class="afp-sim-label">¿Cuánto sería el 2.87% de tu sueldo?</div>
+        <div class="afp-sim-row">
+          <span class="amt-currency">$</span>
+          <input type="number" id="afpSalario" placeholder="Tu salario bruto mensual" inputmode="decimal">
+        </div>
+        <div class="afp-sim-result" id="afpSimResult"></div>
+      </div>
+
+      <div class="leak-disclaimer">Información educativa, no reemplaza asesoría oficial. Las reglas pueden cambiar — confirma siempre con tu AFP o la SIPEN para tu caso específico.</div>
+    </div>
+  </div>
+
+  <div class="course-card">
+    <div class="leak-toggle-text">🎓 Minicurso: Finanzas que sí aplican</div>
+    <div class="course-intro">4 videos cortos (5-8 min), uno por semana de aprendizaje. El primero es gratis para que lo pruebes — los demás vienen con tu compra.</div>
+
+    <div class="course-item unlocked" id="courseItem1">
+      <div class="course-num">1</div>
+      <div>
+        <div class="course-item-title">Presupuesto que sí se cumple</div>
+        <div class="course-item-sub">5 min · por qué los presupuestos normales fallan</div>
+      </div>
+      <div class="course-free-tag">Gratis</div>
+    </div>
+    <div class="course-item locked">
+      <div class="course-num">2</div>
+      <div>
+        <div class="course-item-title">Ahorro sin sufrimiento</div>
+        <div class="course-item-sub">6 min · cómo construir el hábito sin sentirlo un sacrificio</div>
+      </div>
+      <div class="course-lock-icon">🔒</div>
+    </div>
+    <div class="course-item locked">
+      <div class="course-num">3</div>
+      <div>
+        <div class="course-item-title">Deudas: sal sin ahogarte</div>
+        <div class="course-item-sub">7 min · por dónde empezar cuando debes en varios lados</div>
+      </div>
+      <div class="course-lock-icon">🔒</div>
+    </div>
+    <div class="course-item locked">
+      <div class="course-num">4</div>
+      <div>
+        <div class="course-item-title">Dinero en pareja y familia</div>
+        <div class="course-item-sub">8 min · cómo hablar de plata en casa sin pelear</div>
+      </div>
+      <div class="course-lock-icon">🔒</div>
+    </div>
+  </div>
+
+  <div class="xmas-card">
+    <div class="leak-toggle-text">🎄 Reto Navideño: Agosto - Diciembre</div>
+    <div class="xmas-intro">22 semanas, tú eliges cuánto. Aparta el dinero en una cuenta separada — es tu "San inteligente": el compromiso es contigo, no con el vecino.</div>
+
+    <div class="xmas-levels" id="xmasLevels">
+      <div class="xmas-level" data-level="25">
+        <div class="xmas-level-name">Básico</div>
+        <div class="xmas-level-amt">$25/sem</div>
+      </div>
+      <div class="xmas-level active" data-level="50">
+        <div class="xmas-level-name">Medio</div>
+        <div class="xmas-level-amt">$50/sem</div>
+      </div>
+      <div class="xmas-level" data-level="100">
+        <div class="xmas-level-name">Pro</div>
+        <div class="xmas-level-amt">$100/sem</div>
+      </div>
+    </div>
+
+    <div class="xmas-goal">
+      <div class="num" id="xmasProgressNum">$0 de $12,650</div>
+      <div class="lbl" id="xmasProgressLbl">Marca las semanas que ya depositaste</div>
+    </div>
+
+    <div class="xmas-tip">Es tu dinero, tú decides. Si puedes esperar unos días más antes de tocarlo, tu Navidad te lo va a agradecer.</div>
+
+    <div id="xmasWeeks"></div>
+  </div>
+
+  <div class="kids-card">
+    <div class="kids-badge">Upsell · $5</div>
+    <div class="kids-title">🚀 Emprendedores en la casa</div>
+    <div class="kids-sub">Un mini-curso y una lista de retos para que los niños de la casa (tengas o no tengas) vayan armando mentalidad de emprendimiento desde chiquitos.</div>
+
+    <div class="kids-preview" id="kidsPreview">
+      <ul class="kids-preview-list">
+        <li>Video corto para niños: "Tu primer negocio"</li>
+        <li>6 retos para ir aprendiendo, uno a la vez</li>
+        <li>Pensado para hacer en familia, sin pantallas de más</li>
+      </ul>
+      <button class="kids-unlock-btn" id="kidsUnlockBtn">Agregar por $5 →</button>
+      <div class="kids-unlock-note">Se agrega en el mismo pago, sin volver a pasar tarjeta. Después de hoy, este módulo cuesta $7 aparte.</div>
+    </div>
+
+    <div class="kids-full" id="kidsFull">
+      <div class="afp-video-btn" id="videoCard3">
+        <div class="video-play">▶</div>
+        <div class="video-card-text">
+          <div class="video-card-title">Tu primer negocio</div>
+          <div class="video-card-sub">Video para niños · 5 min</div>
+        </div>
+      </div>
+      <div class="kids-progress" id="kidsProgress">0 de 6 retos completados</div>
+      <div id="kidsTasks"></div>
+    </div>
+  </div>
+
+  <div class="section-title">¿En qué vas a gastar? <span class="count" id="countTag">0 seleccionados</span></div>
+  <div class="chips" id="chips"></div>
+
+  <div id="results"></div>
+
+</div>
+
+<footer>Los porcentajes son puntos de partida educativos, no asesoría financiera personalizada.</footer>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-sheet">
+    <div class="modal-top">
+      <div>
+        <div class="modal-eyebrow">Tu resumen</div>
+      </div>
+      <button class="close-btn" id="closeModal">✕</button>
+    </div>
+    <div class="modal-title">Así queda tu presupuesto</div>
+
+    <div class="summary-total">
+      <div class="num" id="summaryTotal">$0</div>
+      <div class="lbl">de $0 de ingreso</div>
+    </div>
+
+    <div id="summaryRows"></div>
+
+    <a class="whatsapp-btn" id="whatsappBtn" href="#" target="_blank" rel="noopener">
+      Compartir por WhatsApp
+    </a>
+  </div>
+</div>
+
+<div class="modal-overlay" id="videoModalOverlay">
+  <div class="video-modal-sheet">
+    <div class="modal-top">
+      <div>
+        <div class="modal-eyebrow">Video</div>
+      </div>
+      <button class="close-btn" id="closeVideoModal">✕</button>
+    </div>
+    <div class="modal-title">Cómo sacarle el jugo a la app</div>
+    <div class="video-frame-wrap" id="videoFrameWrap">
+      <div class="video-placeholder">
+        <div class="big-play">▶</div>
+        <div class="ph-text">Video aquí — se activa solo en cuanto agregues el link en el código</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="videoModalOverlay2">
+  <div class="video-modal-sheet">
+    <div class="modal-top">
+      <div>
+        <div class="modal-eyebrow">Video</div>
+      </div>
+      <button class="close-btn" id="closeVideoModal2">✕</button>
+    </div>
+    <div class="modal-title">Tu AFP explicada sin rodeos</div>
+    <div class="video-frame-wrap" id="videoFrameWrap2">
+      <div class="video-placeholder">
+        <div class="big-play">▶</div>
+        <div class="ph-text">Video aquí — se activa solo en cuanto agregues el link en el código</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="videoModalOverlay3">
+  <div class="video-modal-sheet">
+    <div class="modal-top">
+      <div>
+        <div class="modal-eyebrow">Video</div>
+      </div>
+      <button class="close-btn" id="closeVideoModal3">✕</button>
+    </div>
+    <div class="modal-title">Tu primer negocio</div>
+    <div class="video-frame-wrap" id="videoFrameWrap3">
+      <div class="video-placeholder">
+        <div class="big-play">▶</div>
+        <div class="ph-text">Video aquí — se activa solo en cuanto agregues el link en el código</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="videoModalOverlayCourse">
+  <div class="video-modal-sheet">
+    <div class="modal-top">
+      <div>
+        <div class="modal-eyebrow">Minicurso · Tema 1 de 4</div>
+      </div>
+      <button class="close-btn" id="closeVideoModalCourse">✕</button>
+    </div>
+    <div class="modal-title">Presupuesto que sí se cumple</div>
+    <div class="video-frame-wrap" id="videoFrameWrapCourse">
+      <div class="video-placeholder">
+        <div class="big-play">▶</div>
+        <div class="ph-text">Video aquí — se activa solo en cuanto agregues el link en el código</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
