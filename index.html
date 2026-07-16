@@ -12,7 +12,6 @@
 
 <div class="app-container">
   
-  <!-- CABECERA FIJA CON EL LOGO ORIGINAL SVG -->
   <header class="app-header">
     <div class="wordmark">
       <svg class="brand-compass-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -21,7 +20,6 @@
         <line x1="50" y1="85" x2="50" y2="95" stroke="currentColor" stroke-width="8" stroke-linecap="round"/>
         <line x1="5" y1="50" x2="15" y2="50" stroke="currentColor" stroke-width="8" stroke-linecap="round"/>
         <line x1="85" y1="50" x2="95" y2="50" stroke="currentColor" stroke-width="8" stroke-linecap="round"/>
-        <!-- Aguja de la Brújula (Mitad Naranja, Mitad Negra) -->
         <polygon points="50,15 42,50 50,50" fill="#FD8C45"/>
         <polygon points="50,15 58,50 50,50" fill="#FD8C45" opacity="0.9"/>
         <polygon points="50,85 42,50 50,50" fill="currentColor"/>
@@ -31,10 +29,8 @@
     </div>
   </header>
 
-  <!-- CONTENIDO DE LA APP -->
   <main class="app-content">
     
-    <!-- PESTAÑA 1: CALCULADORA DE PRESUPUESTO -->
     <section id="pane-presupuesto" class="tab-pane active">
       <div class="intro-block">
         <div class="welcome-badge">¡Qué bueno tenerte aquí! 👋</div>
@@ -42,7 +38,6 @@
         <p class="sub">Manejar tu dinero no tiene que ser aburrido. Esta app es <strong>educativa, interactiva y retadora</strong>. Pon tus números abajo y mira el cambio. ¡Explora las pestañas inferiores!</p>
       </div>
 
-      <!-- Video Tutorial Nativo Incrustado -->
       <div class="video-native-box">
         <div class="video-embed-container" id="embed-tutorial">
           <div class="video-placeholder-luxury"><span>▶ Reproducir tutorial de la app (2 min)</span></div>
@@ -75,12 +70,19 @@
       <div id="results"></div>
     </section>
 
-    <!-- PESTAÑA 2: RETO NAVIDEÑO -->
     <section id="pane-reto" class="tab-pane">
       <div class="intro-block">
         <h1>Mi Reto Navideño</h1>
         <p class="sub">De agosto a diciembre 2026 · 22 semanas</p>
         <p class="sub" style="margin-top: 8px; font-size: 13px;">Elige tu nivel, aparta ese dinero en tu "cuenta candado" y marca cada semana al depositar. El compromiso es contigo mismo.</p>
+      </div>
+
+      <div class="video-native-box">
+        <div class="video-embed-container" id="embed-reto-xmas">
+          <div class="video-placeholder-luxury" style="background: #1A0F0A; border: 1px solid rgba(253, 140, 69, 0.2);">
+            <span style="color: var(--brand-orange);">▶ Cómo funciona el Reto Navideño (2 min)</span>
+          </div>
+        </div>
       </div>
 
       <div class="xmas-card">
@@ -115,7 +117,6 @@
       </div>
     </section>
 
-    <!-- PESTAÑA 3: ACADEMIA -->
     <section id="pane-academia" class="tab-pane">
       <div class="intro-block">
         <h1>Academia</h1>
@@ -184,7 +185,6 @@
 
   </main>
 
-  <!-- BARRA DE NAVEGACIÓN INFERIOR -->
   <nav class="bottom-nav">
     <button class="nav-item active" data-tab="presupuesto"><span class="nav-icon">💰</span><span class="nav-label">Presupuesto</span></button>
     <button class="nav-item" data-tab="reto"><span class="nav-icon">🎄</span><span class="nav-label">Reto Navidad</span></button>
@@ -192,7 +192,6 @@
   </nav>
 </div>
 
-<!-- MODAL DE RESUMEN FINAL -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal-sheet">
     <div class="modal-top"><div class="modal-eyebrow">Tu resumen</div><button class="close-btn" id="closeModal">✕</button></div>
