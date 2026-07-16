@@ -33,9 +33,12 @@ const leaks = [
 let leakChecked = {};
 
 const kidsTasks = [
-  { id: 'frasco', text: 'Ahorrar 3 monedas de la mesada en un pote claro.' },
-  { id: 'vender', text: 'Vender un juguete o ropa que ya no use.' },
-  { id: 'tarea', text: 'Hacer un mandado o labor extra por un incentivo.' }
+  { id: 'frasco', text: 'Ahorrar 3 monedas de tu mesada en un frasco transparente.' },
+  { id: 'vender', text: 'Vender algo propio que ya no uses (a un familiar o vecino).' },
+  { id: 'tarea', text: 'Haz una labor extra en casa a cambio de una "paga".' },
+  { id: 'inventar', text: 'Inventar algo simple para vender un día (limonada, pulseras).' },
+  { id: 'regalo', text: 'Al recibir dinero de regalo, guarda la mitad antes de gastar.' },
+  { id: 'adulto', text: 'Cuéntale a un adulto qué harías si tuvieras tu propio negocio.' }
 ];
 let kidsChecked = {};
 
@@ -67,7 +70,7 @@ function lazyLoadVideos() {
   }
 }
 
-// PRESUPUESTO
+// PRESUPUESTO LÓGICA
 const chipsEl = document.getElementById('chips');
 const resultsEl = document.getElementById('results');
 const incomeEl = document.getElementById('income');
@@ -96,17 +99,12 @@ function getIncome() {
 }
 
 function computeAmounts() {
-  const income = getIncome();
-  const amounts = {};
-  let lockedSum = 0; let unlockedWeightSum = 0;
-
+  const income = getIncome(); const amounts = {}; let lockedSum = 0; let unlockedWeightSum = 0;
   selected.forEach(key => {
     if (locked[key] != null) lockedSum += locked[key];
     else unlockedWeightSum += (incomeType === 'variable' ? categories[key].wVariable : categories[key].wFijo);
   });
-
   let remaining = income - lockedSum; if (remaining < 0) remaining = 0;
-
   selected.forEach(key => {
     if (locked[key] != null) amounts[key] = locked[key];
     else {
@@ -171,9 +169,7 @@ function openSummary() {
   const total = Object.values(amounts).reduce((a, b) => a + b, 0);
   document.getElementById('summaryTotal').textContent = `RD$${fmt(total)}`;
   let rows = '';
-  selected.forEach(key => {
-    rows += `<div class="summary-row"><span>${categories[key].label}</span><strong>RD$${fmt(amounts[key])}</strong></div>`;
-  });
+  selected.forEach(key => { rows += `<div class="summary-row"><span>${categories[key].label}</span><strong>RD$${fmt(amounts[key])}</strong></div>`; });
   document.getElementById('summaryRows').innerHTML = rows;
   document.getElementById('modalOverlay').classList.add('show');
 }
@@ -266,7 +262,7 @@ if (document.getElementById('kidsUnlockBtn')) {
       item.addEventListener('click', () => {
         kidsChecked[t.id] = !kidsChecked[t.id]; document.getElementById(`kbox-${t.id}`).classList.toggle('checked', kidsChecked[t.id]);
         document.getElementById(`kbox-${t.id}`).textContent = kidsChecked[t.id] ? '✓' : '';
-        const done = Object.values(kidsChecked).filter(Boolean).length; document.getElementById('kidsProgress').textContent = `${done} de 3 retos completados`;
+        const done = Object.values(kidsChecked).filter(Boolean).length; document.getElementById('kidsProgress').textContent = `${done} de 6 retos completados`;
       });
       taskBox.appendChild(item);
     });
@@ -274,7 +270,7 @@ if (document.getElementById('kidsUnlockBtn')) {
   });
 }
 
-// TIPO INGRESO
+// CONTROL DE TIPO DE INGRESO
 document.querySelectorAll('.type-btn').forEach(b => {
   b.addEventListener('click', () => {
     incomeType = b.dataset.type; document.querySelectorAll('.type-btn').forEach(btn => btn.classList.toggle('active', btn === b));
@@ -282,7 +278,7 @@ document.querySelectorAll('.type-btn').forEach(b => {
   });
 });
 
-// INICIALIZADORES
+// INICIALIZADORES AL CARGAR
 buildChips(); buildLeaks(); buildXmas();
 if (incomeEl) incomeEl.addEventListener('input', render);
 render(); lazyLoadVideos();
