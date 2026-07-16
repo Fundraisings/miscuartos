@@ -20,7 +20,8 @@ const VIDEO_LINKS = {
   tutorial: '', 
   afp: '',
   curso1: '',
-  kids: ''
+  kids: '',
+  retoXmas: ''
 };
 
 const leaks = [
@@ -38,17 +39,14 @@ const kidsTasks = [
 ];
 let kidsChecked = {};
 
-// SISTEMA DE NAVEGACIÓN ENTRE PÁGINAS (TABS)
+// NAVEGACIÓN TABS
 document.querySelectorAll('.nav-item').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-    
     btn.classList.add('active');
-    const tabName = btn.dataset.tab;
-    document.getElementById(`pane-${tabName}`).classList.add('active');
+    document.getElementById(`pane-${btn.dataset.tab}`).classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    
     lazyLoadVideos();
   });
 });
@@ -56,6 +54,9 @@ document.querySelectorAll('.nav-item').forEach(btn => {
 function lazyLoadVideos() {
   if (document.getElementById('pane-presupuesto').classList.contains('active') && VIDEO_LINKS.tutorial) {
     document.getElementById('embed-tutorial').innerHTML = `<iframe src="${VIDEO_LINKS.tutorial}" allowfullscreen></iframe>`;
+  }
+  if (document.getElementById('pane-reto').classList.contains('active') && VIDEO_LINKS.retoXmas) {
+    document.getElementById('embed-reto-xmas').innerHTML = `<iframe src="${VIDEO_LINKS.retoXmas}" allowfullscreen></iframe>`;
   }
   if (document.getElementById('pane-academia').classList.contains('active')) {
     if (VIDEO_LINKS.afp) document.getElementById('embed-afp').innerHTML = `<iframe src="${VIDEO_LINKS.afp}" allowfullscreen></iframe>`;
@@ -66,7 +67,7 @@ function lazyLoadVideos() {
   }
 }
 
-// LÓGICA DE PRESUPUESTO
+// PRESUPUESTO
 const chipsEl = document.getElementById('chips');
 const resultsEl = document.getElementById('results');
 const incomeEl = document.getElementById('income');
@@ -80,12 +81,8 @@ function buildChips() {
     chip.className = 'chip';
     chip.innerHTML = `<span class="dot"></span>${cat.label}`;
     chip.addEventListener('click', () => {
-      if (selected.has(key)) {
-        selected.delete(key);
-        delete locked[key];
-      } else {
-        selected.add(key);
-      }
+      if (selected.has(key)) { selected.delete(key); delete locked[key]; }
+      else { selected.add(key); }
       chip.classList.toggle('active');
       render();
     });
@@ -101,16 +98,14 @@ function getIncome() {
 function computeAmounts() {
   const income = getIncome();
   const amounts = {};
-  let lockedSum = 0;
-  let unlockedWeightSum = 0;
+  let lockedSum = 0; let unlockedWeightSum = 0;
 
   selected.forEach(key => {
     if (locked[key] != null) lockedSum += locked[key];
     else unlockedWeightSum += (incomeType === 'variable' ? categories[key].wVariable : categories[key].wFijo);
   });
 
-  let remaining = income - lockedSum;
-  if (remaining < 0) remaining = 0;
+  let remaining = income - lockedSum; if (remaining < 0) remaining = 0;
 
   selected.forEach(key => {
     if (locked[key] != null) amounts[key] = locked[key];
@@ -139,9 +134,7 @@ function render() {
   html += `<div class="bar-caption"><span>RD$${fmt(total)} asignados</span><span>de RD$${fmt(income)}</span></div>`;
 
   selected.forEach(key => {
-    const cat = categories[key];
-    const amt = amounts[key] || 0;
-    const isLocked = locked[key] != null;
+    const cat = categories[key]; const amt = amounts[key] || 0; const isLocked = locked[key] != null;
     html += `
       <div class="cat-card" style="margin-top:12px;">
         <div class="cat-top">
@@ -161,18 +154,13 @@ function render() {
 
   resultsEl.querySelectorAll('.amt-input').forEach(inp => {
     inp.addEventListener('input', (e) => {
-      const key = e.target.dataset.key;
-      const val = parseFloat(e.target.value);
-      locked[key] = isNaN(val) ? 0 : val;
-      render();
+      const key = e.target.dataset.key; const val = parseFloat(e.target.value);
+      locked[key] = isNaN(val) ? 0 : val; render();
     });
   });
 
   resultsEl.querySelectorAll('[data-reset]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      delete locked[e.target.dataset.reset];
-      render();
-    });
+    btn.addEventListener('click', (e) => { delete locked[e.target.dataset.reset]; render(); });
   });
 
   document.getElementById('summaryBtn').addEventListener('click', openSummary);
@@ -194,19 +182,15 @@ if (document.getElementById('closeModal')) {
   document.getElementById('closeModal').addEventListener('click', () => document.getElementById('modalOverlay').classList.remove('show'));
 }
 
-// DINERO OCULTO LÓGICA
+// DINERO OCULTO
 function buildLeaks() {
-  const box = document.getElementById('leakItems');
-  if (!box) return;
-  box.innerHTML = '';
+  const box = document.getElementById('leakItems'); if (!box) return; box.innerHTML = '';
   leaks.forEach(l => {
-    const item = document.createElement('div');
-    item.className = 'leak-item';
+    const item = document.createElement('div'); item.className = 'leak-item';
     item.innerHTML = `<span class="leak-checkbox" id="lbox-${l.id}"></span><span class="leak-text">${l.text} (~RD$${fmt(l.amount)}/mes)</span>`;
     item.addEventListener('click', () => {
       leakChecked[l.id] = !leakChecked[l.id];
-      const checkbox = document.getElementById(`lbox-${l.id}`);
-      checkbox.classList.toggle('checked', leakChecked[l.id]);
+      const checkbox = document.getElementById(`lbox-${l.id}`); checkbox.classList.toggle('checked', leakChecked[l.id]);
       checkbox.textContent = leakChecked[l.id] ? '✓' : '';
       const totalLeak = leaks.reduce((s, curr) => s + (leakChecked[curr.id] ? curr.amount : 0), 0);
       document.getElementById('leakAmount').textContent = `~RD$${fmt(totalLeak)}/mes`;
@@ -216,66 +200,38 @@ function buildLeaks() {
   });
 }
 
-// RETO NAVIDEÑO LÓGICA
-let xmasLevel = 50;
-let xmasChecked = {};
-const xmasMonths = [
-  ['AGOSTO', 4], ['SEPTIEMBRE', 4], ['OCTUBRE', 5], ['NOVIEMBRE', 4], ['DICIEMBRE', 5]
-];
+// RETO NAVIDEÑO
+let xmasLevel = 50; let xmasChecked = {};
+const xmasMonths = [['AGOSTO', 4], ['SEPTIEMBRE', 4], ['OCTUBRE', 5], ['NOVIEMBRE', 4], ['DICIEMBRE', 5]];
 
 function buildXmas() {
-  const container = document.getElementById('xmasWeeks');
-  if (!container) return;
-  container.innerHTML = '';
-  let weekNum = 1;
-
+  const container = document.getElementById('xmasWeeks'); if (!container) return; container.innerHTML = ''; let weekNum = 1;
   xmasMonths.forEach(([monthName, count]) => {
-    const monthHeader = document.createElement('div');
-    monthHeader.className = 'xmas-month-header';
-    monthHeader.style.gridColumn = '1 / -1';
-    monthHeader.style.fontSize = '11px';
-    monthHeader.style.fontWeight = '700';
-    monthHeader.style.letterSpacing = '0.08em';
-    monthHeader.style.color = 'var(--brand-orange)';
-    monthHeader.style.marginTop = '14px';
-    monthHeader.style.marginBottom = '4px';
-    monthHeader.textContent = monthName;
+    const monthHeader = document.createElement('div'); monthHeader.className = 'xmas-month-header';
+    monthHeader.style.gridColumn = '1 / -1'; monthHeader.style.fontSize = '11px'; monthHeader.style.fontWeight = '700';
+    monthHeader.style.letterSpacing = '0.08em'; monthHeader.style.color = 'var(--brand-orange)';
+    monthHeader.style.marginTop = '14px'; monthHeader.style.marginBottom = '4px'; monthHeader.textContent = monthName;
     container.appendChild(monthHeader);
 
     for (let i = 0; i < count; i++) {
-      const w = weekNum;
-      const row = document.createElement('div');
-      row.className = 'xmas-week';
-      row.innerHTML = `
-        <span class="xmas-week-label">Semana ${w < 10 ? '0' + w : w}</span>
-        <span class="xmas-week-amt" id="xamt-${w}">RD$${fmt(w * xmasLevel)}</span>
-        <span class="xmas-week-check" id="xbox-${w}"></span>
-      `;
+      const w = weekNum; const row = document.createElement('div'); row.className = 'xmas-week';
+      row.innerHTML = `<span class="xmas-week-label">Semana ${w < 10 ? '0' + w : w}</span><span class="xmas-week-amt" id="xamt-${w}">RD$${fmt(w * xmasLevel)}</span><span class="xmas-week-check" id="xbox-${w}"></span>`;
       row.addEventListener('click', () => {
         xmasChecked[w] = !xmasChecked[w];
-        const checkbox = document.getElementById(`xbox-${w}`);
-        checkbox.classList.toggle('checked', xmasChecked[w]);
-        checkbox.textContent = xmasChecked[w] ? '✓' : '';
-        renderXmasProgress();
+        const checkbox = document.getElementById(`xbox-${w}`); checkbox.classList.toggle('checked', xmasChecked[w]);
+        checkbox.textContent = xmasChecked[w] ? '✓' : ''; renderXmasProgress();
       });
-      container.appendChild(row);
-      weekNum++;
+      container.appendChild(row); weekNum++;
     }
   });
   renderXmasProgress();
 }
 
 function renderXmasProgress() {
-  let saved = 0;
-  for (let i = 1; i <= 22; i++) {
-    if (xmasChecked[i]) saved += i * xmasLevel;
-  }
-  const totalGoal = xmasLevel * 253;
-  document.getElementById('xmasProgressNum').textContent = `RD$${fmt(saved)} de RD$${fmt(totalGoal)}`;
+  let saved = 0; for (let i = 1; i <= 22; i++) { if (xmasChecked[i]) saved += i * xmasLevel; }
+  const totalGoal = xmasLevel * 253; document.getElementById('xmasProgressNum').textContent = `RD$${fmt(saved)} de RD$${fmt(totalGoal)}`;
   const weeksLeft = 22 - Object.values(xmasChecked).filter(Boolean).length;
-  document.getElementById('xmasProgressLbl').textContent = saved > 0
-    ? `¡Sigue así! Te faltan ${weeksLeft} semanas`
-    : 'Marca las semanas que ya depositaste';
+  document.getElementById('xmasProgressLbl').textContent = saved > 0 ? `¡Sigue así! Te faltan ${weeksLeft} semanas` : 'Marca las semanas que ya depositaste';
 }
 
 document.querySelectorAll('.xmas-level').forEach(el => {
@@ -283,8 +239,7 @@ document.querySelectorAll('.xmas-level').forEach(el => {
     xmasLevel = parseInt(el.dataset.level);
     document.querySelectorAll('.xmas-level').forEach(l => l.classList.toggle('active', l === el));
     for (let w = 1; w <= 22; w++) {
-      const amtEl = document.getElementById(`xamt-${w}`);
-      if (amtEl) amtEl.textContent = `RD$${fmt(w * xmasLevel)}`;
+      const amtEl = document.getElementById(`xamt-${w}`); if (amtEl) amtEl.textContent = `RD$${fmt(w * xmasLevel)}`;
     }
     renderXmasProgress();
   });
@@ -293,8 +248,7 @@ document.querySelectorAll('.xmas-level').forEach(el => {
 // SIMULADOR AFP
 if (document.getElementById('afpSalario')) {
   document.getElementById('afpSalario').addEventListener('input', (e) => {
-    const salario = parseFloat(e.target.value);
-    const res = document.getElementById('afpSimResult');
+    const salario = parseFloat(e.target.value); const res = document.getElementById('afpSimResult');
     if (!salario || salario <= 0) { res.classList.remove('show'); return; }
     res.innerHTML = `Tu retención mensual es de <b>RD$${fmt(salario * 0.0287)}</b>. Tu empleador aporta obligatoriamente otros <b>RD$${fmt(salario * 0.0710)}</b> adicionales que van directos a tu fondo.`;
     res.classList.add('show');
@@ -304,19 +258,15 @@ if (document.getElementById('afpSalario')) {
 // INTERACCIONES UPSELL NIÑOS
 if (document.getElementById('kidsUnlockBtn')) {
   document.getElementById('kidsUnlockBtn').addEventListener('click', () => {
-    document.getElementById('kidsPreview').style.display = 'none';
-    document.getElementById('kidsFull').classList.add('show');
-    const taskBox = document.getElementById('kidsTasks');
-    taskBox.innerHTML = '';
+    document.getElementById('kidsPreview').style.display = 'none'; document.getElementById('kidsFull').classList.add('show');
+    const taskBox = document.getElementById('kidsTasks'); taskBox.innerHTML = '';
     kidsTasks.forEach(t => {
       const item = document.createElement('div'); item.className = 'kids-task';
       item.innerHTML = `<span class="kids-task-check" id="kbox-${t.id}"></span><span class="kids-task-text">${t.text}</span>`;
       item.addEventListener('click', () => {
-        kidsChecked[t.id] = !kidsChecked[t.id];
-        document.getElementById(`kbox-${t.id}`).classList.toggle('checked', kidsChecked[t.id]);
+        kidsChecked[t.id] = !kidsChecked[t.id]; document.getElementById(`kbox-${t.id}`).classList.toggle('checked', kidsChecked[t.id]);
         document.getElementById(`kbox-${t.id}`).textContent = kidsChecked[t.id] ? '✓' : '';
-        const done = Object.values(kidsChecked).filter(Boolean).length;
-        document.getElementById('kidsProgress').textContent = `${done} de 3 retos completados`;
+        const done = Object.values(kidsChecked).filter(Boolean).length; document.getElementById('kidsProgress').textContent = `${done} de 3 retos completados`;
       });
       taskBox.appendChild(item);
     });
@@ -324,20 +274,15 @@ if (document.getElementById('kidsUnlockBtn')) {
   });
 }
 
-// CONTROL DE TIPO DE INGRESO
+// TIPO INGRESO
 document.querySelectorAll('.type-btn').forEach(b => {
   b.addEventListener('click', () => {
-    incomeType = b.dataset.type;
-    document.querySelectorAll('.type-btn').forEach(btn => btn.classList.toggle('active', btn === b));
-    document.getElementById('variableBanner').classList.toggle('show', incomeType === 'variable');
-    render();
+    incomeType = b.dataset.type; document.querySelectorAll('.type-btn').forEach(btn => btn.classList.toggle('active', btn === b));
+    document.getElementById('variableBanner').classList.toggle('show', incomeType === 'variable'); render();
   });
 });
 
-// INICIALIZADORES AL CARGAR
-buildChips();
-buildLeaks();
-buildXmas();
+// INICIALIZADORES
+buildChips(); buildLeaks(); buildXmas();
 if (incomeEl) incomeEl.addEventListener('input', render);
-render();
-lazyLoadVideos();
+render(); lazyLoadVideos();
