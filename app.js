@@ -42,6 +42,24 @@ const kidsTasks = [
 ];
 let kidsChecked = {};
 
+// BOTÓN PARA ENTRAR DESDE EL SPLASH SCREEN
+if (document.getElementById('enterAppBtn')) {
+  document.getElementById('enterAppBtn').addEventListener('click', () => {
+    const splash = document.getElementById('app-splash');
+    const mainApp = document.getElementById('mainAppContainer');
+    
+    splash.classList.add('fade-out');
+    mainApp.style.display = 'flex';
+    
+    // Remover la pantalla de la vista física luego de la animación de salida
+    setTimeout(() => {
+      splash.style.display = 'none';
+    }, 600);
+    
+    lazyLoadVideos();
+  });
+}
+
 // NAVEGACIÓN TABS
 document.querySelectorAll('.nav-item').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -55,17 +73,20 @@ document.querySelectorAll('.nav-item').forEach(btn => {
 });
 
 function lazyLoadVideos() {
-  if (document.getElementById('pane-presupuesto').classList.contains('active') && VIDEO_LINKS.tutorial) {
-    document.getElementById('embed-tutorial').innerHTML = `<iframe src="${VIDEO_LINKS.tutorial}" allowfullscreen></iframe>`;
-  }
-  if (document.getElementById('pane-reto').classList.contains('active') && VIDEO_LINKS.retoXmas) {
-    document.getElementById('embed-reto-xmas').innerHTML = `<iframe src="${VIDEO_LINKS.retoXmas}" allowfullscreen></iframe>`;
-  }
-  if (document.getElementById('pane-academia').classList.contains('active')) {
-    if (VIDEO_LINKS.afp) document.getElementById('embed-afp').innerHTML = `<iframe src="${VIDEO_LINKS.afp}" allowfullscreen></iframe>`;
-    if (VIDEO_LINKS.curso1) document.getElementById('embed-curso').innerHTML = `<iframe src="${VIDEO_LINKS.curso1}" allowfullscreen></iframe>`;
-    if (VIDEO_LINKS.kids && document.getElementById('kidsFull').classList.contains('show')) {
-      document.getElementById('embed-kids').innerHTML = `<iframe src="${VIDEO_LINKS.kids}" allowfullscreen></iframe>`;
+  // Solo carga videos si la Splash Screen ya no se está mostrando
+  if (document.getElementById('app-splash').style.display === 'none') {
+    if (document.getElementById('pane-presupuesto').classList.contains('active') && VIDEO_LINKS.tutorial) {
+      document.getElementById('embed-tutorial').innerHTML = `<iframe src="${VIDEO_LINKS.tutorial}" allowfullscreen></iframe>`;
+    }
+    if (document.getElementById('pane-reto').classList.contains('active') && VIDEO_LINKS.retoXmas) {
+      document.getElementById('embed-reto-xmas').innerHTML = `<iframe src="${VIDEO_LINKS.retoXmas}" allowfullscreen></iframe>`;
+    }
+    if (document.getElementById('pane-academia').classList.contains('active')) {
+      if (VIDEO_LINKS.afp) document.getElementById('embed-afp').innerHTML = `<iframe src="${VIDEO_LINKS.afp}" allowfullscreen></iframe>`;
+      if (VIDEO_LINKS.curso1) document.getElementById('embed-curso').innerHTML = `<iframe src="${VIDEO_LINKS.curso1}" allowfullscreen></iframe>`;
+      if (VIDEO_LINKS.kids && document.getElementById('kidsFull').classList.contains('show')) {
+        document.getElementById('embed-kids').innerHTML = `<iframe src="${VIDEO_LINKS.kids}" allowfullscreen></iframe>`;
+      }
     }
   }
 }
@@ -281,4 +302,4 @@ document.querySelectorAll('.type-btn').forEach(b => {
 // INICIALIZADORES AL CARGAR
 buildChips(); buildLeaks(); buildXmas();
 if (incomeEl) incomeEl.addEventListener('input', render);
-render(); lazyLoadVideos();
+render();
