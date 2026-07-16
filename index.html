@@ -31,6 +31,7 @@
 
   <main class="app-content">
     
+    <!-- PESTAÑA 1: PRESUPUESTO -->
     <section id="pane-presupuesto" class="tab-pane active">
       <div class="intro-block">
         <div class="welcome-badge">¡Qué bueno tenerte aquí! 👋</div>
@@ -70,6 +71,7 @@
       <div id="results"></div>
     </section>
 
+    <!-- PESTAÑA 2: RETO NAVIDEÑO -->
     <section id="pane-reto" class="tab-pane">
       <div class="intro-block">
         <h1>Mi Reto Navideño</h1>
@@ -112,36 +114,39 @@
         <div id="xmasWeeks"></div>
 
         <div class="xmas-footer-tips" style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--muted); display: flex; flex-direction: column; gap: 8px; line-height: 1.5;">
-          <p>💡 <strong>Tip:</strong> Abre una cuenta de ahorro aparte. Dinero que entra ahí no se toca hasta diciembre, salvo una emergencia real de salud o de vida.</p>
+          <p>💡 <strong>Tip:</strong> Abre una cuenta de ahorro aparte. Dinero que entra ahí no se toca hasta diciembre, salvo una emergencia real de salud.</p>
         </div>
       </div>
     </section>
 
+    <!-- PESTAÑA 3: ACADEMIA -->
     <section id="pane-academia" class="tab-pane">
       <div class="intro-block">
         <h1>Academia</h1>
-        <p class="sub">Clases cortas y herramientas sobre realidades financieras.</p>
+        <p class="sub">Clases cortas y herramientas financieras. El video de introducción es gratis — haz tu upgrade para desbloquear las clases magistrales.</p>
       </div>
 
       <div class="course-card">
-        <div class="premium-badge-title">🎓 MINICURSO PREMIUM</div>
+        <div class="offer-header-badge">OFERTA DE INTRODUCCIÓN · SOLO $9 <span class="old-price">$19</span></div>
+        <div class="premium-badge-title">🎓 MINICURSO: FINANZAS QUE SÍ APLICAN</div>
         <div class="video-native-box">
           <div class="video-embed-container" id="embed-curso">
-            <div class="video-placeholder-luxury"><span>▶ Clase 1: Presupuesto que sí se cumple (Gratis)</span></div>
+            <div class="video-placeholder-luxury"><span>▶ Video 1: Cómo romper el ciclo del "no me da" (Gratis · 4 min)</span></div>
           </div>
         </div>
         
         <div class="cause-box">
-          <p>4 videos cortos (5-8 min). El primero es gratis para que lo pruebes — desbloquea el curso completo con tu upgrade.</p>
+          <p>Disfruta de la clase introductoria gratis. Desbloquea las próximas 4 lecciones prácticas con tu upgrade de solo $9.</p>
           <div class="cause-divider"></div>
           <p>🐾 <strong>Propósito miscuartos:</strong> Por cada persona que hace el upgrade a la versión de pago, donamos $3 dólares de nuestras ganancias a fundaciones de rescate animal registradas para asegurar su alimento. Tu educación ayuda a salvar vidas.</p>
         </div>
 
         <div class="course-list-minimal">
-          <div class="course-item unlocked active"><div class="course-num">1</div><div class="course-info-text"><b>Presupuesto real</b> · 5 min</div></div>
-          <div class="course-item locked"><div class="course-num">2</div><div class="course-info-text"><b>Ahorro sin sufrir</b> · 6 min 🔒</div></div>
-          <div class="course-item locked"><div class="course-num">3</div><div class="course-info-text"><b>Salir de deudas</b> · 7 min 🔒</div></div>
-          <div class="course-item locked"><div class="course-num">4</div><div class="course-info-text"><b>Dinero en familia</b> · 8 min 🔒</div></div>
+          <div class="course-item unlocked active"><div class="course-num">1</div><div class="course-info-text"><b>Clase Intro: Rompiendo el ciclo</b> · Gratis</div></div>
+          <div class="course-item locked"><div class="course-num">2</div><div class="course-info-text"><b>Presupuesto real que sí se cumple</b> · 5 min 🔒</div></div>
+          <div class="course-item locked"><div class="course-num">3</div><div class="course-info-text"><b>Ahorro sin sufrimiento ni sacrificios</b> · 6 min 🔒</div></div>
+          <div class="course-item locked"><div class="course-num">4</div><div class="course-info-text"><b>Deudas: Plan para salir sin ahogarte</b> · 7 min 🔒</div></div>
+          <div class="course-item locked"><div class="course-num">5</div><div class="course-info-text"><b>Dinero en pareja y finanzas en casa</b> · 8 min 🔒</div></div>
         </div>
       </div>
 
@@ -169,15 +174,36 @@
         <div class="leak-result" id="leakResult"><div class="amount" id="leakAmount">$0</div><div class="msg" id="leakMsg"></div></div>
       </div>
 
+      <!-- MÓDULO UPSELL DE NIÑOS CON OFERTA CRUZADA -->
       <div class="kids-card">
-        <div class="premium-badge-title setup-upsell">🚀 NEGOCIOS PARA NIÑOS (+$5)</div>
+        <div class="upsell-pricing-tag">OFERTA ADICIONAL · SOLO $5 <span class="old-price">Precio regular $7</span></div>
+        <div class="premium-badge-title setup-upsell">🚀 NEGOCIOS PARA NIÑOS</div>
+        
         <div class="kids-preview" id="kidsPreview">
-          <p class="micro-sub">Educación financiera y retos interactivos para los hijos.</p>
-          <button class="kids-unlock-btn" id="kidsUnlockBtn">Desbloquear por $5</button>
+          <p class="micro-sub" style="font-size: 13.5px; line-height: 1.45; color: var(--ink); margin-bottom: 12px;">
+            Desarrollar una mentalidad emprendedora desde la infancia no se trata solo de dinero; es sembrar resiliencia y creatividad para formar a los <strong>futuros empresarios</strong> del mañana.
+          </p>
+          <p class="micro-sub" style="font-size: 12.5px; color: var(--muted); margin-bottom: 14px;">Agrega este módulo <strong>ahora mismo por solo $5</strong> junto a tu pago de la app (Ahorras $2. Si lo compras después te costará $7 aparte).</p>
+          <button class="kids-unlock-btn" id="kidsUnlockBtn">Agregar al pago por $5 →</button>
         </div>
+
         <div class="kids-full" id="kidsFull">
-          <div class="video-native-box"><div class="video-embed-container" id="embed-kids"><div class="video-placeholder-luxury"><span>▶ Video: Tu primer negocio (Para niños)</span></div></div></div>
-          <div class="kids-progress" id="kidsProgress">0 de 6 retos completados</div>
+          <div class="video-native-box">
+            <div class="video-embed-container" id="embed-kids">
+              <div class="video-placeholder-luxury" style="background: #0F171E; border: 1px solid rgba(253, 140, 69, 0.2);">
+                <span style="color: var(--brand-orange);">▶ Video Intro: El chip del futuro empresario (2 min)</span>
+              </div>
+            </div>
+          </div>
+          <div class="kids-progress" id="kidsProgress">0 de 5 clases completadas</div>
+          <div class="course-list-minimal" style="margin-top: 12px; margin-bottom: 16px;">
+            <div class="course-item unlocked active"><div class="course-num">1</div><div class="course-info-text"><b>Tu primer negocio en casa</b> · 5 min</div></div>
+            <div class="course-item unlocked"><div class="course-num">2</div><div class="course-info-text"><b>El juego del presupuesto infantil</b> · 6 min</div></div>
+            <div class="course-item unlocked"><div class="course-num">3</div><div class="course-info-text"><b>¿De dónde sale el dinero del banco?</b> · 5 min</div></div>
+            <div class="course-item unlocked"><div class="course-num">4</div><div class="course-info-text"><b>Cómo ponerle precio a tus ideas</b> · 7 min</div></div>
+            <div class="course-item unlocked"><div class="course-num">5</div><div class="course-info-text"><b>Socios de juego: Trabajo en equipo</b> · 6 min</div></div>
+          </div>
+          <p class="micro-sub" style="font-size: 13px; font-weight: 600; margin-bottom: 8px;">Retos prácticos para hacer en familia:</p>
           <div id="kidsTasks"></div>
         </div>
       </div>
