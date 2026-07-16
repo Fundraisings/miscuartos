@@ -1,18 +1,14 @@
 :root {
-  /* Paleta Oficial extraída del Logo */
   --bg: #F5F7F5;
   --card: #FFFFFF;
   --ink: #111814;
   --muted: #56665D;
   --line: rgba(17, 24, 20, 0.06);
-  
-  --accent: #1D5E49;        /* Verde profundo del logo */
+  --accent: #1D5E49;
   --accent-soft: rgba(40, 127, 97, 0.06);
-  --accent-solid: #287F61;   /* El tono de verde principal */
-  
-  --brand-orange: #FD8C45;   /* El naranja exacto de la aguja de la brújula */
+  --accent-solid: #287F61;
+  --brand-orange: #FD8C45;
   --brand-orange-soft: rgba(253, 140, 69, 0.08);
-  
   --radius-lg: 20px;
   --radius-md: 14px;
   --radius-sm: 10px;
@@ -62,28 +58,16 @@ body {
   .app-header { background: rgba(9, 15, 12, 0.85); }
 }
 
-/* Tipografía de Marca */
 .wordmark {
   font-family: 'Fraunces', serif; font-weight: 700; font-size: 19px;
   display: flex; align-items: center; gap: 8px;
   color: var(--accent-solid);
 }
 
-.brand-compass-icon {
-  width: 24px;
-  height: 24px;
-  color: var(--ink);
-}
+.brand-compass-icon { width: 24px; height: 24px; color: var(--ink); }
+.app-content { padding: 84px 18px 110px; flex-grow: 1; }
 
-.app-content {
-  padding: 84px 18px 110px;
-  flex-grow: 1;
-}
-
-.tab-pane {
-  display: none;
-  animation: fadeIn 0.3s ease;
-}
+.tab-pane { display: none; animation: fadeIn 0.3s ease; }
 .tab-pane.active { display: flex; flex-direction: column; gap: 20px; }
 
 @keyframes fadeIn {
@@ -91,17 +75,10 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Tarjeta de Bienvenida con Borde Naranja de Acento */
 .welcome-badge {
-  display: inline-block;
-  background: var(--brand-orange-soft);
-  color: var(--brand-orange);
-  font-size: 11.5px;
-  font-weight: 700;
-  padding: 6px 12px;
-  border-radius: 999px;
-  margin-bottom: 12px;
-  border: 1px solid rgba(253, 140, 69, 0.15);
+  display: inline-block; background: var(--brand-orange-soft); color: var(--brand-orange);
+  font-size: 11.5px; font-weight: 700; padding: 6px 12px; border-radius: 999px;
+  margin-bottom: 12px; border: 1px solid rgba(253, 140, 69, 0.15);
 }
 
 .intro-block h1 { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 600; margin-bottom: 6px; letter-spacing: -0.02em; }
@@ -109,45 +86,18 @@ body {
 .intro-block .sub strong { color: var(--ink); font-weight: 600; }
 
 .income-card, .extra-card, .leak-card, .afp-card, .course-card, .kids-card, .cat-card {
-  background: var(--card); border: 1px solid var(--line);
-  border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow);
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow);
 }
 
-.premium-badge-title {
-  font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: var(--brand-orange); margin-bottom: 12px;
-}
-.premium-badge-title.setup-upsell { color: var(--brand-orange); }
+.premium-badge-title { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: var(--brand-orange); margin-bottom: 12px; }
 
-/* Caja de Propósito/Causa Social de Lujo (Naranja Suave) */
-.cause-box {
-  background: var(--brand-orange-soft);
-  border-radius: var(--radius-md);
-  padding: 16px;
-  margin-bottom: 18px;
-  border: 1px solid rgba(253, 140, 69, 0.1);
-}
-.cause-box p {
-  font-size: 12.5px;
-  color: var(--muted);
-  line-height: 1.45;
-}
-.cause-box strong {
-  color: var(--ink);
-}
-.cause-divider {
-  height: 1px;
-  background: rgba(253, 140, 69, 0.15);
-  margin: 12px 0;
-}
+.cause-box { background: var(--brand-orange-soft); border-radius: var(--radius-md); padding: 16px; margin-bottom: 18px; border: 1px solid rgba(253, 140, 69, 0.1); }
+.cause-box p { font-size: 12.5px; color: var(--muted); line-height: 1.45; }
+.cause-box strong { color: var(--ink); }
+.cause-divider { height: 1px; background: rgba(253, 140, 69, 0.15); margin: 12px 0; }
 
-.income-input-row, .extra-row, .afp-sim-row, .cat-bottom {
-  display: flex; align-items: center; gap: 8px; background: var(--bg);
-  padding: 12px 16px; border-radius: var(--radius-md); margin: 10px 0;
-}
-#income, .amt-input, #afpSalario, #extraIncome {
-  font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 600;
-  border: none; background: transparent; color: var(--ink); width: 100%; outline: none;
-}
+.income-input-row, .extra-row, .afp-sim-row, .cat-bottom { display: flex; align-items: center; gap: 8px; background: var(--bg); padding: 12px 16px; border-radius: var(--radius-md); margin: 10px 0; }
+#income, .amt-input, #afpSalario, #extraIncome { font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 600; border: none; background: transparent; color: var(--ink); width: 100%; outline: none; }
 .currency, .amt-currency { font-family: 'IBM Plex Mono', monospace; font-size: 22px; color: var(--muted); }
 
 .type-toggle { display: flex; background: var(--bg); padding: 4px; border-radius: 999px; margin-bottom: 12px; }
@@ -215,12 +165,10 @@ body {
   background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
   border-top: 1px solid var(--line); display: flex; padding: 8px 10px 24px; z-index: 100;
 }
-@media (prefers-color-scheme: dark) {
-  .bottom-nav { background: rgba(17, 26, 21, 0.85); }
-}
+@media (prefers-color-scheme: dark) { .bottom-nav { background: rgba(17, 26, 21, 0.85); } }
 .nav-item { flex: 1; background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--muted); cursor: pointer; }
 .nav-item.active { color: var(--accent-solid); }
-.nav-item[data-tab="reto"].active { color: var(--brand-orange); } /* El Reto Navidad brilla en Naranja */
+.nav-item[data-tab="reto"].active { color: var(--brand-orange); }
 .nav-icon { font-size: 20px; }
 .nav-label { font-size: 11px; font-weight: 600; }
 
