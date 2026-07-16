@@ -10,7 +10,38 @@
 </head>
 <body>
 
-<div class="app-container">
+<!-- PANTALLA DE INTRODUCCIÓN ESPECTACULAR (SPLASH SCREEN) -->
+<div id="app-splash" class="splash-screen">
+  <div class="splash-content">
+    <!-- Brújula giratoria idéntica al logo -->
+    <div class="splash-compass-wrap">
+      <svg class="splash-compass" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="45" stroke="currentColor" stroke-width="6" fill="none"/>
+        <line x1="50" y1="5" x2="50" y2="15" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+        <line x1="50" y1="85" x2="50" y2="95" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+        <line x1="5" y1="50" x2="15" y2="50" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+        <line x1="85" y1="50" x2="95" y2="50" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+        <polygon points="50,15 42,50 50,50" fill="#FD8C45"/>
+        <polygon points="50,15 58,50 50,50" fill="#FD8C45" opacity="0.9"/>
+        <polygon points="50,85 42,50 50,50" fill="currentColor"/>
+        <polygon points="50,85 58,50 50,50" fill="currentColor" opacity="0.95"/>
+      </svg>
+    </div>
+    
+    <div class="splash-brand">miscuartos</div>
+    <div class="splash-tagline">Tu coach financiero de bolsillo</div>
+    <div class="splash-desc">Una app diseñada para guiarte y ayudarte a manejar de forma inteligente tu dinero.</div>
+    
+    <div class="splash-cultural-note">
+      * <strong>miscuartos:</strong> Expresión dominicana con la que nos referimos a nuestro dinero ganao' con esfuerzo ("dame mis cuartos", "trabajando duro por mis cuartos").
+    </div>
+
+    <button class="splash-btn" id="enterAppBtn">Comenzar a guiarme →</button>
+  </div>
+</div>
+
+<!-- CONTENEDOR PRINCIPAL DE LA APP -->
+<div class="app-container" id="mainAppContainer" style="display: none;">
   
   <header class="app-header">
     <div class="wordmark">
@@ -174,7 +205,6 @@
         <div class="leak-result" id="leakResult"><div class="amount" id="leakAmount">$0</div><div class="msg" id="leakMsg"></div></div>
       </div>
 
-      <!-- MÓDULO UPSELL DE NIÑOS CON OFERTA CRUZADA -->
       <div class="kids-card">
         <div class="upsell-pricing-tag">OFERTA ADICIONAL · SOLO $5 <span class="old-price">Precio regular $7</span></div>
         <div class="premium-badge-title setup-upsell">🚀 NEGOCIOS PARA NIÑOS</div>
