@@ -1,78 +1,347 @@
-/* Reemplaza o añade estos bloques en tu style.css para ver el cambio inmediato */
-
 :root {
-  --bg: #F5F7F4; /* Un off-white más limpio y sofisticado */
+  /* Paleta High-End */
+  --bg: #F4F7F5;
   --card: #FFFFFF;
-  --ink: #0F1914; /* Un verde-negro profundo, mucho más elegante que el negro puro */
-  --muted: #627269;
-  --line: rgba(22, 35, 28, 0.06); /* Líneas sutiles basadas en transparencias */
-  --accent: #1B664D; /* Verde esmeralda premium */
-  --accent-soft: rgba(27, 102, 77, 0.06);
-  --amber: #DF9327; /* Oro viejo / Ámbar refinado */
-  --amber-soft: rgba(223, 147, 39, 0.08);
-  --radius: 20px; /* Bordes un poco más curvos y modernos */
+  --ink: #0A110D;
+  --muted: #53645A;
+  --line: rgba(10, 17, 13, 0.05);
+  --accent: #16523D;
+  --accent-soft: rgba(22, 82, 61, 0.04);
+  --accent-solid: #1E6F53;
+  --amber: #CD7F19;
+  --amber-soft: rgba(205, 127, 25, 0.06);
+  --radius-lg: 24px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
   
-  /* Sombras de lujo: difusas, suaves y casi imperceptibles */
-  --shadow-sm: 0 2px 8px rgba(15, 25, 20, 0.02);
-  --shadow-md: 0 12px 24px -4px rgba(15, 25, 20, 0.04);
+  /* Sombras de nivel superior */
+  --shadow-premium: 0 4px 20px -2px rgba(10, 17, 13, 0.02), 0 20px 40px -10px rgba(10, 17, 13, 0.05);
+  --shadow-inset: inset 0 2px 4px rgba(10, 17, 13, 0.01);
+  --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Aplicando el suavizado y transiciones premium globales */
+/* Modo Oscuro Automático/Manual Premium */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #090F0C;
+    --card: #111A15;
+    --ink: #ECF2EE;
+    --muted: #829489;
+    --line: rgba(236, 242, 238, 0.06);
+    --accent: #34A87F;
+    --accent-soft: rgba(52, 168, 127, 0.06);
+    --accent-solid: #41BF93;
+    --amber: #F0A53A;
+    --amber-soft: rgba(240, 165, 58, 0.08);
+    --shadow-premium: 0 4px 30px rgba(0, 0, 0, 0.2);
+  }
+}
+
+* {
+  box-sizing: border-box;
+  selection-background-color: var(--accent-soft);
+}
+
 body {
-  background: var(--bg);
+  margin: 0;
+  background-color: var(--bg);
   color: var(--ink);
-  transition: background-color 0.3s ease;
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  padding: 40px 20px 100px;
+  transition: var(--transition);
 }
 
-/* Tarjetas elevadas con micro-borde */
-.income-card, .cat-card, .leak-card, .afp-card, .course-card, .xmas-card {
+/* Layout responsivo elegante (Evita que se vea estirado) */
+.wrap {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+}
+
+@media (min-width: 768px) {
+  .wrap {
+    grid-template-columns: 1.1fr 0.9fr;
+    align-items: start;
+  }
+  .header-area {
+    grid-column: 1 / -1;
+  }
+}
+
+.header-area {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.wordmark {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin-bottom: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wordmark .dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+h1 {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 42px;
+  line-height: 1.1;
+  margin: 0 0 12px;
+  letter-spacing: -0.02em;
+}
+
+.sub {
+  color: var(--muted);
+  font-size: 16px;
+  max-width: 540px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Tarjetas Estilo Fintech de Lujo */
+.income-card, .extra-card, .leak-card, .afp-card, .course-card, .xmas-card, .kids-card, .cat-card {
   background: var(--card);
   border: 1px solid var(--line);
-  box-shadow: var(--shadow-sm);
-  border-radius: var(--radius);
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+  box-shadow: var(--shadow-premium);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  margin-bottom: 0; /* Controlado por el gap del grid */
+  transition: var(--transition);
 }
 
-/* Efecto Hover/Focus de lujo al interactuar con las tarjetas */
-.income-card:focus-within, .cat-card:hover {
+.income-card:focus-within, .extra-card:focus-within, .cat-card:hover {
+  border-color: var(--accent);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-  border-color: rgba(27, 102, 77, 0.2);
 }
 
-/* Chips interactivos con rebote elástico */
+/* Inputs Premium (Gigantes y limpios) */
+.income-input-row, .extra-row, .afp-sim-row, .cat-bottom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg);
+  padding: 12px 20px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-inset);
+  border: 1px solid transparent;
+  transition: var(--transition);
+}
+
+.income-card:focus-within .income-input-row {
+  border-color: var(--line);
+  background: var(--card);
+}
+
+#income {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 40px;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  width: 100%;
+  color: var(--ink);
+  outline: none;
+}
+
+.currency, .amt-currency {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 32px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.amt-input {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 20px;
+  font-weight: 600;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  width: 100%;
+  outline: none;
+}
+
+/* Selectores de Tipo de Ingreso Estilo Apple */
+.type-toggle {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+  background: var(--bg);
+  padding: 4px;
+  border-radius: 999px;
+  box-shadow: var(--shadow-inset);
+}
+
+.type-btn {
+  flex: 1;
+  text-align: center;
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  transition: var(--transition);
+  user-select: none;
+}
+
+.type-btn.active {
+  background: var(--card);
+  color: var(--accent);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+/* Chips de Categorías Minimalistas */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
 .chip {
+  padding: 12px 20px;
+  border-radius: 999px;
   border: 1px solid var(--line);
   background: var(--card);
-  box-shadow: var(--shadow-sm);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  font-size: 14.5px;
+  font-weight: 500;
+  box-shadow: var(--shadow-premium);
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.chip:active {
-  transform: scale(0.95);
+.chip:hover {
+  transform: translateY(-1px);
 }
 
 .chip.active {
-  background: var(--accent);
-  color: #ffffff;
-  border-color: var(--accent);
-}
-.chip.active .dot {
-  background: #ffffff;
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--card);
 }
 
-/* Modales con desenfoque de fondo cinematográfico */
+.chip .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--line);
+}
+.chip.active .dot { background: var(--accent-solid); }
+
+/* Barras de Progreso Fluidas */
+.bar {
+  background: var(--line);
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  box-shadow: var(--shadow-inset);
+}
+
+/* Reproductores de Video e Items Colapsables Premium */
+.video-card, .afp-video-btn {
+  background: var(--ink);
+  border-radius: var(--radius-md);
+  padding: 18px 22px;
+  transition: var(--transition);
+}
+.video-card:hover, .afp-video-btn:hover {
+  transform: scale(1.01);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+}
+
+.leak-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.leak-chevron {
+  font-size: 16px;
+  transition: var(--transition);
+}
+
+/* Casillas de Verificación Estilo iOS */
+.leak-checkbox, .kids-task-check, .xmas-week-check {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--line);
+  transition: var(--transition);
+  display: flex; align-items: center; justify-content: center;
+}
+
+.leak-checkbox.checked, .kids-task-check.checked, .xmas-week-check.checked {
+  background-color: var(--accent-solid);
+  border-color: var(--accent-solid);
+}
+
+/* Modales Premium con Difuminado Cinematográfico */
 .modal-overlay {
-  background: rgba(15, 25, 20, 0.4);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  transition: opacity 0.3s ease;
+  background: rgba(10, 17, 13, 0.3);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .modal-sheet {
   background: var(--card);
-  border-radius: 24px 24px 0 0;
-  box-shadow: 0 -10px 40px rgba(0,0,0,0.05);
-  transform: translateY(0);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  padding: 40px 32px;
+  box-shadow: 0 -20px 50px rgba(0,0,0,0.08);
+}
+
+/* Botón de Acción Principal Fijo Inferior */
+.summary-btn {
+  background: var(--accent-solid);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  padding: 18px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 24px rgba(30, 111, 83, 0.2);
+  transition: var(--transition);
+}
+
+.summary-btn:hover {
+  background: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(30, 111, 83, 0.3);
+}
+
+/* Reto Navideño en Grid Elegante */
+#xmasWeeks {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.xmas-week {
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  border: 1px solid transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: var(--transition);
+}
+
+.xmas-week:hover {
+  border-color: var(--line);
+  background: var(--card);
 }
