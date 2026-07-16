@@ -1,75 +1,86 @@
 const categories = {
-  vivienda:   { label: 'Vivienda',              color: '#1F7A5C', wFijo: 0.25, wVariable: 0.23, maxRec: 0.35,
-                tip: 'Incluye alquiler o cuota, más servicios (luz, agua, internet). Se sugiere no pasar del 35% de tu ingreso aquí. Si pagas mantenimiento o servicios con tarjeta, hazlo justo después de la fecha de corte para ganar días de financiamiento gratis — pero paga el total, no el mínimo.' },
-  comida:     { label: 'Comida',                color: '#3E9C77', wFijo: 0.13, wVariable: 0.13,
-                tip: 'Separa mentalmente "mercado de la semana" de "comer fuera" aunque los sumes en una sola cifra aquí. Muchos supermercados tienen días fijos de descuento en carnes y vegetales, y algunas tarjetas devuelven cashback ahí — vale la pena ubicar cuáles aplican donde compras.' },
-  transporte: { label: 'Transporte',            color: '#6BBE9A', wFijo: 0.08, wVariable: 0.08,
-                tip: 'Súmale mantenimiento e imprevistos del carro o moto, no solo el combustible — es lo que más se subestima en este apartado.' },
-  colegio:    { label: 'Colegio / Niños',       color: '#2D8ACE', wFijo: 0.09, wVariable: 0.09,
-                tip: 'Colegio, uniformes y útiles no caen parejo todo el año. Reserva un poco cada mes para agosto/septiembre en vez de sentirlo todo de golpe.' },
-  salud:      { label: 'Salud',                 color: '#3AA0A0', wFijo: 0.04, wVariable: 0.05,
-                tip: 'Medicamentos recurrentes y consultas van aquí. Si aún no tienes seguro médico, este suele ser el primer apartado que conviene hacer crecer apenas puedas.' },
-  seguros:    { label: 'Seguros',               color: '#4C6B8A', wFijo: 0.05, wVariable: 0.04,
-                tip: 'Seguro médico, de auto, de hogar o de vida si tienes alguno — no solo el médico. Es de los gastos que más se olvidan hasta que realmente se necesitan.' },
-  mascotas:   { label: 'Mascotas',              color: '#C2447A', wFijo: 0.05, wVariable: 0.04,
-                tip: 'Comida, veterinario, vacunas y antipulgas van aquí. Si tienes mascota, este gasto existe siempre aunque no esté presupuestado — mejor darle su espacio real que sacarlo de otra categoría a la fuerza.' },
-  deudas:     { label: 'Deudas',                color: '#8B5CF6', wFijo: 0.10, wVariable: 0.09, maxRec: 0.20,
-                tip: 'Paga primero la deuda con la tasa de interés más alta (casi siempre la tarjeta de crédito), aunque el monto total sea el más pequeño. Si esta categoría supera el 20% de tu ingreso, empieza a preocuparte por el interés que estás pagando, no solo por el monto.' },
-  ahorro:     { label: 'Ahorro',                color: '#B4432A', wFijo: 0.13, wVariable: 0.19,
-                tip: 'Trátalo como una factura fija, no como lo que sobra al final. Si no tienes fondo de emergencia, prioriza acumular aquí el equivalente a 3 meses de tus gastos básicos antes que cualquier otra meta — y si recibes regalía en diciembre, aparta una parte antes de que desaparezca.' },
-  familia:    { label: 'Apoyo a familia / Remesas', color: '#E8A33D', wFijo: 0.04, wVariable: 0.03,
-                tip: 'Si envías o recibes dinero de familiares con regularidad, dale su propia categoría — así no se mezcla con tu gasto personal y puedes verlo claro.' },
-  diversion:  { label: 'Diversión',             color: '#66766D', wFijo: 0.04, wVariable: 0.03,
-                tip: 'Un presupuesto sin espacio para disfrutar rara vez se cumple. Ponle un número chico pero real, no lo dejes en cero.' },
+  vivienda:   { label: 'Vivienda', color: '#1F7A5C', wFijo: 0.25, wVariable: 0.23, maxRec: 0.35, tip: 'Alquiler, luz, agua, internet. Intenta no pasar del 35%.' },
+  comida:     { label: 'Comida', color: '#3E9C77', wFijo: 0.13, wVariable: 0.13, tip: 'Supermercado y compras fijas de alimentos.' },
+  transporte: { label: 'Transporte', color: '#6BBE9A', wFijo: 0.08, wVariable: 0.08, tip: 'Combustible, concho y mantenimiento básico.' },
+  colegio:    { label: 'Niños / Escuela', color: '#2D8ACE', wFijo: 0.09, wVariable: 0.09, tip: 'Mensualidades escolares y cuidado.' },
+  salud:      { label: 'Salud', color: '#3AA0A0', wFijo: 0.04, wVariable: 0.05, tip: 'Medicamentos y consultas médicas fijas.' },
+  seguros:    { label: 'Seguros', color: '#4C6B8A', wFijo: 0.05, wVariable: 0.04, tip: 'Cualquier póliza médica o de vehículo.' },
+  mascotas:   { label: 'Mascotas', color: '#C2447A', wFijo: 0.05, wVariable: 0.04, tip: 'Comida y cuidados veterinarios.' },
+  deudas:     { label: 'Deudas', color: '#8B5CF6', wFijo: 0.10, wVariable: 0.09, maxRec: 0.20, tip: 'Tarjetas o préstamos. Ataca la de mayor interés.' },
+  ahorro:     { label: 'Ahorro', color: '#B4432A', wFijo: 0.13, wVariable: 0.19, tip: 'Tu colchón de tranquilidad. Míralo como factura obligatoria.' },
+  familia:    { label: 'Remesas / Apoyo', color: '#E8A33D', wFijo: 0.04, wVariable: 0.03, tip: 'Dinero fijo enviado a padres o familiares.' },
+  diversion:  { label: 'Diversión', color: '#66766D', wFijo: 0.04, wVariable: 0.03, tip: 'Salidas y gustos. Pequeño pero necesario para no rendirte.' }
 };
 
 let selected = new Set();
 let locked = {};
 let incomeType = 'fijo';
 
-// 👇 Configura aquí tus URLs reales de Embed cuando estén listas
-const VIDEO_EMBED_URL = '';
-const VIDEO_EMBED_URL_2 = '';
-const VIDEO_EMBED_URL_3 = '';
-const VIDEO_EMBED_URL_COURSE_1 = '';
-
-const kidsTasks = [
-  { id: 'frasco',  text: 'Ahorra 3 monedas de tu domingo/mesada en un frasco transparente y cuéntalas cada semana.' },
-  { id: 'vender',  text: 'Vende algo tuyo que ya no uses (a un familiar o vecino) y anota cuánto ganaste.' },
-  { id: 'tarea',   text: 'Haz una tarea extra en casa a cambio de una "paga" — y decide tú en qué gastarla.' },
-  { id: 'invento', text: 'Inventa algo simple para vender un día (limonada, pulseras, lavar carros).' },
-  { id: 'mitad',   text: 'Cuando recibas dinero de regalo, guarda la mitad antes de gastar el resto.' },
-  { id: 'cuenta',  text: 'Cuéntale a un adulto qué harías si tuvieras tu propio negocio.' },
-];
-let kidsChecked = {};
-let kidsUnlocked = false;
+// 🔴 COLOCA AQUÍ TUS LINKS DE EMBED DE YOUTUBE O VIMEO
+const VIDEO_LINKS = {
+  tutorial: '', // Ejemplo: 'https://www.youtube.com/embed/TU_ID'
+  afp: '',
+  curso1: '',
+  kids: ''
+};
 
 const leaks = [
-  { id: 'lista',    text: 'Voy al súper sin lista y termino comprando cosas que no pensaba llevar.', amount: 30 },
-  { id: 'comida',   text: 'Casi siempre como fuera en vez de llevar comida de casa al trabajo.', amount: 40 },
-  { id: 'recargas', text: 'Compro recargas sueltas de datos/minutos en vez de un paquete.', amount: 12 },
-  { id: 'subs',     text: 'Tengo suscripciones (streaming, apps) que ya casi no uso pero sigo pagando.', amount: 10 },
-  { id: 'compara',  text: 'Compro cosas grandes sin comparar precio en más de un lugar.', amount: 18 },
+  { id: 'lista', text: 'Ir al súper sin lista escrita', amount: 30 },
+  { id: 'comida', text: 'Comer fuera en horario laboral frecuentemente', amount: 40 },
+  { id: 'recargas', text: 'Comprar recargas sueltas en vez de paquitos', amount: 12 },
+  { id: 'subs', text: 'Suscripciones streaming que no usas', amount: 10 }
 ];
 let leakChecked = {};
 
-function weightOf(key){
-  return incomeType === 'variable' ? categories[key].wVariable : categories[key].wFijo;
+const kidsTasks = [
+  { id: 'frasco', text: 'Ahorrar 3 monedas de la mesada en un pote claro.' },
+  { id: 'vender', text: 'Vender un juguete o ropa que ya no use.' },
+  { id: 'tarea', text: 'Hacer un mandado o labor extra por un incentivo.' }
+];
+let kidsChecked = {};
+
+// SISTEMA DE NAVEGACIÓN ENTRE PÁGINAS (TABS)
+document.querySelectorAll('.nav-item').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+    
+    btn.classList.add('active');
+    const tabName = btn.dataset.tab;
+    document.getElementById(`pane-${tabName}`).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    // Activar los reproductores cuando la pestaña se abra
+    lazyLoadVideos();
+  });
+});
+
+function lazyLoadVideos() {
+  if (document.getElementById('pane-presupuesto').classList.contains('active') && VIDEO_LINKS.tutorial) {
+    document.getElementById('embed-tutorial').innerHTML = `<iframe src="${VIDEO_LINKS.tutorial}" allowfullscreen></iframe>`;
+  }
+  if (document.getElementById('pane-academia').classList.contains('active')) {
+    if (VIDEO_LINKS.afp) document.getElementById('embed-afp').innerHTML = `<iframe src="${VIDEO_LINKS.afp}" allowfullscreen></iframe>`;
+    if (VIDEO_LINKS.curso1) document.getElementById('embed-curso').innerHTML = `<iframe src="${VIDEO_LINKS.curso1}" allowfullscreen></iframe>`;
+    if (VIDEO_LINKS.kids && document.getElementById('kidsFull').classList.contains('show')) {
+      document.getElementById('embed-kids').innerHTML = `<iframe src="${VIDEO_LINKS.kids}" allowfullscreen></iframe>`;
+    }
+  }
 }
 
+// LÓGICA DE PRESUPUESTO
 const chipsEl = document.getElementById('chips');
 const resultsEl = document.getElementById('results');
 const incomeEl = document.getElementById('income');
 const countTag = document.getElementById('countTag');
 
-function buildChips(){
-  Object.entries(categories).forEach(([key, cat])=>{
+function buildChips() {
+  Object.entries(categories).forEach(([key, cat]) => {
     const chip = document.createElement('div');
     chip.className = 'chip';
-    chip.dataset.key = key;
     chip.innerHTML = `<span class="dot"></span>${cat.label}`;
-    chip.addEventListener('click', ()=>{
-      if(selected.has(key)){
+    chip.addEventListener('click', () => {
+      if (selected.has(key)) {
         selected.delete(key);
         delete locked[key];
       } else {
@@ -82,409 +93,199 @@ function buildChips(){
   });
 }
 
-function buildLeaks(){
-  const container = document.getElementById('leakItems');
-  leaks.forEach(leak=>{
-    const item = document.createElement('div');
-    item.className = 'leak-item';
-    item.innerHTML = `<span class="leak-checkbox" id="leakbox-${leak.id}"></span><span class="leak-text">${leak.text}</span>`;
-    item.addEventListener('click', ()=>{
-      leakChecked[leak.id] = !leakChecked[leak.id];
-      document.getElementById(`leakbox-${leak.id}`).classList.toggle('checked', leakChecked[leak.id]);
-      document.getElementById(`leakbox-${leak.id}`).textContent = leakChecked[leak.id] ? '✓' : '';
-      renderLeakResult();
-    });
-    container.appendChild(item);
-  });
-}
-
-function renderLeakResult(){
-  const total = leaks.reduce((sum, l)=> sum + (leakChecked[l.id] ? l.amount : 0), 0);
-  const resultEl = document.getElementById('leakResult');
-  if(total > 0){
-    document.getElementById('leakAmount').textContent = `~$${total}/mes`;
-    const income = getIncome();
-    const newTotal = income + total;
-    document.getElementById('leakMsg').textContent = income > 0
-      ? `Si ajustas esos hábitos, tu ingreso disponible este mes podría subir de $${fmt(income)} a $${fmt(newTotal)}.`
-      : `Ese es dinero que hoy se te va sin darte cuenta — ajustarlo no cuesta nada, solo el hábito.`;
-    resultEl.classList.add('show');
-  } else {
-    resultEl.classList.remove('show');
-  }
-}
-
-function getIncome(){
+function getIncome() {
   const v = parseFloat(incomeEl.value);
   return isNaN(v) || v < 0 ? 0 : v;
 }
 
-function computeAmounts(){
+function computeAmounts() {
   const income = getIncome();
   const amounts = {};
   let lockedSum = 0;
   let unlockedWeightSum = 0;
 
-  selected.forEach(key=>{
-    if(locked[key] != null){
-      lockedSum += locked[key];
-    } else {
-      unlockedWeightSum += weightOf(key);
-    }
+  selected.forEach(key => {
+    if (locked[key] != null) lockedSum += locked[key];
+    else unlockedWeightSum += (incomeType === 'variable' ? categories[key].wVariable : categories[key].wFijo);
   });
 
   let remaining = income - lockedSum;
-  if(remaining < 0) remaining = 0;
+  if (remaining < 0) remaining = 0;
 
-  selected.forEach(key=>{
-    if(locked[key] != null){
-      amounts[key] = locked[key];
-    } else {
-      const w = unlockedWeightSum > 0 ? weightOf(key) / unlockedWeightSum : 0;
+  selected.forEach(key => {
+    if (locked[key] != null) amounts[key] = locked[key];
+    else {
+      const w = unlockedWeightSum > 0 ? (incomeType === 'variable' ? categories[key].wVariable : categories[key].wFijo) / unlockedWeightSum : 0;
       amounts[key] = remaining * w;
     }
   });
-
-  return { amounts, income, lockedSum };
+  return { amounts, income };
 }
 
-function fmt(n){
-  return n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-}
+function fmt(n) { return n.toLocaleString('en-US', { maximumFractionDigits: 0 }); }
 
-function render(){
-  countTag.textContent = `${selected.size} seleccionado${selected.size===1?'':'s'}`;
-
-  if(selected.size === 0){
-    resultsEl.innerHTML = `<div class="empty">Marca al menos una categoría arriba para ver la sugerencia de presupuesto.</div>`;
+function render() {
+  countTag.textContent = `${selected.size} seleccionado${selected.size === 1 ? '' : 's'}`;
+  if (selected.size === 0) {
+    resultsEl.innerHTML = `<div class="empty" style="text-align:center; font-size:13px; color:var(--muted); padding:20px; border:1px dashed var(--line); border-radius:12px;">Marca qué pagarás este mes para armar la sugerencia.</div>`;
     return;
   }
 
   const { amounts, income } = computeAmounts();
-  const total = Object.values(amounts).reduce((a,b)=>a+b, 0);
+  const total = Object.values(amounts).reduce((a, b) => a + b, 0);
 
-  let barHtml = `<div class="bar-wrap"><div class="bar">`;
-  selected.forEach(key=>{
-    const pct = income > 0 ? (amounts[key] / income * 100) : 0;
-    barHtml += `<div class="bar-seg" style="width:${pct}%; background:${categories[key].color}"></div>`;
-  });
-  const overBudget = total > income + 0.5;
-  barHtml += `</div><div class="bar-caption"><span class="used ${overBudget?'over':''}">$${fmt(total)} asignados</span><span>de $${fmt(income)}</span></div></div>`;
+  let html = `<div class="bar"><div class="bar-seg" style="width:${income > 0 ? (total / income * 100) : 0}%; background:var(--accent-solid)"></div></div>`;
+  html += `<div class="bar-caption"><span>$${fmt(total)} asignados</span><span>de $${fmt(income)}</span></div>`;
 
-  let cardsHtml = '';
-  selected.forEach(key=>{
+  selected.forEach(key => {
     const cat = categories[key];
     const amt = amounts[key] || 0;
-    const pct = income > 0 ? (amt / income * 100) : 0;
     const isLocked = locked[key] != null;
-
-    let semaforoHtml = '';
-    let alertHtml = '';
-    if(cat.maxRec){
-      const ratio = income > 0 ? (amt / income) : 0;
-      let level = 'green';
-      if(ratio > cat.maxRec) level = 'red';
-      else if(ratio > cat.maxRec * 0.85) level = 'yellow';
-      semaforoHtml = `<span class="semaforo ${level}"></span>`;
-      if(level === 'red'){
-        const recPct = Math.round(cat.maxRec*100);
-        alertHtml = `<div class="alert-line show">${cat.label} supera el ${recPct}% sugerido de tu ingreso. No es el fin del mundo, pero vale la pena vigilar de cerca el resto del presupuesto este mes.</div>`;
-      }
-    }
-
-    cardsHtml += `
-      <div class="cat-card">
+    html += `
+      <div class="cat-card" style="margin-top:12px;">
         <div class="cat-top">
-          <div class="cat-name-row">
-            <span class="swatch" style="background:${cat.color}"></span>
-            <span class="cat-name">${cat.label}</span>
-            <button class="info-btn" data-tip="${key}">i</button>
-          </div>
-          <span class="pct">${pct.toFixed(0)}%${semaforoHtml}</span>
+          <span style="font-weight:600; font-size:14px;">${cat.label}</span>
+          <span class="pct" style="font-size:12px; color:var(--muted);">${cat.tip}</span>
         </div>
         <div class="cat-bottom">
           <span class="amt-currency">$</span>
-          <input class="amt-input" type="number" inputmode="decimal" data-key="${key}" value="${amt.toFixed(0)}">
-          ${isLocked ? `<button class="reset-btn" data-reset="${key}">Auto</button>` : ``}
+          <input class="amt-input" type="number" data-key="${key}" value="${amt.toFixed(0)}">
+          ${isLocked ? `<button class="reset-btn" data-reset="${key}">Auto</button>` : ''}
         </div>
-        ${alertHtml}
-        <div class="tip" id="tip-${key}">${cat.tip}</div>
-      </div>
-    `;
+      </div>`;
   });
 
-  resultsEl.innerHTML = barHtml + cardsHtml + `
-    <div class="cta-row">
-      <button class="summary-btn" id="summaryBtn">Ver mi resumen →</button>
-    </div>
-  `;
+  html += `<button class="summary-btn" id="summaryBtn">Ver mi resumen →</button>`;
+  resultsEl.innerHTML = html;
 
-  resultsEl.querySelectorAll('.amt-input').forEach(inp=>{
-    inp.addEventListener('input', (e)=>{
+  resultsEl.querySelectorAll('.amt-input').forEach(inp => {
+    inp.addEventListener('input', (e) => {
       const key = e.target.dataset.key;
       const val = parseFloat(e.target.value);
       locked[key] = isNaN(val) ? 0 : val;
       render();
-      const newInp = resultsEl.querySelector(`.amt-input[data-key="${key}"]`);
-      if(newInp){ newInp.focus(); newInp.setSelectionRange(newInp.value.length, newInp.value.length); }
     });
   });
 
-  resultsEl.querySelectorAll('[data-reset]').forEach(btn=>{
-    btn.addEventListener('click', (e)=>{
-      const key = e.target.dataset.reset;
-      delete locked[key];
+  resultsEl.querySelectorAll('[data-reset]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      delete locked[e.target.dataset.reset];
       render();
     });
   });
 
-  resultsEl.querySelectorAll('.info-btn').forEach(btn=>{
-    btn.addEventListener('click', (e)=>{
-      const key = e.target.dataset.tip;
-      document.getElementById(`tip-${key}`).classList.toggle('show');
-    });
-  });
-
-  const summaryBtn = document.getElementById('summaryBtn');
-  if(summaryBtn){ summaryBtn.addEventListener('click', openSummary); }
+  document.getElementById('summaryBtn').addEventListener('click', openSummary);
 }
 
-function openSummary(){
+function openSummary() {
   const { amounts, income } = computeAmounts();
-  const total = Object.values(amounts).reduce((a,b)=>a+b, 0);
-
+  const total = Object.values(amounts).reduce((a, b) => a + b, 0);
   document.getElementById('summaryTotal').textContent = `$${fmt(total)}`;
-  document.querySelector('.summary-total .lbl').textContent = `de $${fmt(income)} de ingreso`;
-
-  let rowsHtml = '';
-  let waText = `📋 Mi presupuesto de este mes:\n\n`;
-  selected.forEach(key=>{
-    const cat = categories[key];
-    const amt = amounts[key] || 0;
-    rowsHtml += `
-      <div class="summary-row">
-        <span class="r-name"><span class="swatch" style="background:${cat.color}"></span>${cat.label}</span>
-        <span class="r-amt">$${fmt(amt)}</span>
-      </div>
-    `;
-    waText += `${cat.label}: $${fmt(amt)}\n`;
+  let rows = '';
+  selected.forEach(key => {
+    rows += `<div class="summary-row"><span>${categories[key].label}</span><strong>$${fmt(amounts[key])}</strong></div>`;
   });
-  waText += `\nTotal: $${fmt(total)} de $${fmt(income)}\n\nLo armé en minutos con Miscuartos, mi coach financiero de bolsillo — arma el tuyo también 🐾`;
-
-  document.getElementById('summaryRows').innerHTML = rowsHtml;
-  document.getElementById('whatsappBtn').href = `https://wa.me/?text=${encodeURIComponent(waText)}`;
+  document.getElementById('summaryRows').innerHTML = rows;
   document.getElementById('modalOverlay').classList.add('show');
 }
 
-document.getElementById('closeModal').addEventListener('click', ()=>{
-  document.getElementById('modalOverlay').classList.remove('show');
-});
-document.getElementById('modalOverlay').addEventListener('click', (e)=>{
-  if(e.target.id === 'modalOverlay') e.target.classList.remove('show');
-});
+document.getElementById('closeModal').addEventListener('click', () => document.getElementById('modalOverlay').classList.remove('show'));
 
-document.getElementById('videoCard').addEventListener('click', ()=>{
-  if(VIDEO_EMBED_URL){
-    document.getElementById('videoFrameWrap').innerHTML = `<iframe src="${VIDEO_EMBED_URL}" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
-  }
-  document.getElementById('videoModalOverlay').classList.add('show');
-});
-document.getElementById('closeVideoModal').addEventListener('click', ()=>{
-  document.getElementById('videoModalOverlay').classList.remove('show');
-});
-document.getElementById('videoModalOverlay').addEventListener('click', (e)=>{
-  if(e.target.id === 'videoModalOverlay') e.target.classList.remove('show');
-});
-
-buildChips();
-buildLeaks();
-incomeEl.addEventListener('input', ()=>{ render(); renderLeakResult(); });
-
-document.getElementById('leakToggle').addEventListener('click', ()=>{
-  document.getElementById('leakBody').classList.toggle('open');
-  document.getElementById('leakChevron').classList.toggle('open');
-});
-
-document.getElementById('afpToggle').addEventListener('click', ()=>{
-  document.getElementById('afpBody').classList.toggle('open');
-  document.getElementById('afpChevron').classList.toggle('open');
-});
-
-document.getElementById('videoCard2').addEventListener('click', (e)=>{
-  e.stopPropagation();
-  if(VIDEO_EMBED_URL_2){
-    document.getElementById('videoFrameWrap2').innerHTML = `<iframe src="${VIDEO_EMBED_URL_2}" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
-  }
-  document.getElementById('videoModalOverlay2').classList.add('show');
-});
-document.getElementById('closeVideoModal2').addEventListener('click', ()=>{
-  document.getElementById('videoModalOverlay2').classList.remove('show');
-});
-document.getElementById('videoModalOverlay2').addEventListener('click', (e)=>{
-  if(e.target.id === 'videoModalOverlay2') e.target.classList.remove('show');
-});
-
-document.getElementById('afpSalario').addEventListener('input', (e)=>{
-  const salario = parseFloat(e.target.value);
-  const resultEl = document.getElementById('afpSimResult');
-  if(!salario || salario <= 0){
-    resultEl.classList.remove('show');
-    return;
-  }
-  const tuyo = salario * 0.0287;
-  const patronal = salario * 0.0710;
-  const anual = tuyo * 12;
-  resultEl.innerHTML = `De tu sueldo se descuentan <b>$${tuyo.toFixed(0)}</b> al mes para tu pensión (más <b>$${patronal.toFixed(0)}</b> que pone tu empleador, sin salir de tu bolsillo). Si guardas un monto parecido aparte, en un año tendrías <b>$${anual.toFixed(0)}</b> disponibles para una emergencia real — sin tocar tu pensión, solo complementándola.`;
-  resultEl.classList.add('show');
-});
-
-function buildKidsTasks(){
-  const container = document.getElementById('kidsTasks');
-  kidsTasks.forEach(t=>{
+// DINERO OCULTO LÓGICA
+function buildLeaks() {
+  const box = document.getElementById('leakItems');
+  leaks.forEach(l => {
     const item = document.createElement('div');
-    item.className = 'kids-task';
-    item.innerHTML = `<span class="kids-task-check" id="kidsbox-${t.id}"></span><span class="kids-task-text">${t.text}</span>`;
-    item.addEventListener('click', ()=>{
-      kidsChecked[t.id] = !kidsChecked[t.id];
-      const box = document.getElementById(`kidsbox-${t.id}`);
-      box.classList.toggle('checked', kidsChecked[t.id]);
-      box.textContent = kidsChecked[t.id] ? '✓' : '';
-      const done = Object.values(kidsChecked).filter(Boolean).length;
-      document.getElementById('kidsProgress').textContent = `${done} de ${kidsTasks.length} retos completados`;
+    item.className = 'leak-item';
+    item.innerHTML = `<span class="leak-checkbox" id="lbox-${l.id}"></span><span class="leak-text">${l.text} (~$${l.amount}/mes)</span>`;
+    item.addEventListener('click', () => {
+      leakChecked[l.id] = !leakChecked[l.id];
+      document.getElementById(`lbox-${l.id}`).classList.toggle('checked', leakChecked[l.id]);
+      document.getElementById(`lbox-${l.id}`).textContent = leakChecked[l.id] ? '✓' : '';
+      const totalLeak = leaks.reduce((s, curr) => s + (leakChecked[curr.id] ? curr.amount : 0), 0);
+      document.getElementById('leakAmount').textContent = `~$${totalLeak}/mes`;
+      document.getElementById('leakMsg').textContent = totalLeak > 0 ? 'Esos cuartos se te escapan en automático — controlarlo te da un respiro directo.' : '';
+      document.getElementById('leakResult').classList.toggle('show', totalLeak > 0);
     });
-    container.appendChild(item);
+    box.appendChild(item);
   });
 }
-document.getElementById('courseItem1').addEventListener('click', ()=>{
-  if(VIDEO_EMBED_URL_COURSE_1){
-    document.getElementById('videoFrameWrapCourse').innerHTML = `<iframe src="${VIDEO_EMBED_URL_COURSE_1}" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
-  }
-  document.getElementById('videoModalOverlayCourse').classList.add('show');
-});
-document.getElementById('closeVideoModalCourse').addEventListener('click', ()=>{
-  document.getElementById('videoModalOverlayCourse').classList.remove('show');
-});
-document.getElementById('videoModalOverlayCourse').addEventListener('click', (e)=>{
-  if(e.target.id === 'videoModalOverlayCourse') e.target.classList.remove('show');
-});
 
-document.querySelectorAll('.course-item.locked').forEach(item=>{
-  item.addEventListener('click', ()=>{
-    const title = item.querySelector('.course-item-title').textContent;
-    alert(`"${title}" se desbloquea con tu compra de Miscuartos ($9).`);
-  });
-});
-
-const xmasMonths = [
-  ['Agosto', 4], ['Septiembre', 4], ['Octubre', 5], ['Noviembre', 4], ['Diciembre', 5]
-];
+// RETO NAVIDEÑO LÓGICA
 let xmasLevel = 50;
 let xmasChecked = {};
-
-function xmasGoal(level){ return level * 253; }
-
-function buildXmasWeeks(){
+function buildXmas() {
   const container = document.getElementById('xmasWeeks');
   container.innerHTML = '';
-  let weekNum = 1;
-  xmasMonths.forEach(([monthName, count])=>{
-    const monthLabel = document.createElement('div');
-    monthLabel.className = 'xmas-month';
-    monthLabel.textContent = monthName;
-    container.appendChild(monthLabel);
-    for(let i=0; i<count; i++){
-      const w = weekNum;
-      const row = document.createElement('div');
-      row.className = 'xmas-week';
-      row.innerHTML = `<span class="xmas-week-check" id="xmasbox-${w}"></span><span class="xmas-week-label">Semana ${w}</span><span class="xmas-week-amt" id="xmasamt-${w}"></span>`;
-      row.addEventListener('click', ()=>{
-        xmasChecked[w] = !xmasChecked[w];
-        const box = document.getElementById(`xmasbox-${w}`);
-        box.classList.toggle('checked', xmasChecked[w]);
-        box.textContent = xmasChecked[w] ? '✓' : '';
-        renderXmasProgress();
-      });
-      container.appendChild(row);
-      weekNum++;
-    }
-  });
-  renderXmasAmounts();
-  renderXmasProgress();
-}
-
-function renderXmasAmounts(){
-  for(let w=1; w<=22; w++){
-    const el = document.getElementById(`xmasamt-${w}`);
-    if(el) el.textContent = `$${xmasLevel*w}`;
+  for (let w = 1; w <= 22; w++) {
+    const row = document.createElement('div');
+    row.className = 'xmas-week';
+    row.innerHTML = `<span class="xmas-week-label">Semana ${w}</span><span class="xmas-week-amt" id="xamt-${w}">$${w * xmasLevel}</span><span class="xmas-week-check" id="xbox-${w}"></span>`;
+    row.addEventListener('click', () => {
+      xmasChecked[w] = !xmasChecked[w];
+      document.getElementById(`xbox-${w}`).classList.toggle('checked', xmasChecked[w]);
+      document.getElementById(`xbox-${w}`).textContent = xmasChecked[w] ? '✓' : '';
+      let saved = 0; for (let i = 1; i <= 22; i++) if (xmasChecked[i]) saved += i * xmasLevel;
+      const totalGoal = xmasLevel * 253;
+      document.getElementById('xmasProgressNum').textContent = `$${fmt(saved)} de $${fmt(totalGoal)}`;
+    });
+    container.appendChild(row);
   }
 }
 
-function renderXmasProgress(){
-  let saved = 0;
-  for(let w=1; w<=22; w++){
-    if(xmasChecked[w]) saved += xmasLevel*w;
-  }
-  const goal = xmasGoal(xmasLevel);
-  document.getElementById('xmasProgressNum').textContent = `$${fmt(saved)} de $${fmt(goal)}`;
-  const weeksLeft = 22 - Object.values(xmasChecked).filter(Boolean).length;
-  document.getElementById('xmasProgressLbl').textContent = saved > 0
-    ? `Te faltan ${weeksLeft} semanas para completar tu meta`
-    : 'Marca las semanas que ya depositaste';
-}
-
-document.querySelectorAll('.xmas-level').forEach(el=>{
-  el.addEventListener('click', ()=>{
+document.querySelectorAll('.xmas-level').forEach(el => {
+  el.addEventListener('click', () => {
     xmasLevel = parseInt(el.dataset.level);
-    document.querySelectorAll('.xmas-level').forEach(l=>l.classList.toggle('active', l===el));
-    renderXmasAmounts();
-    renderXmasProgress();
+    document.querySelectorAll('.xmas-level').forEach(l => l.classList.toggle('active', l === el));
+    for (let w = 1; w <= 22; w++) document.getElementById(`xamt-${w}`).textContent = `$${w * xmasLevel}`;
+    let saved = 0; for (let i = 1; i <= 22; i++) if (xmasChecked[i]) saved += i * xmasLevel;
+    document.getElementById('xmasProgressNum').textContent = `$${fmt(saved)} de $${fmt(xmasLevel * 253)}`;
   });
 });
 
-buildXmasWeeks();
-buildKidsTasks();
+// SIMULADOR AFP
+document.getElementById('afpSalario').addEventListener('input', (e) => {
+  const salario = parseFloat(e.target.value);
+  const res = document.getElementById('afpSimResult');
+  if (!salario || salario <= 0) { res.classList.remove('show'); return; }
+  res.innerHTML = `Tu retención mensual de nómina es de <b>$${fmt(salario * 0.0287)}</b>. Tu empleador aporta obligatoriamente otros <b>$${fmt(salario * 0.0710)}</b> adicionales que van directos a tu patrimonio de vejez.`;
+  res.classList.add('show');
+});
 
-document.getElementById('kidsUnlockBtn').addEventListener('click', ()=>{
-  kidsUnlocked = true;
-  document.getElementById('kidsPreview').classList.add('hide');
+// INTERACCIONES UPSELL NIÑOS
+document.getElementById('kidsUnlockBtn').addEventListener('click', () => {
+  document.getElementById('kidsPreview').style.display = 'none';
   document.getElementById('kidsFull').classList.add('show');
+  const taskBox = document.getElementById('kidsTasks');
+  taskBox.innerHTML = '';
+  kidsTasks.forEach(t => {
+    const item = document.createElement('div'); item.className = 'kids-task';
+    item.innerHTML = `<span class="kids-task-check" id="kbox-${t.id}"></span><span class="kids-task-text">${t.text}</span>`;
+    item.addEventListener('click', () => {
+      kidsChecked[t.id] = !kidsChecked[t.id];
+      document.getElementById(`kbox-${t.id}`).classList.toggle('checked', kidsChecked[t.id]);
+      document.getElementById(`kbox-${t.id}`).textContent = kidsChecked[t.id] ? '✓' : '';
+      const done = Object.values(kidsChecked).filter(Boolean).length;
+      document.getElementById('kidsProgress').textContent = `${done} de 3 retos completados`;
+    });
+    taskBox.appendChild(item);
+  });
+  lazyLoadVideos();
 });
 
-document.getElementById('videoCard3').addEventListener('click', ()=>{
-  if(VIDEO_EMBED_URL_3){
-    document.getElementById('videoFrameWrap3').innerHTML = `<iframe src="${VIDEO_EMBED_URL_3}" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
-  }
-  document.getElementById('videoModalOverlay3').classList.add('show');
-});
-document.getElementById('closeVideoModal3').addEventListener('click', ()=>{
-  document.getElementById('videoModalOverlay3').classList.remove('show');
-});
-document.getElementById('videoModalOverlay3').addEventListener('click', (e)=>{
-  if(e.target.id === 'videoModalOverlay3') e.target.classList.remove('show');
-});
-
-document.querySelectorAll('.type-btn').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    incomeType = btn.dataset.type;
-    document.querySelectorAll('.type-btn').forEach(b=>b.classList.toggle('active', b===btn));
+// CONTROL DE TIPO DE INGRESO
+document.querySelectorAll('.type-btn').forEach(b => {
+  b.addEventListener('click', () => {
+    incomeType = b.dataset.type;
+    document.querySelectorAll('.type-btn').forEach(btn => btn.classList.toggle('active', btn === b));
     document.getElementById('variableBanner').classList.toggle('show', incomeType === 'variable');
     render();
   });
 });
 
-const extraEl = document.getElementById('extraIncome');
-const extraTipEl = document.getElementById('extraTip');
-extraEl.addEventListener('input', ()=>{
-  const v = parseFloat(extraEl.value);
-  if(!v || v <= 0){
-    extraTipEl.classList.remove('show');
-    return;
-  }
-  const deuda = Math.round(v * 0.5);
-  const gusto = Math.round(v * 0.3);
-  const proximo = Math.round(v * 0.2);
-  extraTipEl.textContent = `Con ese extra, una guía simple es: $${deuda} directo a deudas o ahorro, $${gusto} para un gusto, y $${proximo} guardado para adelantar el próximo mes. No lo mezcles con tu presupuesto normal de arriba — trátalo aparte.`;
-  extraTipEl.classList.add('show');
-});
-
-render();
+// INICIALIZADORES
+buildChips();
+buildLeaks();
+buildXmas();
+incomeEl.addEventListener('input', render);
+lazyLoadVideos();
