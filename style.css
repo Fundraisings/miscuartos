@@ -32,6 +32,58 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body { background-color: var(--bg); color: var(--ink); font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+
+/* ESTILOS SPLASH SCREEN (VISTA DE INTRO OSCURA) */
+.splash-screen {
+  position: fixed; inset: 0; background-color: #0A0F0C; color: #EDF3EF;
+  z-index: 9999; display: flex; align-items: center; justify-content: center;
+  padding: 24px; text-align: center; transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.splash-content {
+  max-width: 380px; display: flex; flex-direction: column; align-items: center;
+}
+.splash-compass-wrap {
+  width: 140px; height: 140px; margin-bottom: 24px; display: flex; align-items: center; justify-content: center;
+}
+.splash-compass {
+  width: 100%; height: 100%; color: #EDF3EF;
+  animation: compassRotate 4.5s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+}
+@keyframes compassRotate {
+  0% { transform: rotate(0deg); }
+  40% { transform: rotate(400deg); }
+  60% { transform: rotate(340deg); }
+  100% { transform: rotate(360deg); }
+}
+.splash-brand {
+  font-family: 'Fraunces', serif; font-size: 34px; font-weight: 700;
+  color: var(--brand-orange); letter-spacing: -0.02em; margin-bottom: 6px;
+}
+.splash-tagline {
+  font-size: 15px; font-weight: 600; color: #EDF3EF; opacity: 0.9;
+  letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 16px;
+}
+.splash-desc {
+  font-size: 14px; line-height: 1.5; color: #A2B2A7; margin-bottom: 24px;
+}
+.splash-cultural-note {
+  font-size: 12px; line-height: 1.45; color: #728277; text-align: left;
+  background: rgba(253, 140, 69, 0.05); padding: 12px 14px; border-radius: 12px;
+  border-left: 3px solid var(--brand-orange); margin-bottom: 30px;
+}
+.splash-btn {
+  background: var(--accent-solid); color: #FFF; border: none; font-size: 14px;
+  font-weight: 600; padding: 14px 28px; border-radius: 999px; cursor: pointer;
+  box-shadow: 0 10px 20px rgba(40, 127, 97, 0.25); transition: all 0.3s ease;
+}
+.splash-btn:hover {
+  background: #34A57E; transform: translateY(-2px);
+}
+.splash-screen.fade-out {
+  opacity: 0; pointer-events: none; transform: scale(1.05);
+}
+
+/* INTERFAZ GENERAL */
 .app-container { max-width: 480px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; background-color: var(--bg); }
 .app-header { position: fixed; top: 0; width: 100%; max-width: 480px; background: rgba(245, 247, 245, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 16px 20px; z-index: 100; border-bottom: 1px solid var(--line); }
 @media (prefers-color-scheme: dark) { .app-header { background: rgba(9, 15, 12, 0.85); } }
@@ -50,7 +102,6 @@ body { background-color: var(--bg); color: var(--ink); font-family: 'Inter', san
 .intro-block .sub { color: var(--muted); font-size: 14px; line-height: 1.45; }
 .intro-block .sub strong { color: var(--ink); font-weight: 600; }
 
-/* Banners de Precios de Oferta y Upsell */
 .offer-header-badge, .upsell-pricing-tag {
   background: var(--accent-soft); color: var(--accent-solid); font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 12px; letter-spacing: 0.02em;
 }
