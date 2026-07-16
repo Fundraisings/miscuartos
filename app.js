@@ -236,7 +236,7 @@ function buildXmas() {
     monthHeader.style.fontSize = '11px';
     monthHeader.style.fontWeight = '700';
     monthHeader.style.letterSpacing = '0.08em';
-    monthHeader.style.color = 'var(--accent-solid)';
+    monthHeader.style.color = 'var(--brand-orange)';
     monthHeader.style.marginTop = '14px';
     monthHeader.style.marginBottom = '4px';
     monthHeader.textContent = monthName;
