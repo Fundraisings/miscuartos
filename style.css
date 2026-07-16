@@ -1,32 +1,34 @@
 :root {
-  --bg: #F6F8F6;
+  /* Paleta Oficial extraída del Logo */
+  --bg: #F5F7F5;
   --card: #FFFFFF;
-  --ink: #0A120E;
+  --ink: #111814;
   --muted: #56665D;
-  --line: rgba(10, 18, 14, 0.06);
-  --accent: #154D38;
-  --accent-soft: rgba(21, 77, 56, 0.05);
-  --accent-solid: #1C664A;
-  --amber: #C97A14;
-  --amber-soft: rgba(201, 122, 20, 0.06);
+  --line: rgba(17, 24, 20, 0.06);
+  
+  --accent: #1D5E49;        /* Verde profundo del logo */
+  --accent-soft: rgba(40, 127, 97, 0.06);
+  --accent-solid: #287F61;   /* El tono de verde principal */
+  
+  --brand-orange: #FD8C45;   /* El naranja exacto de la aguja de la brújula */
+  --brand-orange-soft: rgba(253, 140, 69, 0.08);
+  
   --radius-lg: 20px;
   --radius-md: 14px;
   --radius-sm: 10px;
-  --shadow: 0 4px 24px -4px rgba(10, 18, 14, 0.04);
+  --shadow: 0 4px 24px -4px rgba(17, 24, 20, 0.04);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #080E0B;
-    --card: #101814;
+    --bg: #090F0C;
+    --card: #111A15;
     --ink: #EDF3EF;
     --muted: #7E9185;
     --line: rgba(237, 243, 239, 0.06);
-    --accent: #32A37B;
-    --accent-soft: rgba(50, 163, 123, 0.06);
-    --accent-solid: #3EB389;
-    --amber: #EAA035;
-    --amber-soft: rgba(234, 160, 53, 0.08);
+    --accent: #3EB389;
+    --accent-soft: rgba(62, 179, 137, 0.06);
+    --accent-solid: #41BF93;
     --shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
   }
 }
@@ -51,20 +53,27 @@ body {
 
 .app-header {
   position: fixed; top: 0; width: 100%; max-width: 480px;
-  background: rgba(246, 248, 246, 0.85);
+  background: rgba(245, 247, 245, 0.85);
   backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
   padding: 16px 20px; z-index: 100;
   border-bottom: 1px solid var(--line);
 }
 @media (prefers-color-scheme: dark) {
-  .app-header { background: rgba(8, 14, 11, 0.85); }
+  .app-header { background: rgba(9, 15, 12, 0.85); }
 }
 
+/* Tipografía de Marca */
 .wordmark {
-  font-family: 'Fraunces', serif; font-weight: 700; font-size: 18px;
-  display: flex; align-items: center; gap: 6px;
+  font-family: 'Fraunces', serif; font-weight: 700; font-size: 19px;
+  display: flex; align-items: center; gap: 8px;
+  color: var(--accent-solid);
 }
-.wordmark .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent-solid); }
+
+.brand-compass-icon {
+  width: 24px;
+  height: 24px;
+  color: var(--ink);
+}
 
 .app-content {
   padding: 84px 18px 110px;
@@ -82,16 +91,19 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Tarjeta de Bienvenida con Borde Naranja de Acento */
 .welcome-badge {
   display: inline-block;
-  background: var(--accent-soft);
-  color: var(--accent-solid);
-  font-size: 12px;
-  font-weight: 600;
+  background: var(--brand-orange-soft);
+  color: var(--brand-orange);
+  font-size: 11.5px;
+  font-weight: 700;
   padding: 6px 12px;
   border-radius: 999px;
   margin-bottom: 12px;
+  border: 1px solid rgba(253, 140, 69, 0.15);
 }
+
 .intro-block h1 { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 600; margin-bottom: 6px; letter-spacing: -0.02em; }
 .intro-block .sub { color: var(--muted); font-size: 14px; line-height: 1.45; }
 .intro-block .sub strong { color: var(--ink); font-weight: 600; }
@@ -102,9 +114,31 @@ body {
 }
 
 .premium-badge-title {
-  font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: var(--accent-solid); margin-bottom: 12px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: var(--brand-orange); margin-bottom: 12px;
 }
-.premium-badge-title.setup-upsell { color: var(--amber); }
+.premium-badge-title.setup-upsell { color: var(--brand-orange); }
+
+/* Caja de Propósito/Causa Social de Lujo (Naranja Suave) */
+.cause-box {
+  background: var(--brand-orange-soft);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 18px;
+  border: 1px solid rgba(253, 140, 69, 0.1);
+}
+.cause-box p {
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+.cause-box strong {
+  color: var(--ink);
+}
+.cause-divider {
+  height: 1px;
+  background: rgba(253, 140, 69, 0.15);
+  margin: 12px 0;
+}
 
 .income-input-row, .extra-row, .afp-sim-row, .cat-bottom {
   display: flex; align-items: center; gap: 8px; background: var(--bg);
@@ -157,22 +191,24 @@ body {
 .leak-checkbox.checked, .kids-task-check.checked, .xmas-week-check.checked { background: var(--accent-solid); border-color: var(--accent-solid); }
 
 .xmas-levels { display: flex; gap: 6px; margin-bottom: 14px; }
-.xmas-level { flex: 1; text-align: center; padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--line); cursor: pointer; }
-.xmas-level.active { background: var(--accent-soft); border-color: var(--accent-solid); }
+.xmas-level { flex: 1; text-align: center; padding: 8px; border-radius: var(--radius-sm); border: 1px solid var(--line); cursor: pointer; transition: all 0.3s ease; }
+.xmas-level.active { background: var(--brand-orange-soft); border-color: var(--brand-orange); }
 .xmas-level-name { font-size: 11px; font-weight: 700; color: var(--muted); }
+.xmas-level.active .xmas-level-name { color: var(--brand-orange); }
 .xmas-level-amt { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; }
-.xmas-goal { background: var(--accent-soft); padding: 14px; border-radius: var(--radius-md); text-align: center; margin-bottom: 14px; }
-.xmas-goal .num { font-family: 'IBM Plex Mono', monospace; font-size: 18px; font-weight: 700; color: var(--accent-solid); }
+.xmas-goal { background: var(--brand-orange-soft); padding: 14px; border-radius: var(--radius-md); text-align: center; margin-bottom: 14px; border: 1px solid rgba(253, 140, 69, 0.1); }
+.xmas-goal .num { font-family: 'IBM Plex Mono', monospace; font-size: 18px; font-weight: 700; color: var(--brand-orange); }
 .xmas-goal .lbl { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
 
 #xmasWeeks { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; max-height: 260px; overflow-y: auto; padding-right: 4px; }
 .xmas-week { background: var(--bg); padding: 10px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: space-between; }
 .xmas-week-label { font-size: 12px; font-weight: 500; }
 .xmas-week-amt { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; }
+.xmas-week-check.checked { background: var(--brand-orange); border-color: var(--brand-orange); }
 
 .kids-full { display: none; }
 .kids-full.show { display: block; }
-.kids-unlock-btn { width: 100%; padding: 12px; background: var(--amber); border: none; color: #fff; font-weight: 700; border-radius: var(--radius-md); font-size: 13px; cursor: pointer; }
+.kids-unlock-btn { width: 100%; padding: 12px; background: var(--brand-orange); border: none; color: #fff; font-weight: 700; border-radius: var(--radius-md); font-size: 13px; cursor: pointer; }
 
 .bottom-nav {
   position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px;
@@ -180,10 +216,11 @@ body {
   border-top: 1px solid var(--line); display: flex; padding: 8px 10px 24px; z-index: 100;
 }
 @media (prefers-color-scheme: dark) {
-  .bottom-nav { background: rgba(16, 24, 20, 0.85); }
+  .bottom-nav { background: rgba(17, 26, 21, 0.85); }
 }
 .nav-item { flex: 1; background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--muted); cursor: pointer; }
 .nav-item.active { color: var(--accent-solid); }
+.nav-item[data-tab="reto"].active { color: var(--brand-orange); } /* El Reto Navidad brilla en Naranja */
 .nav-icon { font-size: 20px; }
 .nav-label { font-size: 11px; font-weight: 600; }
 
