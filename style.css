@@ -122,25 +122,56 @@ input:focus-visible,
 .upsell-pricing-tag { background: var(--brand-orange-soft); color: var(--brand-orange); }
 .old-price { text-decoration: line-through; opacity: 0.5; font-weight: 500; }
 
-.income-card, .extra-card, .leak-card, .afp-card, .course-card, .kids-card, .cat-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow); }
+.income-card, .leak-card, .afp-card, .course-card, .kids-card, .cat-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow); }
 .premium-badge-title { font-size: 11px; font-weight: 700; letter-spacing: 0.05em; color: var(--ink); opacity: 0.4; margin-bottom: 12px; }
 .micro-sub { font-size: 12.5px; color: var(--muted); }
+
+/* ===== TOTAL STICKY: baja contigo mientras llenas la lista de categorías ===== */
+.sticky-total-box {
+  position: sticky;
+  top: 72px;
+  z-index: 50;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  box-shadow: 0 8px 24px -6px rgba(17, 24, 20, 0.12);
+  margin-bottom: 12px;
+}
+.sticky-total-num { font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 700; }
+.sticky-total-of { font-size: 11.5px; color: var(--muted); }
+.sticky-total-status { font-size: 11.5px; margin-top: 6px; line-height: 1.4; padding: 6px 8px; border-radius: 8px; }
+
+/* ===== FILAS COMPACTAS DE CATEGORÍA ===== */
+.cat-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 12px 14px; background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--radius-md); margin-bottom: 8px;
+}
+.cat-row-label { display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; }
+.cat-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--line); flex-shrink: 0; }
+.cat-dot.green { background: var(--accent-solid); }
+.cat-dot.amber { background: var(--brand-orange); }
+.cat-dot.red { background: #B4432A; }
+.cat-row-input-wrap { display: flex; align-items: center; gap: 4px; background: var(--bg); border-radius: var(--radius-sm); padding: 6px 10px; }
+.cat-row-input-wrap .amt-currency { font-size: 13px; }
+.cat-row .amt-input { font-size: 15px; width: 90px; text-align: right; }
 
 .cause-box { background: var(--brand-orange-soft); border-radius: var(--radius-md); padding: 16px; margin-bottom: 18px; border: 1px solid rgba(253, 140, 69, 0.1); }
 .cause-box p { font-size: 12.5px; color: var(--muted); line-height: 1.45; }
 .cause-box strong { color: var(--ink); }
 .cause-divider { height: 1px; background: rgba(253, 140, 69, 0.15); margin: 12px 0; }
 
-.income-input-row, .extra-row, .afp-sim-row, .cat-bottom { display: flex; align-items: center; gap: 8px; background: var(--bg); padding: 12px 16px; border-radius: var(--radius-md); margin: 10px 0; }
-#income, .amt-input, #afpSalario, #extraIncome { font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 600; border: none; background: transparent; color: var(--ink); width: 100%; outline: none; }
+.income-input-row, .afp-sim-row, .cat-bottom { display: flex; align-items: center; gap: 8px; background: var(--bg); padding: 12px 16px; border-radius: var(--radius-md); margin: 10px 0; }
+#income, .amt-input, #afpSalario { font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 600; border: none; background: transparent; color: var(--ink); width: 100%; outline: none; }
 .currency, .amt-currency { font-family: 'IBM Plex Mono', monospace; font-size: 22px; color: var(--muted); }
 
 .type-toggle { display: flex; background: var(--bg); padding: 4px; border-radius: 999px; margin-bottom: 12px; }
 .type-btn { flex: 1; text-align: center; padding: 8px; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; }
 .type-btn.active { background: var(--card); color: var(--accent-solid); box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
 
-.variable-banner, .extra-tip, .afp-sim-result { display: none; font-size: 12px; line-height: 1.5; color: var(--muted); margin-top: 8px; }
-.variable-banner.show, .extra-tip.show, .afp-sim-result.show { display: block; }
+.variable-banner, .afp-sim-result { display: none; font-size: 12px; line-height: 1.5; color: var(--muted); margin-top: 8px; }
+.variable-banner.show, .afp-sim-result.show { display: block; }
 
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .chip { padding: 10px 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); font-size: 13.5px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 6px; }
