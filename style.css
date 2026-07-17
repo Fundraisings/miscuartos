@@ -4,7 +4,6 @@
   --ink: #111814;
   --muted: #56665D;
   --line: rgba(17, 24, 20, 0.06);
-  --accent: #1D5E49;
   --accent-soft: rgba(40, 127, 97, 0.06);
   --accent-solid: #287F61;
   --brand-orange: #FD8C45;
@@ -22,7 +21,6 @@
     --ink: #EDF3EF;
     --muted: #7E9185;
     --line: rgba(237, 243, 239, 0.06);
-    --accent: #3EB389;
     --accent-soft: rgba(62, 179, 137, 0.06);
     --accent-solid: #41BF93;
     --shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
@@ -32,6 +30,22 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body { background-color: var(--bg); color: var(--ink); font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+
+/* ACCESIBILIDAD: foco visible para teclado en todo elemento interactivo */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--brand-orange);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ACCESIBILIDAD: respeta "reducir movimiento" del sistema */
+@media (prefers-reduced-motion: reduce) {
+  .splash-compass { animation: none !important; }
+  .tab-pane, .splash-screen, .splash-btn { animation: none !important; transition: none !important; }
+}
 
 /* ESTILOS SPLASH SCREEN (VISTA DE INTRO OSCURA) */
 .splash-screen {
@@ -110,6 +124,7 @@ body { background-color: var(--bg); color: var(--ink); font-family: 'Inter', san
 
 .income-card, .extra-card, .leak-card, .afp-card, .course-card, .kids-card, .cat-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow); }
 .premium-badge-title { font-size: 11px; font-weight: 700; letter-spacing: 0.05em; color: var(--ink); opacity: 0.4; margin-bottom: 12px; }
+.micro-sub { font-size: 12.5px; color: var(--muted); }
 
 .cause-box { background: var(--brand-orange-soft); border-radius: var(--radius-md); padding: 16px; margin-bottom: 18px; border: 1px solid rgba(253, 140, 69, 0.1); }
 .cause-box p { font-size: 12.5px; color: var(--muted); line-height: 1.45; }
@@ -151,7 +166,7 @@ body { background-color: var(--bg); color: var(--ink); font-family: 'Inter', san
 .course-num { width: 22px; height: 22px; border-radius: 50%; background: var(--line); font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
 .course-item.unlocked .course-num { background: var(--accent-soft); color: var(--accent-solid); }
 .course-info-text, .leak-text, .kids-task-text { font-size: 13px; color: var(--ink); }
-.course-item.locked { opacity: 0.5; }
+.course-item.locked { opacity: 0.5; cursor: pointer; }
 
 .luxury-accordion { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
 .luxury-accordion summary { font-size: 13px; font-weight: 600; color: var(--accent-solid); cursor: pointer; list-style: none; }
@@ -171,7 +186,7 @@ body { background-color: var(--bg); color: var(--ink); font-family: 'Inter', san
 .xmas-goal .lbl { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
 
 #xmasWeeks { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; max-height: 260px; overflow-y: auto; padding-right: 4px; }
-.xmas-week { background: var(--bg); padding: 10px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: space-between; }
+.xmas-week { background: var(--bg); padding: 10px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
 .xmas-week-label { font-size: 12px; font-weight: 500; }
 .xmas-week-amt { font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; }
 .xmas-week-check.checked { background: var(--brand-orange); border-color: var(--brand-orange); }
@@ -201,3 +216,30 @@ body { background-color: var(--bg); color: var(--ink); font-family: 'Inter', san
 .summary-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
 .whatsapp-btn { display: block; text-align: center; padding: 12px; background: #25D366; color: #fff; text-decoration: none; border-radius: var(--radius-md); font-weight: 600; font-size: 13.5px; margin-top: 14px; }
 footer { text-align: center; font-size: 11px; color: var(--muted); padding: 20px 0; }
+
+/* ===== CRÉDITO INTELIGENTE ===== */
+.credit-dates-row { display: flex; gap: 10px; margin: 10px 0 12px; }
+.credit-date-box { flex: 1; background: var(--bg); border-radius: var(--radius-md); padding: 12px; }
+.credit-date-num { width: 20px; height: 20px; border-radius: 50%; background: var(--accent-solid); color: #fff; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; }
+.credit-date-title { font-size: 12.5px; font-weight: 700; margin-bottom: 3px; }
+.credit-date-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+.credit-trick { background: var(--accent-soft); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 12px; color: var(--ink); line-height: 1.5; margin-bottom: 8px; }
+.credit-warning { background: rgba(180, 67, 42, 0.08); border-radius: var(--radius-sm); padding: 10px 12px; font-size: 11.5px; color: #8a3320; line-height: 1.5; }
+@media (prefers-color-scheme: dark) { .credit-warning { color: #E8998A; background: rgba(180, 67, 42, 0.15); } }
+
+.credit-slider-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+.credit-slider-pct { font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 700; color: var(--brand-orange); }
+.credit-slider-tag { font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 999px; }
+.credit-slider-tag.good { background: var(--accent-soft); color: var(--accent-solid); }
+.credit-slider-tag.warn { background: var(--brand-orange-soft); color: var(--brand-orange); }
+.credit-slider-tag.bad { background: rgba(180, 67, 42, 0.1); color: #8a3320; }
+@media (prefers-color-scheme: dark) { .credit-slider-tag.bad { color: #E8998A; } }
+
+input[type="range"].credit-range { width: 100%; accent-color: var(--brand-orange); margin-bottom: 12px; }
+.credit-result-row { display: flex; gap: 8px; }
+.credit-result-box { flex: 1; background: var(--bg); border-radius: var(--radius-sm); padding: 8px; text-align: center; }
+.credit-result-box .lbl { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.credit-result-box .val { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 700; margin-top: 2px; }
+
+.credit-util-gauge { display: flex; height: 9px; border-radius: 999px; overflow: hidden; margin: 6px 0 5px; }
+.credit-util-caption { display: flex; justify-content: space-between; font-size: 9.5px; color: var(--muted); }
