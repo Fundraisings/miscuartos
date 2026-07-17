@@ -108,7 +108,6 @@ function lazyLoadVideos() {
 const chipsEl = document.getElementById('chips');
 const resultsEl = document.getElementById('results');
 const incomeEl = document.getElementById('income');
-const extraIncomeEl = document.getElementById('extraIncome');
 const countTag = document.getElementById('countTag');
 
 function fmt(n) { return Math.round(n).toLocaleString('en-US', { maximumFractionDigits: 0 }); }
@@ -188,28 +187,27 @@ function renderCategoryList() {
   }
 
   let html = `
-    <div class="bar" id="totalBar"><div class="bar-seg" id="totalBarSeg" style="width:0%; background:var(--accent-solid)"></div></div>
-    <div class="bar-caption"><span id="totalPaidLbl">RD$0 asignados</span><span id="totalIncomeLbl">de RD$0</span></div>
-    <div id="totalOverWarning" style="display:none; font-size:11.5px; color:#8a3320; background:rgba(180,67,42,0.08); padding:8px 10px; border-radius:8px; margin-top:6px; line-height:1.4;"></div>
+    <div class="sticky-total-box">
+      <div class="sticky-total-num" id="stickyTotalNum">RD$0</div>
+      <div class="sticky-total-of" id="stickyTotalOf">de RD$0 ganado este mes</div>
+      <div class="bar" style="margin:8px 0 0;"><div class="bar-seg" id="totalBarSeg" style="width:0%; background:var(--accent-solid)"></div></div>
+      <div class="sticky-total-status" id="totalOverWarning" style="display:none;"></div>
+    </div>
   `;
 
   selected.forEach(key => {
     const cat = categories[key];
     html += `
-      <div class="cat-card" style="margin-top:12px;">
-        <div class="cat-top">
-          <div style="font-weight:600; font-size:14px; margin-bottom: 2px;">${cat.label}</div>
-          <div class="pct" style="font-size:11.5px; color:var(--muted); line-height: 1.3;">${cat.tip}</div>
-        </div>
-        <div class="cat-bottom">
+      <div class="cat-row">
+        <div class="cat-row-label"><span class="cat-dot" id="dot-${key}"></span>${cat.label}</div>
+        <div class="cat-row-input-wrap">
           <span class="amt-currency">RD$</span>
           <input class="amt-input" type="number" inputmode="decimal" data-key="${key}" placeholder="0" value="${amounts[key] != null ? amounts[key] : ''}">
         </div>
-        <div class="cat-advice" id="advice-${key}" style="display:none; font-size:11.5px; line-height:1.5; padding:8px 10px; border-radius:8px; margin-top:8px;"></div>
       </div>`;
   });
 
-  html += `<button class="summary-btn" id="summaryBtn">Ver mi resumen →</button>`;
+  html += `<button class="summary-btn" id="summaryBtn">Ver mi resumen y consejos →</button>`;
   resultsEl.innerHTML = html;
 
   resultsEl.querySelectorAll('.amt-input').forEach(inp => {
@@ -217,39 +215,25 @@ function renderCategoryList() {
       const key = e.target.dataset.key;
       const val = parseFloat(e.target.value);
       amounts[key] = isNaN(val) ? 0 : val;
-      updateCategoryAdvice(key);
+      updateCategoryDot(key);
       updateTotals();
     });
   });
 
   document.getElementById('summaryBtn').addEventListener('click', openSummary);
 
-  // pinta todo el estado inicial (por si ya había montos cargados)
-  selected.forEach(key => updateCategoryAdvice(key));
+  selected.forEach(key => updateCategoryDot(key));
   updateTotals();
 }
 
-function updateCategoryAdvice(key) {
-  const box = document.getElementById(`advice-${key}`);
-  if (!box) return;
+// Solo actualiza el puntito de color de la fila — el detalle completo
+// del consejo vive en el resumen final, no aquí (para no saturar la lista).
+function updateCategoryDot(key) {
+  const dot = document.getElementById(`dot-${key}`);
+  if (!dot) return;
   const income = getIncome();
-  const amount = amounts[key] || 0;
-  const advice = categoryAdvice(key, amount, income);
-
-  if (!advice) {
-    box.style.display = 'none';
-    return;
-  }
-  const colors = {
-    green: { bg: 'var(--accent-soft)', fg: 'var(--accent-solid)' },
-    amber: { bg: 'var(--brand-orange-soft)', fg: 'var(--brand-orange)' },
-    red:   { bg: 'rgba(180,67,42,0.08)', fg: '#8a3320' }
-  };
-  const c = colors[advice.level];
-  box.style.display = 'block';
-  box.style.background = c.bg;
-  box.style.color = c.fg;
-  box.innerHTML = advice.html;
+  const advice = categoryAdvice(key, amounts[key] || 0, income);
+  dot.className = 'cat-dot' + (advice ? ` ${advice.level}` : '');
 }
 
 function updateTotals() {
@@ -258,27 +242,33 @@ function updateTotals() {
   selected.forEach(key => { total += (amounts[key] || 0); });
 
   const seg = document.getElementById('totalBarSeg');
-  const paidLbl = document.getElementById('totalPaidLbl');
-  const incomeLbl = document.getElementById('totalIncomeLbl');
+  const numEl = document.getElementById('stickyTotalNum');
+  const ofEl = document.getElementById('stickyTotalOf');
   const warnBox = document.getElementById('totalOverWarning');
   if (!seg) return;
 
   const pct = income > 0 ? Math.min((total / income) * 100, 100) : 0;
   seg.style.width = `${pct}%`;
   seg.style.background = total > income && income > 0 ? '#B4432A' : 'var(--accent-solid)';
-  paidLbl.textContent = `RD$${fmt(total)} asignados`;
-  incomeLbl.textContent = `de RD$${fmt(income)}`;
+  numEl.textContent = `RD$${fmt(total)}`;
+  ofEl.textContent = `de RD$${fmt(income)} ganado este mes`;
 
   if (income > 0 && total > income) {
     const exceso = total - income;
     warnBox.style.display = 'block';
-    warnBox.innerHTML = `Tu presupuesto suma RD$${fmt(exceso)} más de lo que ingresa este mes. No es un error del sistema — es información real: algo tiene que ceder, o el ingreso tiene que crecer.`;
+    warnBox.style.background = 'rgba(180,67,42,0.08)';
+    warnBox.style.color = '#8a3320';
+    warnBox.innerHTML = `RD$${fmt(exceso)} por encima de lo que ganas. No es un error — es información real.`;
+  } else if (income > 0 && total > 0) {
+    warnBox.style.display = 'block';
+    warnBox.style.background = 'var(--accent-soft)';
+    warnBox.style.color = 'var(--accent-solid)';
+    warnBox.innerHTML = `Te queda RD$${fmt(income - total)} sin asignar todavía.`;
   } else if (warnBox) {
     warnBox.style.display = 'none';
   }
 
-  // recalcula todos los tooltips de categorías que dependen del % de ingreso
-  selected.forEach(key => updateCategoryAdvice(key));
+  selected.forEach(key => updateCategoryDot(key));
 }
 
 function openSummary() {
@@ -287,18 +277,31 @@ function openSummary() {
   selected.forEach(key => { total += (amounts[key] || 0); });
 
   document.getElementById('summaryTotal').textContent = `RD$${fmt(total)}`;
+
   let rows = '';
-  let waText = `📋 Mi presupuesto de este mes (armado con Miscuartos):\n\n`;
+  let waText = `📋 Los números de la casa este mes:\n\n`;
   selected.forEach(key => {
     const amt = amounts[key] || 0;
-    rows += `<div class="summary-row"><span>${categories[key].label}</span><strong>RD$${fmt(amt)}</strong></div>`;
-    waText += `${categories[key].label}: RD$${fmt(amt)}\n`;
+    const advice = categoryAdvice(key, amt, income);
+    rows += `<div class="summary-row" style="flex-direction:column; align-items:stretch; gap:4px;">
+      <div style="display:flex; justify-content:space-between;"><span>${categories[key].label}</span><strong>RD$${fmt(amt)}</strong></div>
+      ${advice ? `<div style="font-size:11px; line-height:1.4; color:${advice.level === 'green' ? 'var(--accent-solid)' : advice.level === 'amber' ? 'var(--brand-orange)' : '#8a3320'};">${advice.html}</div>` : ''}
+    </div>`;
+    waText += `• ${categories[key].label}: RD$${fmt(amt)}\n`;
   });
-  waText += `\nTotal: RD$${fmt(total)} de RD$${fmt(income)} de ingreso\n\nArma el tuyo en minutos con Miscuartos, tu coach financiero de bolsillo 🧭`;
+
+  waText += `\nTotal: RD$${fmt(total)} de RD$${fmt(income)} de ingreso`;
+  if (income > 0 && total > income) {
+    waText += `\n⚠️ Nos pasamos por RD$${fmt(total - income)} — hay que ajustar algo.`;
+  }
+  waText += `\n\nAsí quedamos este mes 🤝 (armado con Miscuartos)`;
 
   document.getElementById('summaryRows').innerHTML = rows;
   const waBtn = document.getElementById('whatsappBtn');
-  if (waBtn) waBtn.href = `https://wa.me/?text=${encodeURIComponent(waText)}`;
+  if (waBtn) {
+    waBtn.textContent = 'Enviar acuerdo del mes por WhatsApp';
+    waBtn.href = `https://wa.me/?text=${encodeURIComponent(waText)}`;
+  }
   document.getElementById('modalOverlay').classList.add('show');
 }
 
@@ -476,24 +479,6 @@ document.querySelectorAll('.course-item.locked').forEach(item => {
     alert(`"${title}" se desbloquea con tu compra de Miscuartos ($9).`);
   });
 });
-
-/* ============ EXTRA / CHIRIPA: consejo separado, no se mezcla con el presupuesto ============ */
-if (extraIncomeEl) {
-  extraIncomeEl.addEventListener('input', () => {
-    const v = parseFloat(extraIncomeEl.value);
-    const tipEl = document.getElementById('extraTip');
-    if (!tipEl) return;
-    if (!v || v <= 0) {
-      tipEl.classList.remove('show');
-      return;
-    }
-    const deuda = Math.round(v * 0.5);
-    const gusto = Math.round(v * 0.3);
-    const proximo = Math.round(v * 0.2);
-    tipEl.innerHTML = `Con ese extra, una guía simple: <b>RD$${fmt(deuda)}</b> directo a deudas o ahorro, <b>RD$${fmt(gusto)}</b> para un gusto, y <b>RD$${fmt(proximo)}</b> guardado para adelantar el próximo mes. No lo mezcles con tu presupuesto de arriba — trátalo aparte.`;
-    tipEl.classList.add('show');
-  });
-}
 
 /* ============ TIPO DE INGRESO ============ */
 document.querySelectorAll('.type-btn').forEach(b => {
