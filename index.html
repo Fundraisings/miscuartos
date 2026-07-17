@@ -27,11 +27,11 @@
         <polygon points="50,85 58,50 50,50" fill="currentColor" opacity="0.95"/>
       </svg>
     </div>
-    
+
     <div class="splash-brand">miscuartos</div>
     <div class="splash-tagline">Tu coach financiero de bolsillo</div>
     <div class="splash-desc">Una app diseñada para guiarte y ayudarte a manejar de forma inteligente tu dinero.</div>
-    
+
     <div class="splash-cultural-note">
       * <strong>miscuartos:</strong> Expresión dominicana con la que nos referimos a nuestro dinero ganao' con esfuerzo ("dame mis cuartos", "trabajando duro por mis cuartos").
     </div>
@@ -42,7 +42,7 @@
 
 <!-- CONTENEDOR PRINCIPAL DE LA APP -->
 <div class="app-container" id="mainAppContainer" style="display: none;">
-  
+
   <header class="app-header">
     <div class="wordmark">
       <svg class="brand-compass-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -61,7 +61,7 @@
   </header>
 
   <main class="app-content">
-    
+
     <!-- PESTAÑA 1: PRESUPUESTO -->
     <section id="pane-presupuesto" class="tab-pane active">
       <div class="intro-block">
@@ -165,7 +165,7 @@
             <div class="video-placeholder-luxury"><span>▶ Video 1: Cómo romper el ciclo del "no me da" (Gratis · 4 min)</span></div>
           </div>
         </div>
-        
+
         <div class="cause-box">
           <p>Disfruta de la clase introductoria gratis. Desbloquea las próximas 4 lecciones prácticas con tu upgrade de solo $9.</p>
           <div class="cause-divider"></div>
@@ -198,6 +198,55 @@
         </details>
       </div>
 
+      <!-- NUEVO: CRÉDITO INTELIGENTE -->
+      <div class="cat-card">
+        <div class="premium-badge-title">💳 CRÉDITO INTELIGENTE</div>
+        <p class="micro-sub" style="font-size:12.5px; color:var(--muted); line-height:1.5; margin-bottom:12px;">Dos fechas que casi nadie revisa, y que pueden costarte —o ahorrarte— miles de pesos.</p>
+
+        <div class="credit-dates-row">
+          <div class="credit-date-box">
+            <div class="credit-date-num">1</div>
+            <div class="credit-date-title">Fecha de Corte</div>
+            <div class="credit-date-desc">El día que cierra tu factura. Lo que compres después entra al próximo estado de cuenta.</div>
+          </div>
+          <div class="credit-date-box">
+            <div class="credit-date-num">2</div>
+            <div class="credit-date-title">Fecha Límite de Pago</div>
+            <div class="credit-date-desc">Tu último día para pagar el total sin intereses — suele ser 20-25 días después del corte.</div>
+          </div>
+        </div>
+
+        <div class="credit-trick">💡 <strong>El truco:</strong> compra los primeros días después de tu corte y ganas hasta 50 días para pagar sin intereses.</div>
+        <div class="credit-warning">⚠️ Solo funciona si pagaste tu balance completo el mes pasado. Con saldo pendiente, los intereses corren desde el día de cada compra nueva. Los adelantos de efectivo nunca tienen gracia.</div>
+
+        <div class="cause-divider" style="background: var(--line); margin: 16px 0;"></div>
+
+        <div class="premium-badge-title" style="margin-bottom:4px;">SIMULADOR: ¿TOTALERO O MÍNIMO?</div>
+        <p class="micro-sub" style="font-size:12px; color:var(--muted); margin-bottom:10px;">Balance de RD$25,000 al 52% anual (tasa promedio en RD). Arrastra para simular tu pago de este mes.</p>
+
+        <div class="credit-slider-row">
+          <span class="credit-slider-pct" id="creditPctLabel">30%</span>
+          <span class="credit-slider-tag" id="creditTag">Riesgo moderado</span>
+        </div>
+        <input type="range" class="credit-range" id="creditSlider" min="5" max="100" value="30">
+
+        <div class="credit-result-row">
+          <div class="credit-result-box"><div class="lbl">Pagas</div><div class="val" id="creditPaid">RD$7,500</div></div>
+          <div class="credit-result-box"><div class="lbl">Pendiente</div><div class="val" id="creditRemaining">RD$17,500</div></div>
+          <div class="credit-result-box"><div class="lbl">Interés/mes</div><div class="val" id="creditInterest">RD$758</div></div>
+        </div>
+
+        <div class="cause-divider" style="background: var(--line); margin: 16px 0;"></div>
+
+        <div class="premium-badge-title" style="margin-bottom:6px;">CUÁNTO DE TU LÍMITE ESTÁS USANDO</div>
+        <div class="credit-util-gauge">
+          <div class="credit-util-seg" style="width:30%; background:#3E9C77;"></div>
+          <div class="credit-util-seg" style="width:20%; background:var(--brand-orange);"></div>
+          <div class="credit-util-seg" style="width:50%; background:#B4432A;"></div>
+        </div>
+        <div class="credit-util-caption"><span>0-30% ideal</span><span>31-50% moderado</span><span>51%+ riesgo</span></div>
+      </div>
+
       <div class="leak-card">
         <div class="premium-badge-title">🔍 DINERO OCULTO</div>
         <p class="micro-sub">Selecciona tus hábitos diarios comunes:</p>
@@ -208,7 +257,7 @@
       <div class="kids-card">
         <div class="upsell-pricing-tag">OFERTA ADICIONAL · SOLO $5 <span class="old-price">Precio regular $7</span></div>
         <div class="premium-badge-title setup-upsell">🚀 NEGOCIOS PARA NIÑOS</div>
-        
+
         <div class="kids-preview" id="kidsPreview">
           <p class="micro-sub" style="font-size: 13.5px; line-height: 1.45; color: var(--ink); margin-bottom: 12px;">
             Desarrollar una mentalidad emprendedora desde la infancia no se trata solo de dinero; es sembrar resiliencia y creatividad para formar a los <strong>futuros empresarios</strong> del mañana.
@@ -225,7 +274,7 @@
               </div>
             </div>
           </div>
-          <div class="kids-progress" id="kidsProgress">0 de 5 clases completadas</div>
+          <div class="kids-progress" id="kidsProgress">0 de 6 retos completados</div>
           <div class="course-list-minimal" style="margin-top: 12px; margin-bottom: 16px;">
             <div class="course-item unlocked active"><div class="course-num">1</div><div class="course-info-text"><b>Tu primer negocio en casa</b> · 5 min</div></div>
             <div class="course-item unlocked"><div class="course-num">2</div><div class="course-info-text"><b>El juego del presupuesto infantil</b> · 6 min</div></div>
