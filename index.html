@@ -153,12 +153,81 @@
         <div id="xmasWeeks"></div>
 
         <div class="xmas-footer-tips" style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--muted); display: flex; flex-direction: column; gap: 8px; line-height: 1.5;">
-          <p>💡 <strong>Tip:</strong> Abre una cuenta de ahorro aparte. Dinero que entra ahí no se toca hasta diciembre, salvo una emergencia real de salud.</p>
+          <p>💡 <strong>Tip:</strong> Abre una cuenta de ahorro aparte. Dinero que entra ahí no se toca hasta diciembre, salvo una emergency real de salud.</p>
         </div>
       </div>
     </section>
 
-    <!-- PESTAÑA 3: ACADEMIA -->
+    <!-- PESTAÑA 3: METAS Y EMPRENDIMIENTO -->
+    <section id="pane-metas" class="tab-pane">
+      <div class="intro-block">
+        <h1>Ruta de Metas & Progreso</h1>
+        <p class="sub">Calcula tu fondo de emergencia, planifica tus sueños y descubre cómo cerrar la brecha financiera.</p>
+      </div>
+
+      <!-- BLOQUE A: FONDO DE EMERGENCIA -->
+      <div class="meta-card">
+        <div class="premium-badge-title">🛡️ TU ESCUDO FINANCIERO (FONDO DE EMERGENCIA)</div>
+        <p class="micro-sub" style="font-size:13px; color:var(--muted); margin-bottom:12px;">El dinero que te dará paz mental ante imprevistos. Se calcula en base a tus gastos fijos mensuales.</p>
+        
+        <div style="margin-bottom: 12px;">
+          <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 4px;">
+            <span>Meses de cobertura:</span>
+            <span id="emergencyMonthsLabel" style="color: #FD8C45; font-weight: 700;">3 meses</span>
+          </div>
+          <input type="range" id="emergencySlider" min="3" max="6" value="3" style="width: 100%; accent-color: #FD8C45;">
+        </div>
+
+        <div class="credit-result-row" style="background: rgba(31, 122, 92, 0.05); border: 1px solid rgba(31, 122, 92, 0.2); border-radius: 12px; padding: 12px;">
+          <div style="text-align: center; width: 100%;">
+            <div style="font-size: 11px; text-transform: uppercase; color: var(--muted); font-weight: 600;">Tu meta de Fondo de Emergencia</div>
+            <div id="emergencyTotalVal" style="font-family: 'IBM Plex Mono', monospace; font-size: 22px; font-weight: 700; color: #1F7A5C; margin-top: 4px;">RD$0</div>
+          </div>
+        </div>
+        <div class="credit-trick" style="margin-top: 10px; background: rgba(45, 138, 206, 0.08); color: #2D8ACE;">
+          💡 <strong>Tip Dominicano:</strong> No dejes este dinero bajo el colchón perdiendo valor. Cuando tengas el equivalente a un mes, transpórtalo a un <strong>Certificado Financiero</strong> o cuenta de ahorro programado en la banca nacional para que genere intereses mensuales.
+        </div>
+      </div>
+
+      <!-- BLOQUE B: EL LANZADOR DE METAS -->
+      <div class="meta-card" style="margin-top: 16px;">
+        <div class="premium-badge-title">🚀 TU PRÓXIMO PASO (PLANIFICADOR)</div>
+        
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 12px;">
+          <div>
+            <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">¿Qué quieres lograr?</label>
+            <input type="text" id="targetGoalName" placeholder="Ej. Inicial del carro, Viaje, Maestría" style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px; outline: none;">
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <div style="flex: 1;">
+              <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">¿Cuánto necesitas? (RD$)</label>
+              <input type="number" id="targetGoalAmount" placeholder="Ej. 100000" inputmode="numeric" style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px; outline: none;">
+            </div>
+            <div style="flex: 1;">
+              <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">¿En cuántos meses?</label>
+              <input type="number" id="targetGoalMonths" placeholder="Ej. 12" inputmode="numeric" style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px; outline: none;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Alerta Dinámica del Coach Financiero -->
+        <div id="coachAlertBox" style="margin-top: 16px; padding: 14px; border-radius: 12px; display: none; font-size: 13.5px; line-height: 1.5;"></div>
+      </div>
+
+      <!-- BLOQUE C: CATÁLOGO DE MICRO-EMPRENDIMIENTOS (DINÁMICO) -->
+      <div id="entrepreneurshipModule" class="meta-card" style="margin-top: 16px; display: none;">
+        <div class="premium-badge-title" style="color: #FD8C45;">💡 MOTOR DE INGRESOS EXTRA</div>
+        <p class="micro-sub" style="font-size: 13px; line-height: 1.4; margin-bottom: 12px;">Para cerrar la brecha de tu meta sin sacrificar tu calidad de vida actual, considera arrancar un micro-proyecto de baja inversión en tus horas libres:</p>
+        
+        <div id="ideasCatalogContainer" style="display: flex; flex-direction: column; gap: 10px;"></div>
+        
+        <div style="margin-top: 14px; padding: 10px; background: #FFF9F5; border: 1px dashed rgba(253, 140, 69, 0.4); border-radius: 8px; font-size: 12px; color: var(--muted); line-height: 1.4;">
+          📌 <strong>Nota de escala:</strong> Si tu idea empieza a facturar de forma constante, puedes formalizarte fácilmente en RD vía el registro de nombre comercial en <strong>ONAPI</strong> y optar por el régimen simplificado (RST) en la DGII.
+        </div>
+      </div>
+    </section>
+
+    <!-- PESTAÑA 4: ACADEMIA -->
     <section id="pane-academia" class="tab-pane">
       <div class="intro-block">
         <h1>Academia</h1>
