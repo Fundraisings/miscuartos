@@ -44,6 +44,14 @@ const kidsTasks = [
 ];
 let kidsChecked = {};
 
+// Ideas de Micro-emprendimiento para el mercado dominicano
+const businessIdeas = [
+  { title: "💻 Gestión de Redes Locales (Social Media)", desc: "Muchos negocios en RD (salones, colmados grandes, tiendas de ropa) no tienen tiempo de subir contenido. Si sabes usar Canva e Instagram, puedes cobrar desde RD$5,000/mes por cuenta." },
+  { title: "🍰 Repostería o Snacks por Encargo", desc: "El dominicano es dulcero. Puedes preparar brownies, galletas o picaderas saladas bajo pedido para eventos o fines de semana sin arriesgar capital en inventario muerto." },
+  { title: "📚 Tutorías Escolares o Universitarias", desc: "Si eres bueno en matemáticas, inglés, contabilidad o redacción, ofrece regularización a hijos de vecinos o compañeros. Dos sesiones semanales pueden aportarte entre RD$4,000 y RD$8,000 mensuales." },
+  { title: "🛍️ Tienda Virtual Dropshipping / Bajo Pedido", desc: "Crea una página de Instagram estéticamente atractiva y vende artículos tendencia (organizadores, cases, joyería) cobrando el 50% por adelantado para realizar el pedido del proveedor." }
+];
+
 /* ============ ACCESIBILIDAD ============ */
 function makeKeyboardActivatable(el) {
   if (!el) return;
@@ -83,6 +91,12 @@ document.querySelectorAll('.nav-item').forEach(btn => {
     
     window.scrollTo({ top: 0, behavior: 'smooth' });
     lazyLoadVideos();
+    
+    // Recalcular vistas de metas si entran a esa pestaña
+    if(btn.dataset.tab === 'metas') {
+      calculateEmergencyFund();
+      calculateTargetGoal();
+    }
   });
 });
 
@@ -126,6 +140,13 @@ function getIncome() {
   if (!incomeEl) return 0;
   const v = parseFloat(incomeEl.value);
   return isNaN(v) || v < 0 ? 0 : v;
+}
+
+// Devuelve el total acumulado de gastos actuales del usuario
+function getTotalExpenses() {
+  let total = 0;
+  Object.keys(categories).forEach(key => { total += (amounts[key] || 0); });
+  return total;
 }
 
 function categoryAdvice(key, amount, income) {
@@ -253,8 +274,7 @@ function showActiveAdvice(key) {
 
 function updateTotals(showOverallStatus) {
   const income = getIncome();
-  let total = 0;
-  Object.keys(categories).forEach(key => { total += (amounts[key] || 0); });
+  let total = getTotalExpenses();
 
   const seg = document.getElementById('totalBarSeg');
   const numEl = document.getElementById('stickyTotalNum');
@@ -432,7 +452,7 @@ function renderXmasProgress() {
   const customMetaTag = document.getElementById('xmasCustomMetaTag');
   
   if (progressNumEl) progressNumEl.textContent = `RD$${fmt(saved)} de RD$${fmt(totalGoal)}`;
-  if (customMetaTag) customMetaTag.textContent = `Meta: RD$${fmt(totalGoal)}`; // Actualiza la etiqueta personalizada
+  if (customMetaTag) customMetaTag.textContent = `Meta: RD$${fmt(totalGoal)}`; 
   
   if (progressLblEl) {
     const checkedCount = Object.values(xmasChecked).filter(Boolean).length;
@@ -441,7 +461,6 @@ function renderXmasProgress() {
   }
 }
 
-// Lógica de Niveles (Incluye el caso personalizado)
 document.querySelectorAll('.xmas-level').forEach(el => {
   makeKeyboardActivatable(el);
   el.addEventListener('click', () => {
@@ -464,7 +483,6 @@ document.querySelectorAll('.xmas-level').forEach(el => {
   });
 });
 
-// Escuchar input personalizado
 const customInput = document.getElementById('xmasCustomAmount');
 if (customInput) {
   customInput.addEventListener('input', () => {
@@ -473,6 +491,101 @@ if (customInput) {
     renderXmasProgress();
   });
 }
+
+/* ============ PESTAÑA: METAS & EMPRENDIMIENTO ============ */
+function calculateEmergencyFund() {
+  const slider = document.getElementById('emergencySlider');
+  const label = document.getElementById('emergencyMonthsLabel');
+  const totalVal = document.getElementById('emergencyTotalVal');
+  if(!slider || !label || !totalVal) return;
+
+  const months = parseInt(slider.value);
+  label.textContent = `${months} meses`;
+  
+  // Extrae los gastos fijos mensuales reales del usuario
+  const monthlyExpenses = getTotalExpenses();
+  const totalFundRequired = monthlyExpenses * months;
+  
+  totalVal.textContent = `RD$${fmt(totalFundRequired)}`;
+}
+
+function calculateTargetGoal() {
+  const goalNameInp = document.getElementById('targetGoalName');
+  const goalAmountInp = document.getElementById('targetGoalAmount');
+  const goalMonthsInp = document.getElementById('targetGoalMonths');
+  const coachBox = document.getElementById('coachAlertBox');
+  const entrepreneurModule = document.getElementById('entrepreneurshipModule');
+
+  if (!goalAmountInp || !goalMonthsInp || !coachBox) return;
+
+  const amount = parseFloat(goalAmountInp.value) || 0;
+  const months = parseInt(goalMonthsInp.value) || 0;
+  const name = goalNameInp ? goalNameInp.value.trim() : "tu meta";
+
+  if (amount <= 0 || months <= 0) {
+    coachBox.style.display = 'none';
+    if(entrepreneurModule) entrepreneurModule.style.display = 'none';
+    return;
+  }
+
+  const monthlySavingsRequired = amount / months;
+  
+  // Capacidad de ahorro real = Ingreso mensual - Egresos mensuales
+  const income = getIncome();
+  const expenses = getTotalExpenses();
+  const actualSavingsCapacity = income - expenses;
+
+  coachBox.style.display = 'block';
+
+  if (monthlySavingsRequired > actualSavingsCapacity) {
+    const deficit = monthlySavingsRequired - actualSavingsCapacity;
+    
+    coachBox.style.background = 'rgba(253, 140, 69, 0.08)';
+    coachBox.style.color = '#B4432A';
+    coachBox.style.border = '1px solid rgba(253, 140, 69, 0.3)';
+    coachBox.innerHTML = `⚠️ Para lograr <b>"${name || 'tu meta'}"</b> necesitas ahorrar <b>RD$${fmt(monthlySavingsRequired)}/mes</b>. Tu presupuesto actual solo dispone de RD$${fmt(Math.max(0, actualSavingsCapacity))}/mes. ¡Te faltan <b>RD$${fmt(deficit)} al mes</b>! Mira abajo cómo cubrirlos.`;
+    
+    // Activa de manera inteligente el módulo de emprendimientos dominicanos
+    if(entrepreneurModule) {
+      entrepreneurModule.style.display = 'block';
+      renderBusinessCatalog();
+    }
+  } else {
+    coachBox.style.background = 'var(--accent-soft)';
+    coachBox.style.color = 'var(--accent-solid)';
+    coachBox.style.border = '1px solid rgba(31, 122, 92, 0.2)';
+    coachBox.innerHTML = `🎉 ¡Excelentes noticias! Para lograr <b>"${name || 'tu meta'}"</b> requieres <b>RD$${fmt(monthlySavingsRequired)}/mes</b> y tu capacidad de ahorro actual soporta este plan perfectamente. ¡Dale con todo!`;
+    
+    if(entrepreneurModule) entrepreneurModule.style.display = 'none';
+  }
+}
+
+function renderBusinessCatalog() {
+  const container = document.getElementById('ideasCatalogContainer');
+  if (!container || container.children.length > 0) return; // Evita duplicar las tarjetas visuales
+
+  businessIdeas.forEach(idea => {
+    const box = document.createElement('div');
+    box.className = 'coach-idea-box';
+    box.innerHTML = `
+      <div class="coach-idea-title">${idea.title}</div>
+      <div class="coach-idea-desc">${idea.desc}</div>
+    `;
+    container.appendChild(box);
+  });
+}
+
+// Escuchadores de eventos para la pestaña Metas
+const emergencySlider = document.getElementById('emergencySlider');
+if (emergencySlider) {
+  emergencySlider.addEventListener('input', calculateEmergencyFund);
+}
+
+['targetGoalAmount', 'targetGoalMonths', 'targetGoalName'].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input', calculateTargetGoal);
+});
+
 
 /* ============ SIMULADOR AFP ============ */
 if (document.getElementById('afpSalario')) {
