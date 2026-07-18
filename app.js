@@ -1,7 +1,7 @@
 /**
  * MISCUARTOS APP - SCRIPT PRINCIPAL COMPLETO (2026)
- * Contiene: Pantalla de inicio, navegación, presupuesto, reto navideño con árbol
- * interactivo y estrella dinámica, simulador AFP y desplegables del Coach.
+ * Contiene: Pantalla de inicio, navegación, presupuesto con mascotas y WhatsApp,
+ * reto navideño con árbol interactivo, simulador AFP y desplegables del Coach.
  */
 
 // --- 1. CONFIGURACIÓN DE DATOS GLOBALES ---
@@ -75,16 +75,20 @@ function renderizarCamposPresupuesto() {
   const resultsContainer = document.getElementById("results");
   if (!resultsContainer) return;
 
+  // Lista de categorías incluyendo Mascotas ahora
   const categorias = [
     { id: "vivienda", label: "🏠 Vivienda y Alquiler", placeholder: "Ej. 15,000" },
     { id: "alimentos", label: "🛒 Súper y Comida (Canasta básica)", placeholder: "Ej. 12,000" },
     { id: "transporte", label: "🚗 Gasolina, Concho o Mototaxi", placeholder: "Ej. 4,000" },
     { id: "servicios", label: "⚡ Luz, Agua, Internet y celular", placeholder: "Ej. 3,500" },
     { id: "entretenimiento", label: "🍗 Salidas, Coros y Delivery", placeholder: "Ej. 3,000" },
+    { id: "mascotas", label: "🐶 Mascotas (Alimento y Vet)", placeholder: "Ej. 2,500" },
     { id: "deudas", label: "💳 Tarjetas y Préstamos", placeholder: "Ej. 5,000" }
   ];
 
   resultsContainer.innerHTML = "";
+  
+  // Renderizamos los campos input de gastos
   categorias.forEach(cat => {
     const row = document.createElement("div");
     row.style = "background: #fff; padding: 14px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #e1e6eb; display: flex; justify-content: space-between; align-items: center; gap: 12px;";
@@ -92,18 +96,35 @@ function renderizarCamposPresupuesto() {
       <label for="${cat.id}" style="font-size: 14px; font-weight: 500; color: #111;">${cat.label}</label>
       <div style="display: flex; align-items: center; gap: 4px;">
         <span style="font-weight: 600; color: #666;">RD$</span>
-        <input type="number" id="${cat.id}" placeholder="${cat.placeholder}" inputmode="numeric" class="gastos-input" style="width: 100px; padding: 6px 10px; border: 1px solid #e1e6eb; border-radius: 8px; font-size: 14px; text-align: right; outline: none;">
+        <input type="number" id="${cat.id}" placeholder="${cat.placeholder}" inputmode="numeric" class="gastos-input" data-label="${cat.label}" style="width: 100px; padding: 6px 10px; border: 1px solid #e1e6eb; border-radius: 8px; font-size: 14px; text-align: right; outline: none;">
       </div>
     `;
     resultsContainer.appendChild(row);
   });
 
+  // Agregar el Botón de WhatsApp al final de la lista de campos
+  const whatsappBtnContainer = document.createElement("div");
+  whatsappBtnContainer.style = "margin-top: 20px; text-align: center;";
+  whatsappBtnContainer.innerHTML = `
+    <button id="shareWhatsappBtn" style="background-color: #25D366; color: white; border: none; padding: 12px 24px; font-size: 15px; font-weight: bold; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 6px rgba(37,211,102,0.2); transition: background 0.2s;">
+      🟢 Enviar por WhatsApp
+    </button>
+  `;
+  resultsContainer.appendChild(whatsappBtnContainer);
+
+  // Escuchar cambios en los inputs para recalcular en tiempo real
   document.querySelectorAll(".gastos-input").forEach(input => {
     input.addEventListener("input", () => {
       calcularPresupuestoInstantaneo();
       actualizarAnalisisDelCoach();
     });
   });
+
+  // Configurar el click para el botón de WhatsApp
+  const shareBtn = document.getElementById("shareWhatsappBtn");
+  if (shareBtn) {
+    shareBtn.addEventListener("click", enviarPresupuestoWhatsApp);
+  }
 }
 
 function calcularPresupuestoInstantaneo() {
@@ -126,31 +147,59 @@ function calcularPresupuestoInstantaneo() {
   return totalGastos;
 }
 
+function enviarPresupuestoWhatsApp() {
+  const sueldo = parseFloat(document.getElementById("income").value) || 0;
+  let mensaje = `📊 *MI PRESUPUESTO - MISCUARTOS APP*\n`;
+  mensaje += `💰 *Ingresos mensuales:* RD$ ${sueldo.toLocaleString('es-DO')}\n\n`;
+  mensaje += `📝 *Detalle de Gastos registrados:*\n`;
+
+  let totalGastos = 0;
+  let hayGastos = false;
+
+  document.querySelectorAll(".gastos-input").forEach(input => {
+    const valor = parseFloat(input.value) || 0;
+    if (valor > 0) {
+      const label = input.getAttribute("data-label");
+      mensaje += `${label}: RD$ ${valor.toLocaleString('es-DO')}\n`;
+      totalGastos += valor;
+      hayGastos = true;
+    }
+  });
+
+  if (!hayGastos) {
+    alert("Por favor, ingresa al menos un monto en tus gastos antes de enviar.");
+    return;
+  }
+
+  const balance = sueldo - totalGastos;
+  mensaje += `\n📉 *Total Gastos:* RD$ ${totalGastos.toLocaleString('es-DO')}\n`;
+  mensaje += `💵 *Balance Libre:* RD$ ${balance.toLocaleString('es-DO')}\n\n`;
+  mensaje += `_Generado desde mi App de Control Financiero 2026._`;
+
+  // Codificar para URL de WhatsApp
+  const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(mensaje)}`;
+  window.open(url, '_blank');
+}
+
 // --- 6. LÓGICA DE LA PESTAÑA: RETO NAVIDEÑO CON ÁRBOL E INTERACTIVIDAD ---
 function inicializarRetoNavideno() {
   const xmasWeeksContainer = document.getElementById("xmasWeeks");
   const progresoNum = document.getElementById("xmasProgressNum");
   if (!xmasWeeksContainer) return;
 
-  // Inyectamos la estructura visual del arbolito y el panel derecho para las luces
   xmasWeeksContainer.innerHTML = `
     <div style="display: flex; flex-direction: column; align-items: center; gap: 20px; margin: 20px 0; position: relative; min-height: 420px; width: 100%;">
       
-      <!-- Contenedor Principal: Árbol Izquierda / Esferas Derecha -->
       <div style="display: flex; width: 100%; max-width: 340px; align-items: center; justify-content: space-between; position: relative;">
         
         <!-- El Arbolito de Navidad en CSS Nativo (Lado Izquierdo) -->
         <div style="display: flex; flex-direction: column; align-items: center; width: 140px; position: relative; margin-left: 10px;">
-          <!-- Copa 1 -->
           <div style="width: 0; height: 0; border-left: 35px solid transparent; border-right: 35px solid transparent; border-bottom: 50px solid #1B4D3E; margin-bottom: -20px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));"></div>
-          <!-- Copa 2 -->
           <div style="width: 0; height: 0; border-left: 50px solid transparent; border-right: 50px solid transparent; border-bottom: 65px solid #143D31; margin-bottom: -25px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));"></div>
-          <!-- Copa 3 (Base) -->
           <div style="width: 0; height: 0; border-left: 65px solid transparent; border-right: 65px solid transparent; border-bottom: 80px solid #0F2E25; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));"></div>
-          <!-- Tronco -->
           <div style="width: 25px; height: 30px; background: #5C4033; border-radius: 0 0 4px 4px;"></div>
           
-          <!-- Estrella Superior Dinámica (Empieza apagada/grisácea) -->
+          <!-- Estrella Superior Dinámica -->
           <div id="starXmas" style="position: absolute; top: -25px; font-size: 24px; color: #A0AAB2; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2)); transition: all 0.4s ease; user-select: none;">⭐</div>
         </div>
 
@@ -185,7 +234,6 @@ function inicializarRetoNavideno() {
 
     esfera.addEventListener("click", () => {
       if (esferasCompletadas.has(i)) {
-        // APAGAR ESFERA
         esferasCompletadas.delete(i);
         esfera.style.background = "#E9ECEF";
         esfera.style.borderColor = "#CED4DA";
@@ -193,12 +241,11 @@ function inicializarRetoNavideno() {
         esfera.style.boxShadow = "inset 0 -2px 4px rgba(0,0,0,0.1)";
         esfera.style.transform = "scale(1)";
       } else {
-        // ENCENDER ESFERA
         esferasCompletadas.add(i);
         
-        let colorBrillo = "#FF4136"; // Rojo
-        if (i % 3 === 0) colorBrillo = "#FFDC00"; // Amarillo oro
-        else if (i % 2 === 0) colorBrillo = "#2ECC40"; // Verde
+        let colorBrillo = "#FF4136";
+        if (i % 3 === 0) colorBrillo = "#FFDC00";
+        else if (i % 2 === 0) colorBrillo = "#2ECC40";
         
         esfera.style.background = colorBrillo;
         esfera.style.borderColor = "#FFF";
@@ -207,12 +254,10 @@ function inicializarRetoNavideno() {
         esfera.style.transform = "scale(1.12)";
       }
 
-      // Validar estados e iluminación de la Estrella Superior
       const exitoBox = document.getElementById("mensajeExitoNavidad");
       const estrella = document.getElementById("starXmas");
       
       if (esferasCompletadas.size === 22) {
-        // META ALCANZADA: Encendemos la estrella e insertamos animación
         if (estrella) {
           estrella.style.color = "#FFD700";
           estrella.style.filter = "drop-shadow(0 0 8px #FFD700)";
@@ -221,7 +266,6 @@ function inicializarRetoNavideno() {
         if (exitoBox) exitoBox.style.display = "block";
         if (progresoNum) progresoNum.style.display = "none";
       } else {
-        // PROGRESO INCOMPLETO: Estrella permanece apagada
         if (estrella) {
           estrella.style.color = "#A0AAB2";
           estrella.style.filter = "drop-shadow(0 1px 2px rgba(0,0,0,0.2))";
