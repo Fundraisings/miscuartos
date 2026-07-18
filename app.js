@@ -16,7 +16,6 @@ const categories = {
   diversion:  { label: 'Diversión',       color: '#66766D', tip: 'Salidas y gustos. Pequeño pero necesario para no rendirte.' }
 };
 
-let selected = new Set();
 let amounts = {};       // lo que la persona realmente escribe por categoría
 let incomeType = 'fijo';
 
@@ -104,35 +103,12 @@ function lazyLoadVideos() {
   }
 }
 
-/* ============ PRESUPUESTO: entrada manual + asesoría dinámica ============ */
-const chipsEl = document.getElementById('chips');
+/* ============ PRESUPUESTO: lista única con casilla de dinero + consejo activo ============ */
 const resultsEl = document.getElementById('results');
 const incomeEl = document.getElementById('income');
 const countTag = document.getElementById('countTag');
 
 function fmt(n) { return Math.round(n).toLocaleString('en-US', { maximumFractionDigits: 0 }); }
-
-function buildChips() {
-  if (!chipsEl) return;
-  chipsEl.innerHTML = '';
-  Object.entries(categories).forEach(([key, cat]) => {
-    const chip = document.createElement('div');
-    chip.className = 'chip';
-    chip.innerHTML = `<span class="dot"></span>${cat.label}`;
-    makeKeyboardActivatable(chip);
-    chip.addEventListener('click', () => {
-      if (selected.has(key)) {
-        selected.delete(key);
-        delete amounts[key];
-      } else {
-        selected.add(key);
-      }
-      chip.classList.toggle('active');
-      renderCategoryList();
-    });
-    chipsEl.appendChild(chip);
-  });
-}
 
 function getIncome() {
   if (!incomeEl) return 0;
@@ -177,15 +153,7 @@ function categoryAdvice(key, amount, income) {
   return null; // categorías sin benchmark: solo se queda el tip base, sin semáforo
 }
 
-function renderCategoryList() {
-  if (!countTag) return;
-  countTag.textContent = `${selected.size} seleccionado${selected.size === 1 ? '' : 's'}`;
-
-  if (selected.size === 0) {
-    resultsEl.innerHTML = `<div class="empty" style="text-align:center; font-size:13px; color:var(--muted); padding:20px; border:1px dashed var(--line); border-radius:12px; margin-top: 14px;">Marca qué pagarás este mes para empezar a anotar tus montos reales.</div>`;
-    return;
-  }
-
+function buildCategoryRows() {
   let html = `
     <div class="sticky-total-box">
       <div class="sticky-total-num" id="stickyTotalNum">RD$0</div>
@@ -195,8 +163,7 @@ function renderCategoryList() {
     </div>
   `;
 
-  selected.forEach(key => {
-    const cat = categories[key];
+  Object.entries(categories).forEach(([key, cat]) => {
     html += `
       <div class="cat-row">
         <div class="cat-row-label"><span class="cat-dot" id="dot-${key}"></span>${cat.label}</div>
@@ -216,30 +183,62 @@ function renderCategoryList() {
       const val = parseFloat(e.target.value);
       amounts[key] = isNaN(val) ? 0 : val;
       updateCategoryDot(key);
-      updateTotals();
+      showActiveAdvice(key);
+      updateCount();
+      updateTotals(false);
     });
+    // La caja sticky "sigue" al campo donde estás parado — muestra el
+    // consejo de esa categoría mientras la llenas, no el total general.
+    inp.addEventListener('focus', (e) => showActiveAdvice(e.target.dataset.key));
+    inp.addEventListener('blur', () => updateTotals(true));
   });
 
   document.getElementById('summaryBtn').addEventListener('click', openSummary);
 
-  selected.forEach(key => updateCategoryDot(key));
-  updateTotals();
+  Object.keys(categories).forEach(key => updateCategoryDot(key));
+  updateCount();
+  updateTotals(true);
 }
 
-// Solo actualiza el puntito de color de la fila — el detalle completo
-// del consejo vive en el resumen final, no aquí (para no saturar la lista).
+function updateCount() {
+  if (!countTag) return;
+  const withAmount = Object.values(amounts).filter(v => v > 0).length;
+  countTag.textContent = `${withAmount} con monto`;
+}
+
+// Solo el puntito de color de la fila — no satura la lista con texto.
 function updateCategoryDot(key) {
   const dot = document.getElementById(`dot-${key}`);
   if (!dot) return;
-  const income = getIncome();
-  const advice = categoryAdvice(key, amounts[key] || 0, income);
+  const amt = amounts[key] || 0;
+  if (!amt) { dot.className = 'cat-dot'; return; }
+  const advice = categoryAdvice(key, amt, getIncome());
   dot.className = 'cat-dot' + (advice ? ` ${advice.level}` : '');
 }
 
-function updateTotals() {
+// Muestra en la caja sticky el consejo de la categoría donde el usuario
+// tiene el cursor ahora mismo — esto es lo que "baja con la lista".
+function showActiveAdvice(key) {
+  const warnBox = document.getElementById('totalOverWarning');
+  if (!warnBox) return;
+  const advice = categoryAdvice(key, amounts[key] || 0, getIncome());
+  if (!advice) { updateTotals(true); return; }
+  const colors = {
+    green: { bg: 'var(--accent-soft)', fg: 'var(--accent-solid)' },
+    amber: { bg: 'var(--brand-orange-soft)', fg: 'var(--brand-orange)' },
+    red:   { bg: 'rgba(180,67,42,0.08)', fg: '#8a3320' }
+  };
+  const c = colors[advice.level];
+  warnBox.style.display = 'block';
+  warnBox.style.background = c.bg;
+  warnBox.style.color = c.fg;
+  warnBox.innerHTML = `<b>${categories[key].label}:</b> ${advice.html}`;
+}
+
+function updateTotals(showOverallStatus) {
   const income = getIncome();
   let total = 0;
-  selected.forEach(key => { total += (amounts[key] || 0); });
+  Object.keys(categories).forEach(key => { total += (amounts[key] || 0); });
 
   const seg = document.getElementById('totalBarSeg');
   const numEl = document.getElementById('stickyTotalNum');
@@ -252,6 +251,8 @@ function updateTotals() {
   seg.style.background = total > income && income > 0 ? '#B4432A' : 'var(--accent-solid)';
   numEl.textContent = `RD$${fmt(total)}`;
   ofEl.textContent = `de RD$${fmt(income)} ganado este mes`;
+
+  if (!showOverallStatus) return; // el usuario sigue con el foco en un campo, no le tapes su consejo activo
 
   if (income > 0 && total > income) {
     const exceso = total - income;
@@ -268,19 +269,20 @@ function updateTotals() {
     warnBox.style.display = 'none';
   }
 
-  selected.forEach(key => updateCategoryDot(key));
+  Object.keys(categories).forEach(key => updateCategoryDot(key));
 }
 
 function openSummary() {
   const income = getIncome();
+  const usedKeys = Object.keys(categories).filter(key => (amounts[key] || 0) > 0);
   let total = 0;
-  selected.forEach(key => { total += (amounts[key] || 0); });
+  usedKeys.forEach(key => { total += (amounts[key] || 0); });
 
   document.getElementById('summaryTotal').textContent = `RD$${fmt(total)}`;
 
   let rows = '';
   let waText = `📋 Los números de la casa este mes:\n\n`;
-  selected.forEach(key => {
+  usedKeys.forEach(key => {
     const amt = amounts[key] || 0;
     const advice = categoryAdvice(key, amt, income);
     rows += `<div class="summary-row" style="flex-direction:column; align-items:stretch; gap:4px;">
@@ -492,12 +494,11 @@ document.querySelectorAll('.type-btn').forEach(b => {
 });
 
 /* ============ INICIALIZADORES ============ */
-buildChips();
 buildLeaks();
 buildXmas();
 
 if (incomeEl) {
-  incomeEl.addEventListener('input', updateTotals);
+  incomeEl.addEventListener('input', () => updateTotals(true));
 }
 
-renderCategoryList();
+buildCategoryRows();
