@@ -1,7 +1,8 @@
 /**
  * MISCUARTOS APP - SCRIPT PRINCIPAL COMPLETO (2026)
- * Contiene: Pantalla de inicio, navegación, presupuesto con mascotas y WhatsApp,
- * reto navideño con árbol interactivo, simulador AFP y desplegables del Coach.
+ * Contiene: Pantalla de inicio, navegación, presupuesto con inputs optimizados,
+ * gráficos dinámicos por categorías, alertas de educación financiera, botón de WhatsApp,
+ * reto con Árbol Navideño 3D Giratorio interactivo, simulador AFP y Coach.
  */
 
 // --- 1. CONFIGURACIÓN DE DATOS GLOBALES ---
@@ -28,7 +29,6 @@ function inicializarPantallaInicio() {
     enterAppBtn.addEventListener("click", () => {
       splashScreen.style.display = "none";
       mainAppContainer.style.display = "block";
-      // Inicializar cálculos por si acaso
       calcularPresupuestoInstantaneo();
     });
   }
@@ -43,11 +43,9 @@ function inicializarNavegacion() {
     btn.addEventListener("click", () => {
       const targetTab = btn.getAttribute("data-tab");
 
-      // Cambiar estado activo de los botones inferiores
       navButtons.forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
 
-      // Cambiar visibilidad de las pestañas de contenido
       tabPanes.forEach(pane => {
         if (pane.id === `pane-${targetTab}`) {
           pane.classList.add("active");
@@ -75,44 +73,60 @@ function renderizarCamposPresupuesto() {
   const resultsContainer = document.getElementById("results");
   if (!resultsContainer) return;
 
-  // Lista de categorías incluyendo Mascotas ahora
+  // 7 Items con sus iconos y placeholders correspondientes
   const categorias = [
-    { id: "vivienda", label: "🏠 Vivienda y Alquiler", placeholder: "Ej. 15,000" },
-    { id: "alimentos", label: "🛒 Súper y Comida (Canasta básica)", placeholder: "Ej. 12,000" },
-    { id: "transporte", label: "🚗 Gasolina, Concho o Mototaxi", placeholder: "Ej. 4,000" },
-    { id: "servicios", label: "⚡ Luz, Agua, Internet y celular", placeholder: "Ej. 3,500" },
-    { id: "entretenimiento", label: "🍗 Salidas, Coros y Delivery", placeholder: "Ej. 3,000" },
-    { id: "mascotas", label: "🐶 Mascotas (Alimento y Vet)", placeholder: "Ej. 2,500" },
-    { id: "deudas", label: "💳 Tarjetas y Préstamos", placeholder: "Ej. 5,000" }
+    { id: "vivienda", label: "🏠 Vivienda y Alquiler", placeholder: "Ej. 15,000", icon: "🏠" },
+    { id: "alimentos", label: "🛒 Súper y Comida (Canasta básica)", placeholder: "Ej. 12,000", icon: "🛒" },
+    { id: "transporte", label: "🚗 Gasolina, Concho o Mototaxi", placeholder: "Ej. 4,000", icon: "🚗" },
+    { id: "servicios", label: "⚡ Luz, Agua, Internet y celular", placeholder: "Ej. 3,500", icon: "⚡" },
+    { id: "entretenimiento", label: "🍗 Salidas, Coros y Delivery", placeholder: "Ej. 3,000", icon: "🍗" },
+    { id: "mascotas", label: "🐶 Mascotas (Alimento y Vet)", placeholder: "Ej. 2,500", icon: "🐶" },
+    { id: "deudas", label: "💳 Tarjetas y Préstamos", placeholder: "Ej. 5,000", icon: "💳" }
   ];
 
   resultsContainer.innerHTML = "";
   
-  // Renderizamos los campos input de gastos
   categorias.forEach(cat => {
-    const row = document.createElement("div");
-    row.style = "background: #fff; padding: 14px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #e1e6eb; display: flex; justify-content: space-between; align-items: center; gap: 12px;";
-    row.innerHTML = `
-      <label for="${cat.id}" style="font-size: 14px; font-weight: 500; color: #111;">${cat.label}</label>
-      <div style="display: flex; align-items: center; gap: 4px;">
-        <span style="font-weight: 600; color: #666;">RD$</span>
-        <input type="number" id="${cat.id}" placeholder="${cat.placeholder}" inputmode="numeric" class="gastos-input" data-label="${cat.label}" style="width: 100px; padding: 6px 10px; border: 1px solid #e1e6eb; border-radius: 8px; font-size: 14px; text-align: right; outline: none;">
+    const card = document.createElement("div");
+    card.style = "background: #fff; padding: 16px; border-radius: 14px; margin-bottom: 14px; border: 1px solid #e1e6eb; display: flex; flex-direction: column; gap: 8px; transition: all 0.3s ease;";
+    card.id = `card-${cat.id}`;
+    
+    card.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
+        <!-- Bloque Izquierdo: Textos e Input abajo -->
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
+          <label for="${cat.id}" style="font-size: 14px; font-weight: 600; color: #111;">${cat.label}</label>
+          <div style="display: flex; align-items: center; gap: 6px; background: #f8f9fa; border: 1px solid #ced4da; border-radius: 8px; padding: 6px 10px; max-width: 180px;">
+            <span style="font-weight: 700; color: #495057; font-size: 13px;">RD$</span>
+            <input type="number" id="${cat.id}" placeholder="${cat.placeholder}" inputmode="numeric" class="gastos-input" data-id="${cat.id}" data-label="${cat.label}" style="width: 100%; border: none; background: transparent; font-size: 14px; text-align: right; outline: none; font-weight: 600;">
+          </div>
+        </div>
+        
+        <!-- Bloque Derecho: Recuadro con Gráfico/Icono Visual Dinámico -->
+        <div id="visual-${cat.id}" style="width: 52px; height: 52px; border-radius: 12px; background: #e9ecef; border: 1px solid #ced4da; display: flex; align-items: center; justify-content: center; font-size: 24px; transition: all 0.3s ease; box-shadow: inset 0 -2px 4px rgba(0,0,0,0.05);">
+          ${cat.icon}
+        </div>
+      </div>
+      
+      <!-- Contenedor dinámico para Educación Financiera y Alertas según el % -->
+      <div id="edu-${cat.id}" style="font-size: 12px; color: #666; font-weight: 500; transition: all 0.3s ease; margin-top: 2px;">
+        Introduce un monto para evaluar el impacto en tus ingresos.
       </div>
     `;
-    resultsContainer.appendChild(row);
+    resultsContainer.appendChild(card);
   });
 
-  // Agregar el Botón de WhatsApp al final de la lista de campos
+  // Botón de WhatsApp
   const whatsappBtnContainer = document.createElement("div");
-  whatsappBtnContainer.style = "margin-top: 20px; text-align: center;";
+  whatsappBtnContainer.style = "margin-top: 24px; text-align: center;";
   whatsappBtnContainer.innerHTML = `
-    <button id="shareWhatsappBtn" style="background-color: #25D366; color: white; border: none; padding: 12px 24px; font-size: 15px; font-weight: bold; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 6px rgba(37,211,102,0.2); transition: background 0.2s;">
+    <button id="shareWhatsappBtn" style="background-color: #25D366; color: white; border: none; padding: 14px 28px; font-size: 15px; font-weight: bold; border-radius: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(37,211,102,0.25); transition: transform 0.2s, background 0.2s;">
       🟢 Enviar por WhatsApp
     </button>
   `;
   resultsContainer.appendChild(whatsappBtnContainer);
 
-  // Escuchar cambios en los inputs para recalcular en tiempo real
+  // Escuchar cambios
   document.querySelectorAll(".gastos-input").forEach(input => {
     input.addEventListener("input", () => {
       calcularPresupuestoInstantaneo();
@@ -120,7 +134,6 @@ function renderizarCamposPresupuesto() {
     });
   });
 
-  // Configurar el click para el botón de WhatsApp
   const shareBtn = document.getElementById("shareWhatsappBtn");
   if (shareBtn) {
     shareBtn.addEventListener("click", enviarPresupuestoWhatsApp);
@@ -128,14 +141,54 @@ function renderizarCamposPresupuesto() {
 }
 
 function calcularPresupuestoInstantaneo() {
+  const sueldo = parseFloat(document.getElementById("income").value) || 0;
   let totalGastos = 0;
   let camposConMonto = 0;
 
+  // Primero calculamos el total
   document.querySelectorAll(".gastos-input").forEach(input => {
     const valor = parseFloat(input.value) || 0;
     if (valor > 0) {
       totalGastos += valor;
       camposConMonto++;
+    }
+  });
+
+  // Actualizamos cada tarjeta dinámicamente con alertas y colores
+  document.querySelectorAll(".gastos-input").forEach(input => {
+    const id = input.getAttribute("data-id");
+    const valor = parseFloat(input.value) || 0;
+    const boxVisual = document.getElementById(`visual-${id}`);
+    const eduTexto = document.getElementById(`edu-${id}`);
+    
+    if (!boxVisual || !eduTexto) return;
+
+    if (valor <= 0) {
+      // ESTADO APAGADO (GRIS)
+      boxVisual.style.background = "#e9ecef";
+      boxVisual.style.borderColor = "#ced4da";
+      boxVisual.style.boxShadow = "inset 0 -2px 4px rgba(0,0,0,0.05)";
+      eduTexto.innerHTML = "Introduce un monto para evaluar el impacto en tus ingresos.";
+      eduTexto.style.color = "#666";
+    } else {
+      // Calcular porcentaje en base al sueldo disponible
+      const porcentaje = sueldo > 0 ? (valor / sueldo) * 100 : 0;
+
+      if (porcentaje > 35) {
+        // ESTADO ALERTA CRÍTICA (ROJO)
+        boxVisual.style.background = "#FFEBE9";
+        boxVisual.style.borderColor = "#FF8170";
+        boxVisual.style.boxShadow = "0 0 8px rgba(255,129,112,0.4)";
+        eduTexto.innerHTML = `⚠️ <strong>¡Alerta!</strong> Este gasto representa el <strong>${porcentaje.toFixed(1)}%</strong> de tus ingresos. Supera el límite recomendado del 35%. Podría comprometer tu salud financiera total mensual.`;
+        eduTexto.style.color = "#D9381E";
+      } else {
+        // ESTADO CONTROLADO (VERDE)
+        boxVisual.style.background = "#E6F4EA";
+        boxVisual.style.borderColor = "#57B988";
+        boxVisual.style.boxShadow = "0 0 8px rgba(87,185,136,0.4)";
+        eduTexto.innerHTML = `✅ Gasto controlado: Representa el <strong>${porcentaje.toFixed(1)}%</strong> de tus ingresos totales. ¡Buen manejo dentro del presupuesto recomendado!`;
+        eduTexto.style.color = "#137333";
+      }
     }
   });
 
@@ -176,35 +229,84 @@ function enviarPresupuestoWhatsApp() {
   mensaje += `💵 *Balance Libre:* RD$ ${balance.toLocaleString('es-DO')}\n\n`;
   mensaje += `_Generado desde mi App de Control Financiero 2026._`;
 
-  // Codificar para URL de WhatsApp
   const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(mensaje)}`;
   window.open(url, '_blank');
 }
 
-// --- 6. LÓGICA DE LA PESTAÑA: RETO NAVIDEÑO CON ÁRBOL E INTERACTIVIDAD ---
+// --- 6. LÓGICA DE LA PESTAÑA: RETO NAVIDEÑO CON ÁRBOL 3D GIRATORIO ---
 function inicializarRetoNavideno() {
   const xmasWeeksContainer = document.getElementById("xmasWeeks");
   const progresoNum = document.getElementById("xmasProgressNum");
   if (!xmasWeeksContainer) return;
 
+  // Inyección de estilos CSS para la perspectiva y rotación 3D nativa
+  if (!document.getElementById("xmas3dStyles")) {
+    const styleTag = document.createElement("style");
+    styleTag.id = "xmas3dStyles";
+    styleTag.innerHTML = `
+      @keyframes spin3d {
+        0% { transform: rotateY(0deg); }
+        100% { transform: rotateY(360deg); }
+      }
+      .tree-3d-scene {
+        perspective: 600px;
+        width: 140px;
+        height: 200px;
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .tree-3d-body {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transform-style: preserve-3d;
+        animation: spin3d 8s linear infinite;
+      }
+      .tree-layer {
+        position: absolute;
+        left: 50%;
+        transform-origin: 0% 50%;
+      }
+      .layer-1 { top: 20px; border-left: 35px solid transparent; border-right: 35px solid transparent; border-bottom: 50px solid #1B4D3E; margin-left: -35px; }
+      .layer-2 { top: 45px; border-left: 50px solid transparent; border-right: 50px solid transparent; border-bottom: 65px solid #143D31; margin-left: -50px; }
+      .layer-3 { top: 75px; border-left: 65px solid transparent; border-right: 65px solid transparent; border-bottom: 80px solid #0F2E25; margin-left: -65px; }
+    `;
+    document.head.appendChild(styleTag);
+  }
+
   xmasWeeksContainer.innerHTML = `
-    <div style="display: flex; flex-direction: column; align-items: center; gap: 20px; margin: 20px 0; position: relative; min-height: 420px; width: 100%;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 20px; margin: 20px 0; position: relative; min-height: 440px; width: 100%;">
       
       <div style="display: flex; width: 100%; max-width: 340px; align-items: center; justify-content: space-between; position: relative;">
         
-        <!-- El Arbolito de Navidad en CSS Nativo (Lado Izquierdo) -->
+        <!-- Escena y Objeto del Árbol 3D en Rotación Continua -->
         <div style="display: flex; flex-direction: column; align-items: center; width: 140px; position: relative; margin-left: 10px;">
-          <div style="width: 0; height: 0; border-left: 35px solid transparent; border-right: 35px solid transparent; border-bottom: 50px solid #1B4D3E; margin-bottom: -20px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));"></div>
-          <div style="width: 0; height: 0; border-left: 50px solid transparent; border-right: 50px solid transparent; border-bottom: 65px solid #143D31; margin-bottom: -25px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));"></div>
-          <div style="width: 0; height: 0; border-left: 65px solid transparent; border-right: 65px solid transparent; border-bottom: 80px solid #0F2E25; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));"></div>
-          <div style="width: 25px; height: 30px; background: #5C4033; border-radius: 0 0 4px 4px;"></div>
           
-          <!-- Estrella Superior Dinámica -->
-          <div id="starXmas" style="position: absolute; top: -25px; font-size: 24px; color: #A0AAB2; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2)); transition: all 0.4s ease; user-select: none;">⭐</div>
+          <!-- Estrella Superior Fija en el eje z exterior -->
+          <div id="starXmas" style="position: absolute; top: -15px; z-index: 10; font-size: 26px; color: #A0AAB2; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2)); transition: all 0.4s ease; user-select: none;">⭐</div>
+          
+          <div class="tree-3d-scene">
+            <div class="tree-3d-body">
+              <!-- Cara A (Frontal) -->
+              <div class="tree-layer layer-1" style="transform: rotateY(0deg);"></div>
+              <div class="tree-layer layer-2" style="transform: rotateY(0deg);"></div>
+              <div class="tree-layer layer-3" style="transform: rotateY(0deg);"></div>
+              
+              <!-- Cara B (Cruzada 90 grados para efecto volumétrico 3D) -->
+              <div class="tree-layer layer-1" style="transform: rotateY(90deg);"></div>
+              <div class="tree-layer layer-2" style="transform: rotateY(90deg);"></div>
+              <div class="tree-layer layer-3" style="transform: rotateY(90deg);"></div>
+            </div>
+          </div>
+          
+          <!-- Tronco del árbol -->
+          <div style="width: 24px; height: 32px; background: #5C4033; border-radius: 0 0 4px 4px; margin-top: -15px; z-index: 2;"></div>
         </div>
 
         <!-- Panel de Luces / Esferas Numéricas (Lado Derecho) -->
-        <div id="lucesXmasContainer" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 170px; background: rgba(244, 247, 249, 0.7); padding: 10px; border-radius: 14px; border: 1px dashed #ced4da;">
+        <div id="lucesXmasContainer" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 170px; background: rgba(244, 247, 249, 0.7); padding: 10px; border-radius: 14px; border: 1px dashed #ced4da; z-index: 5;">
         </div>
 
       </div>
@@ -260,8 +362,8 @@ function inicializarRetoNavideno() {
       if (esferasCompletadas.size === 22) {
         if (estrella) {
           estrella.style.color = "#FFD700";
-          estrella.style.filter = "drop-shadow(0 0 8px #FFD700)";
-          estrella.style.transform = "scale(1.3)";
+          estrella.style.filter = "drop-shadow(0 0 12px #FFD700) drop-shadow(0 0 25px #FFDC00)";
+          estrella.style.transform = "scale(1.4)";
         }
         if (exitoBox) exitoBox.style.display = "block";
         if (progresoNum) progresoNum.style.display = "none";
