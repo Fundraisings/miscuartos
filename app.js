@@ -1,8 +1,8 @@
 /**
  * MISCUARTOS APP - SCRIPT PRINCIPAL COMPLETO (2026)
  * Contiene: Pantalla de inicio, navegación, presupuesto con inputs optimizados,
- * alertas de finanzas realistas personalizadas, pop-up de vista previa, botón de WhatsApp,
- * reto con Árbol Navideño volumétrico 3D interactivo, simulador AFP y Coach.
+ * alertas de finanzas realistas, pop-up de vista previa, botón de WhatsApp,
+ * reto con Árbol Navideño Fotorrealista y regalos en la base, simulador AFP y Coach.
  */
 
 // --- 1. CONFIGURACIÓN DE DATOS GLOBALES ---
@@ -20,43 +20,12 @@ document.addEventListener("DOMContentLoaded", () => {
   inyectarEstilosGlobalesDinamicos();
 });
 
-// --- 3. INYECCIÓN DE ESTILOS CSS REQUERIDOS (3D Y MODAL POP-UP) ---
+// --- 3. INYECCIÓN DE ESTILOS CSS REQUERIDOS (MODAL POP-UP Y DISEÑO) ---
 function inyectarEstilosGlobalesDinamicos() {
   if (document.getElementById("appGlobalStyles")) return;
   const styleTag = document.createElement("style");
   styleTag.id = "appGlobalStyles";
   styleTag.innerHTML = `
-    @keyframes spin3d {
-      0% { transform: rotateY(0deg); }
-      100% { transform: rotateY(360deg); }
-    }
-    .tree-3d-scene {
-      perspective: 800px;
-      width: 140px;
-      height: 200px;
-      position: relative;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .tree-3d-body {
-      width: 100%;
-      height: 100%;
-      position: relative;
-      transform-style: preserve-3d;
-      animation: spin3d 10s linear infinite;
-    }
-    .tree-layer {
-      position: absolute;
-      left: 50%;
-      transform-origin: 0% 50%;
-      backface-visibility: visible;
-    }
-    /* Estructura geométrica del árbol con degradados para dar volumen */
-    .layer-1 { top: 20px; border-left: 35px solid transparent; border-right: 35px solid transparent; border-bottom: 50px solid #1B4D3E; margin-left: -35px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); }
-    .layer-2 { top: 45px; border-left: 50px solid transparent; border-right: 50px solid transparent; border-bottom: 65px solid #143D31; margin-left: -50px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); }
-    .layer-3 { top: 75px; border-left: 65px solid transparent; border-right: 65px solid transparent; border-bottom: 80px solid #0F2E25; margin-left: -65px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); }
-
     /* Modal Pop-up para la vista previa del Presupuesto */
     .modal-preview-overlay {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -165,7 +134,6 @@ function renderizarCamposPresupuesto() {
     resultsContainer.appendChild(card);
   });
 
-  // Botón de Apertura de Vista Previa
   const whatsappBtnContainer = document.createElement("div");
   whatsappBtnContainer.style = "margin-top: 24px; text-align: center;";
   whatsappBtnContainer.innerHTML = `
@@ -217,7 +185,6 @@ function calcularPresupuestoInstantaneo() {
       eduTexto.style.color = "#666";
     } else {
       if (sueldo <= 0) {
-        // Si no hay salario pero hay gasto, se enciende en verde por control simple inicial
         boxVisual.style.background = "#E6F4EA";
         boxVisual.style.borderColor = "#57B988";
         boxVisual.style.boxShadow = "0 0 8px rgba(87,185,136,0.4)";
@@ -251,7 +218,7 @@ function calcularPresupuestoInstantaneo() {
   return totalGastos;
 }
 
-// --- 7. SISTEMA DE POP-UP MODAL NATIVO (VISTA PREVIA DE GASTOS) ---
+// --- 7. SISTEMA DE POP-UP MODAL (VISTA PREVIA DE GASTOS ANTES DE ENVIAR) ---
 function abrirPopUpVistaPrevia() {
   const sueldo = parseFloat(document.getElementById("income").value) || 0;
   let totalGastos = 0;
@@ -279,11 +246,9 @@ function abrirPopUpVistaPrevia() {
 
   const balance = sueldo - totalGastos;
 
-  // Remover modal previo si existiese
   const oldModal = document.getElementById("modalPreviewWhatsapp");
   if (oldModal) oldModal.remove();
 
-  // Crear contenedor modal flotante
   const overlay = document.createElement("div");
   overlay.id = "modalPreviewWhatsapp";
   overlay.className = "modal-preview-overlay";
@@ -316,11 +281,8 @@ function abrirPopUpVistaPrevia() {
   `;
 
   document.body.appendChild(overlay);
-
-  // Forzar reflow para animación
   setTimeout(() => overlay.classList.add("open"), 20);
 
-  // Eventos de cierre y envío
   document.getElementById("closeModalPreview").addEventListener("click", () => {
     overlay.classList.remove("open");
     setTimeout(() => overlay.remove(), 300);
@@ -352,7 +314,7 @@ function enviarPresupuestoWhatsApp(sueldo, totalGastos, balance) {
   window.open(url, '_blank');
 }
 
-// --- 8. LÓGICA DE LA PESTAÑA: RETO NAVIDEÑO CON ÁRBOL 3D REAL (VOLUMÉTRICO) ---
+// --- 8. LÓGICA DE LA PESTAÑA: RETO NAVIDEÑO CON ÁRBOL FOTORREALISTA ESTÁTICO Y REGALOS ---
 function inicializarRetoNavideno() {
   const xmasWeeksContainer = document.getElementById("xmasWeeks");
   const progresoNum = document.getElementById("xmasProgressNum");
@@ -361,44 +323,24 @@ function inicializarRetoNavideno() {
   xmasWeeksContainer.innerHTML = `
     <div style="display: flex; flex-direction: column; align-items: center; gap: 20px; margin: 20px 0; position: relative; min-height: 440px; width: 100%;">
       
-      <div style="display: flex; width: 100%; max-width: 340px; align-items: center; justify-content: space-between; position: relative;">
+      <div style="display: flex; width: 100%; max-width: 350px; align-items: center; justify-content: space-between; position: relative;">
         
-        <!-- Contenedor del Árbol de Navidad Volumétrico 3D -->
-        <div style="display: flex; flex-direction: column; align-items: center; width: 140px; position: relative; margin-left: 10px;">
+        <!-- Contenedor del Árbol de Navidad Fotorrealista Elegante -->
+        <div style="display: flex; flex-direction: column; align-items: center; width: 150px; position: relative; height: 240px; justify-content: flex-end;">
           
-          <!-- Estrella Superior Fija Externa -->
-          <div id="starXmas" style="position: absolute; top: -15px; z-index: 10; font-size: 26px; color: #A0AAB2; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2)); transition: all 0.4s ease; user-select: none;">⭐</div>
+          <!-- Estrella Superior de Guía -->
+          <div id="starXmas" style="position: absolute; top: 0px; z-index: 10; font-size: 28px; color: #A0AAB2; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15)); transition: all 0.4s ease; user-select: none;">⭐</div>
           
-          <div class="tree-3d-scene">
-            <div class="tree-3d-body">
-              <!-- Render de 4 Planos Entrelazados en ángulos equidistantes para conformar volumen con sombreado -->
-              <!-- Plano 0° -->
-              <div class="tree-layer layer-1" style="transform: rotateY(0deg);"></div>
-              <div class="tree-layer layer-2" style="transform: rotateY(0deg);"></div>
-              <div class="tree-layer layer-3" style="transform: rotateY(0deg);"></div>
-              
-              <!-- Plano 45° -->
-              <div class="tree-layer layer-1" style="transform: rotateY(45deg); filter: brightness(0.9);"></div>
-              <div class="tree-layer layer-2" style="transform: rotateY(45deg); filter: brightness(0.9);"></div>
-              <div class="tree-layer layer-3" style="transform: rotateY(45deg); filter: brightness(0.9);"></div>
-
-              <!-- Plano 90° -->
-              <div class="tree-layer layer-1" style="transform: rotateY(90deg); filter: brightness(0.8);"></div>
-              <div class="tree-layer layer-2" style="transform: rotateY(90deg); filter: brightness(0.8);"></div>
-              <div class="tree-layer layer-3" style="transform: rotateY(90deg); filter: brightness(0.8);"></div>
-
-              <!-- Plano 135° -->
-              <div class="tree-layer layer-1" style="transform: rotateY(135deg); filter: brightness(0.85);"></div>
-              <div class="tree-layer layer-2" style="transform: rotateY(135deg); filter: brightness(0.85);"></div>
-              <div class="tree-layer layer-3" style="transform: rotateY(135deg); filter: brightness(0.85);"></div>
-            </div>
-          </div>
+          <!-- Imagen Fotorrealista de Árbol Navideño con Luces Fijas -->
+          <img src="https://images.unsplash.com/photo-1544984243-ec57ea16fe25?auto=format&fit=crop&q=80&w=300" 
+               alt="Árbol de Navidad MisCuartos" 
+               style="width: 130px; height: 190px; object-fit: contain; z-index: 3; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15)); margin-bottom: 10px;">
           
-          <!-- Tronco de soporte -->
-          <div style="width: 24px; height: 32px; background: #5C4033; border-radius: 0 0 4px 4px; margin-top: -15px; z-index: 2;"></div>
+          <!-- Capa Base: Regalos Semi-opacos Acumulados Cubriendo el Tronco -->
+          <div style="position: absolute; bottom: 5px; width: 140px; height: 45px; background-image: url('https://images.unsplash.com/photo-1543257580-7269da773bf5?auto=format&fit=crop&q=80&w=200'); background-size: cover; background-position: center; border-radius: 8px; z-index: 4; opacity: 0.75; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));"></div>
         </div>
 
-        <!-- Panel de Luces / Esferas Numéricas (Derecha) -->
+        <!-- Panel de Control Lateral (Luces / Esferas Numéricas de Ahorro) -->
         <div id="lucesXmasContainer" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 170px; background: rgba(244, 247, 249, 0.7); padding: 10px; border-radius: 14px; border: 1px dashed #ced4da; z-index: 5;">
         </div>
 
@@ -478,8 +420,25 @@ function inicializarRetoNavideno() {
   }
 }
 
-// --- 9. LÓGICA DE LA PESTAÑA: ACADEMIA Y SIMULADORES ---
+// --- 9. LÓGICA DE LA PESTAÑA: ACADEMIA Y SIMULADORES (CONTENIDO MEJORADO) ---
 function inicializarSimuladorAFP() {
+  // Ajustar el contenedor informativo de la Academia con la nueva propuesta comercial integrada
+  const academiaIntroBox = document.getElementById("academiaIntroMessage");
+  if (academiaIntroBox) {
+    academiaIntroBox.innerHTML = `
+      <div style="background: linear-gradient(135deg, #1F7A5C, #143D31); color: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(20,61,49,0.2); margin-bottom: 20px;">
+        <h3 style="margin: 0 0 8px 0; font-size: 17px; font-weight: 700; letter-spacing: -0.3px;">🎓 Academia MisCuartos</h3>
+        <p style="margin: 0 0 14px 0; font-size: 13.5px; line-height: 1.45; opacity: 0.95;">
+          Domina el uso de herramientas financieras interactivas y acelera el control de tu dinero. Comienza viendo nuestra clase introductoria para organizar tus cuentas desde hoy; las pautas clave para registrarte y expandir tus conocimientos hacia los siguientes niveles están detalladas directamente en el contenido del video.
+        </p>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <span style="font-size: 12px; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 20px; font-weight: 600;">⏱️ Clases Cortas</span>
+          <span style="font-size: 12px; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 20px; font-weight: 600;">🛠️ Enfoque Práctico</span>
+        </div>
+      </div>
+    `;
+  }
+
   const afpSalario = document.getElementById("afpSalario");
   if (afpSalario) {
     afpSalario.addEventListener("input", () => {
