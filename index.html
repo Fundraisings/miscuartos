@@ -10,16 +10,293 @@
 </head>
 <body>
 
-<!-- (MANTÉN TODO TU CONTENIDO HTML TAL CUAL LO TENÍAS DESDE EL <div id="app-splash"> HASTA EL CIERRE DEL <div class="modal-overlay">) -->
+<!-- PANTALLA DE INTRODUCCIÓN ESPECTACULAR (SPLASH SCREEN) -->
+<div id="app-splash" class="splash-screen">
+  <div class="splash-content">
+    <!-- Brújula giratoria idéntica al logo -->
+    <div class="splash-compass-wrap">
+      <svg class="splash-compass" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="45" stroke="currentColor" stroke-width="6" fill="none"/>
+        <line x1="50" y1="5" x2="50" y2="15" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+        <line x1="50" y1="85" x2="50" y2="95" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+        <line x1="5" y1="50" x2="15" y2="50" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+        <line x1="85" y1="50" x2="95" y2="50" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+        <polygon points="50,15 42,50 50,50" fill="#FD8C45"/>
+        <polygon points="50,15 58,50 50,50" fill="#FD8C45" opacity="0.9"/>
+        <polygon points="50,85 42,50 50,50" fill="currentColor"/>
+        <polygon points="50,85 58,50 50,50" fill="currentColor" opacity="0.95"/>
+      </svg>
+    </div>
 
-<!-- SOLO ASEGÚRATE DE QUE EL SCRIPT AL FINAL QUEDE ASÍ: -->
-<script>
-  // Este pequeño script asegura que app.js se ejecute solo cuando el DOM esté listo
-  document.addEventListener('DOMContentLoaded', () => {
-    const script = document.createElement('script');
-    script.src = 'app.js';
-    document.body.appendChild(script);
-  });
-</script>
+    <div class="splash-brand">miscuartos</div>
+    <div class="splash-tagline">Tu coach financiero de bolsillo</div>
+    <div class="splash-desc">Una app diseñada para guiarte y ayudarte a manejar de forma inteligente tu dinero.</div>
+
+    <div class="splash-cultural-note">
+      * <strong>miscuartos:</strong> Expresión dominicana con la que nos referimos a nuestro dinero ganao' con esfuerzo ("dame mis cuartos", "trabajando duro por mis cuartos").
+    </div>
+
+    <button class="splash-btn" id="enterAppBtn">Comenzar a guiarme →</button>
+  </div>
+</div>
+
+<!-- CONTENEDOR PRINCIPAL DE LA APP -->
+<div class="app-container" id="mainAppContainer" style="display: none;">
+
+  <header class="app-header">
+    <div class="wordmark">
+      <svg class="brand-compass-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="45" stroke="currentColor" stroke-width="8" fill="none"/>
+        <line x1="50" y1="5" x2="50" y2="15" stroke="currentColor" stroke-width="8" stroke-linecap="round"/>
+        <line x1="50" y1="85" x2="50" y2="95" stroke="currentColor" stroke-width="8" stroke-linecap="round"/>
+        <line x1="5" y1="50" x2="15" y2="50" stroke="currentColor" stroke-width="8" stroke-linecap="round"/>
+        <line x1="85" y1="50" x2="95" y2="50" stroke="currentColor" stroke-width="8" stroke-linecap="round"/>
+        <polygon points="50,15 42,50 50,50" fill="#FD8C45"/>
+        <polygon points="50,15 58,50 50,50" fill="#FD8C45" opacity="0.9"/>
+        <polygon points="50,85 42,50 50,50" fill="currentColor"/>
+        <polygon points="50,85 58,50 50,50" fill="currentColor" opacity="0.95"/>
+      </svg>
+      miscuartos
+    </div>
+  </header>
+
+  <main class="app-content">
+
+    <!-- PESTAÑA 1: PRESUPUESTO -->
+    <section id="pane-presupuesto" class="tab-pane active">
+      <div class="intro-block">
+        <div class="welcome-badge">¡Qué bueno tenerte aquí! 👋</div>
+        <h1>Tus cuartos, bajo tu control</h1>
+        <p class="sub">Manejar tu dinero no tiene que ser aburrido. Esta app es <strong>educativa, interactiva y retadora</strong>. Pon tus números abajo y mira el cambio. ¡Explora las pestañas inferiores!</p>
+      </div>
+
+      <div class="video-native-box">
+        <div class="video-embed-container" id="embed-tutorial">
+          <div class="video-placeholder-luxury"><span>▶ Reproducir tutorial de la app (2 min)</span></div>
+        </div>
+      </div>
+
+      <div class="income-card">
+        <div class="type-toggle" id="typeToggle">
+          <div class="type-btn active" data-type="fijo">Ingreso fijo</div>
+          <div class="type-btn" data-type="variable">Ingreso variable</div>
+        </div>
+        <div class="income-input-row">
+          <span class="currency">$</span>
+          <input type="number" id="income" placeholder="0" inputmode="decimal">
+        </div>
+        <div class="variable-banner" id="variableBanner">Calcula con el mes más bajo de los últimos 3 para blindar tus meses flojos.</div>
+      </div>
+
+      <div class="section-title">Tus gastos este mes <span class="count" id="countTag">0 con monto</span></div>
+      <div id="results"></div>
+    </section>
+
+    <!-- PESTAÑA 2: RETO NAVIDEÑO -->
+    <section id="pane-reto" class="tab-pane">
+      <div class="intro-block">
+        <h1>Mi Reto Navideño</h1>
+        <p class="sub">De agosto a diciembre 2026 · 22 semanas</p>
+        <p class="sub" style="margin-top: 8px; font-size: 13px;">Elige tu nivel, aparta ese dinero en tu "cuenta candado" y marca cada semana al depositar. El compromiso es contigo mismo.</p>
+      </div>
+
+      <div class="video-native-box">
+        <div class="video-embed-container" id="embed-reto-xmas">
+          <div class="video-placeholder-luxury" style="background: #1A0F0A; border: 1px solid rgba(253, 140, 69, 0.2);">
+            <span style="color: var(--brand-orange);">▶ Cómo funciona el Reto Navideño (2 min)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="xmas-card">
+        <div class="xmas-levels" id="xmasLevels">
+          <div class="xmas-level" data-level="25">
+            <div class="xmas-level-name">BÁSICO</div>
+            <div class="xmas-level-amt">+RD$25/sem</div>
+            <div style="font-size: 10px; font-weight: 600; opacity: 0.8; margin-top: 4px;">Meta: RD$6,325</div>
+          </div>
+          <div class="xmas-level active" data-level="50">
+            <div class="xmas-level-name">MEDIO</div>
+            <div class="xmas-level-amt">+RD$50/sem</div>
+            <div style="font-size: 10px; font-weight: 600; opacity: 0.8; margin-top: 4px;">Meta: RD$12,650</div>
+          </div>
+          <div class="xmas-level" data-level="100">
+            <div class="xmas-level-name">PRO</div>
+            <div class="xmas-level-amt">+RD$100/sem</div>
+            <div style="font-size: 10px; font-weight: 600; opacity: 0.8; margin-top: 4px;">Meta: RD$25,300</div>
+          </div>
+        </div>
+
+        <div class="xmas-goal">
+          <div class="num" id="xmasProgressNum">RD$0 de RD$12,650</div>
+          <div class="lbl" id="xmasProgressLbl">Marca las semanas que ya depositaste</div>
+        </div>
+
+        <div id="xmasWeeks"></div>
+
+        <div class="xmas-footer-tips" style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--muted); display: flex; flex-direction: column; gap: 8px; line-height: 1.5;">
+          <p>💡 <strong>Tip:</strong> Abre una cuenta de ahorro aparte. Dinero que entra ahí no se toca hasta diciembre, salvo una emergencia real de salud.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- PESTAÑA 3: ACADEMIA -->
+    <section id="pane-academia" class="tab-pane">
+      <div class="intro-block">
+        <h1>Academia</h1>
+        <p class="sub">Clases cortas y herramientas financieras. El video de introducción es gratis — haz tu upgrade para desbloquear las clases magistrales.</p>
+      </div>
+
+      <div class="course-card">
+        <div class="offer-header-badge">OFERTA DE INTRODUCCIÓN · SOLO $9 <span class="old-price">$19</span></div>
+        <div class="premium-badge-title">🎓 MINICURSO: FINANZAS QUE SÍ APLICAN</div>
+        <div class="video-native-box">
+          <div class="video-embed-container" id="embed-curso">
+            <div class="video-placeholder-luxury"><span>▶ Video 1: Cómo romper el ciclo del "no me da" (Gratis · 4 min)</span></div>
+          </div>
+        </div>
+
+        <div class="cause-box">
+          <p>Disfruta de la clase introductoria gratis. Desbloquea las próximas 4 lecciones prácticas con tu upgrade de solo $9.</p>
+          <div class="cause-divider"></div>
+          <p>🐾 <strong>Propósito miscuartos:</strong> Por cada persona que hace el upgrade a la versión de pago, donamos $3 dólares de nuestras ganancias a fundaciones de rescate animal registradas para asegurar su alimento. Tu educación ayuda a salvar vidas.</p>
+        </div>
+
+        <div class="course-list-minimal">
+          <div class="course-item unlocked active"><div class="course-num">1</div><div class="course-info-text"><b>Clase Intro: Rompiendo el ciclo</b> · Gratis</div></div>
+          <div class="course-item locked"><div class="course-num">2</div><div class="course-info-text"><b>Presupuesto real que sí se cumple</b> · 5 min 🔒</div></div>
+          <div class="course-item locked"><div class="course-num">3</div><div class="course-info-text"><b>Ahorro sin sufrimiento ni sacrificios</b> · 6 min 🔒</div></div>
+          <div class="course-item locked"><div class="course-num">4</div><div class="course-info-text"><b>Deudas: Plan para salir sin ahogarte</b> · 7 min 🔒</div></div>
+          <div class="course-item locked"><div class="course-num">5</div><div class="course-info-text"><b>Dinero en pareja y finanzas en casa</b> · 8 min 🔒</div></div>
+        </div>
+      </div>
+
+      <div class="afp-card">
+        <div class="premium-badge-title">📚 TU AFP EXPLICADA</div>
+        <div class="video-native-box"><div class="video-embed-container" id="embed-afp"><div class="video-placeholder-luxury"><span>▶ Video: Lo que nadie te dice de tu AFP</span></div></div></div>
+        <div class="afp-simulator-box">
+          <label>¿Cuánto es el 2.87% de tu sueldo bruto?</label>
+          <div class="afp-sim-row"><span class="amt-currency">$</span><input type="number" id="afpSalario" placeholder="Ingresa tu sueldo" inputmode="decimal"></div>
+          <div class="afp-sim-result" id="afpSimResult"></div>
+        </div>
+        <details class="luxury-accordion">
+          <summary>Ver verdades legales sobre tu dinero (SIPEN) ▾</summary>
+          <div class="accordion-content">
+            <p><b>¿Se pierde si falleces?</b> No. Es herencia 100% reclamable por tu familia.</p>
+            <p><b>¿Cuándo se saca?</b> A los 60 años con 360 cotizaciones, o por enfermedad terminal.</p>
+          </div>
+        </details>
+      </div>
+
+      <!-- CRÉDITO INTELIGENTE -->
+      <div class="cat-card">
+        <div class="premium-badge-title">💳 CRÉDITO INTELIGENTE</div>
+        <p class="micro-sub" style="font-size:12.5px; color:var(--muted); line-height:1.5; margin-bottom:12px;">Dos fechas que casi nadie revisa, y que pueden costarte —o ahorrarte— miles de pesos.</p>
+
+        <div class="credit-dates-row">
+          <div class="credit-date-box">
+            <div class="credit-date-num">1</div>
+            <div class="credit-date-title">Fecha de Corte</div>
+            <div class="credit-date-desc">El día que cierra tu factura. Lo que compres después entra al próximo estado de cuenta.</div>
+          </div>
+          <div class="credit-date-box">
+            <div class="credit-date-num">2</div>
+            <div class="credit-date-title">Fecha Límite de Pago</div>
+            <div class="credit-date-desc">Tu último día para pagar el total sin intereses — suele ser 20-25 días después del corte.</div>
+          </div>
+        </div>
+
+        <div class="credit-trick">💡 <strong>El truco:</strong> compra los primeros días después de tu corte y ganas hasta 50 días para pagar sin intereses.</div>
+        <div class="credit-warning">⚠️ Solo funciona si pagaste tu balance completo el mes pasado. Con saldo pendiente, los intereses corren desde el día de cada compra nueva. Los adelantos de efectivo nunca tienen gracia.</div>
+
+        <div class="cause-divider" style="background: var(--line); margin: 16px 0;"></div>
+
+        <div class="premium-badge-title" style="margin-bottom:4px;">SIMULADOR: ¿TOTALERO O MÍNIMO?</div>
+        <p class="micro-sub" style="font-size:12px; color:var(--muted); margin-bottom:10px;">Balance de RD$25,000 al 52% anual (tasa promedio en RD). Arrastra para simular tu pago de este mes.</p>
+
+        <div class="credit-slider-row">
+          <span class="credit-slider-pct" id="creditPctLabel">30%</span>
+          <span class="credit-slider-tag" id="creditTag">Riesgo moderado</span>
+        </div>
+        <input type="range" class="credit-range" id="creditSlider" min="5" max="100" value="30">
+
+        <div class="credit-result-row">
+          <div class="credit-result-box"><div class="lbl">Pagas</div><div class="val" id="creditPaid">RD$7,500</div></div>
+          <div class="credit-result-box"><div class="lbl">Pendiente</div><div class="val" id="creditRemaining">RD$17,500</div></div>
+          <div class="credit-result-box"><div class="lbl">Interés/mes</div><div class="val" id="creditInterest">RD$758</div></div>
+        </div>
+
+        <div class="cause-divider" style="background: var(--line); margin: 16px 0;"></div>
+
+        <div class="premium-badge-title" style="margin-bottom:6px;">CUÁNTO DE TU LÍMITE ESTÁS USANDO</div>
+        <div class="credit-util-gauge">
+          <div class="credit-util-seg" style="width:30%; background:#3E9C77;"></div>
+          <div class="credit-util-seg" style="width:20%; background:var(--brand-orange);"></div>
+          <div class="credit-util-seg" style="width:50%; background:#B4432A;"></div>
+        </div>
+        <div class="credit-util-caption"><span>0-30% ideal</span><span>31-50% moderado</span><span>51%+ riesgo</span></div>
+      </div>
+
+      <div class="leak-card">
+        <div class="premium-badge-title">🔍 DINERO OCULTO</div>
+        <p class="micro-sub">Selecciona tus hábitos diarios comunes:</p>
+        <div id="leakItems"></div>
+        <div class="leak-result" id="leakResult"><div class="amount" id="leakAmount">$0</div><div class="msg" id="leakMsg"></div></div>
+      </div>
+
+      <div class="kids-card">
+        <div class="upsell-pricing-tag">OFERTA ADICIONAL · SOLO $5 <span class="old-price">Precio regular $7</span></div>
+        <div class="premium-badge-title setup-upsell">🚀 NEGOCIOS PARA NIÑOS</div>
+
+        <div class="kids-preview" id="kidsPreview">
+          <p class="micro-sub" style="font-size: 13.5px; line-height: 1.45; color: var(--ink); margin-bottom: 12px;">
+            Desarrollar una mentalidad emprendedora desde la infancia no se trata solo de dinero; es sembrar resiliencia y creatividad para formar a los <strong>futuros empresarios</strong> del mañana.
+          </p>
+          <p class="micro-sub" style="font-size: 12.5px; color: var(--muted); margin-bottom: 14px;">Agrega este módulo <strong>ahora mismo por solo $5</strong> junto a tu pago de la app (Ahorras $2. Si lo compras después te costará $7 aparte).</p>
+          <button class="kids-unlock-btn" id="kidsUnlockBtn">Agregar al pago por $5 →</button>
+        </div>
+
+        <div class="kids-full" id="kidsFull">
+          <div class="video-native-box">
+            <div class="video-embed-container" id="embed-kids">
+              <div class="video-placeholder-luxury" style="background: #0F171E; border: 1px solid rgba(253, 140, 69, 0.2);">
+                <span style="color: var(--brand-orange);">▶ Video Intro: El chip del futuro empresario (2 min)</span>
+              </div>
+            </div>
+          </div>
+          <div class="kids-progress" id="kidsProgress">0 de 6 retos completados</div>
+          <div class="course-list-minimal" style="margin-top: 12px; margin-bottom: 16px;">
+            <div class="course-item unlocked active"><div class="course-num">1</div><div class="course-info-text"><b>Tu primer negocio en casa</b> · 5 min</div></div>
+            <div class="course-item unlocked"><div class="course-num">2</div><div class="course-info-text"><b>El juego del presupuesto infantil</b> · 6 min</div></div>
+            <div class="course-item unlocked"><div class="course-num">3</div><div class="course-info-text"><b>¿De dónde sale el dinero del banco?</b> · 5 min</div></div>
+            <div class="course-item unlocked"><div class="course-num">4</div><div class="course-info-text"><b>Cómo ponerle precio a tus ideas</b> · 7 min</div></div>
+            <div class="course-item unlocked"><div class="course-num">5</div><div class="course-info-text"><b>Socios de juego: Trabajo en equipo</b> · 6 min</div></div>
+          </div>
+          <p class="micro-sub" style="font-size: 13px; font-weight: 600; margin-bottom: 8px;">Retos prácticos para hacer en familia:</p>
+          <div id="kidsTasks"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-tab="presupuesto"><span class="nav-icon">💰</span><span class="nav-label">Presupuesto</span></button>
+    <button class="nav-item" data-tab="reto"><span class="nav-icon">🎄</span><span class="nav-label">Reto Navidad</span></button>
+    <button class="nav-item" data-tab="academia"><span class="nav-icon">🎓</span><span class="nav-label">Academia</span></button>
+  </nav>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-sheet">
+    <div class="modal-top"><div class="modal-eyebrow">Tu resumen</div><button class="close-btn" id="closeModal">✕</button></div>
+    <div class="summary-total"><div class="num" id="summaryTotal">$0</div><div class="lbl">de presupuesto armado</div></div>
+    <div id="summaryRows"></div>
+    <a class="whatsapp-btn" id="whatsappBtn" href="#" target="_blank" rel="noopener">Compartir por WhatsApp</a>
+  </div>
+</div>
+
+<!-- CARGA NORMAL DEL SCRIPT (EL ATRIBUTO DEFER SE ENCARGA DEL RESTO EN EL NAVEGADOR) -->
+<script src="app.js" defer></script>
 </body>
 </html>
