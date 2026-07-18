@@ -2,7 +2,7 @@
  * MISCUARTOS APP - SCRIPT PRINCIPAL COMPLETO (2026)
  * Contiene: Pantalla de inicio, navegación, presupuesto con inputs optimizados,
  * alertas de finanzas realistas, pop-up de vista previa, botón de WhatsApp,
- * reto con Árbol Navideño Fotorrealista y regalos en la base, simulador AFP y Coach.
+ * reto con Árbol Navideño Personalizado (arbolito2.png) y regalos, simulador AFP y Coach.
  */
 
 // --- 1. CONFIGURACIÓN DE DATOS GLOBALES ---
@@ -314,7 +314,7 @@ function enviarPresupuestoWhatsApp(sueldo, totalGastos, balance) {
   window.open(url, '_blank');
 }
 
-// --- 8. LÓGICA DE LA PESTAÑA: RETO NAVIDEÑO CON ÁRBOL FOTORREALISTA ESTÁTICO Y REGALOS ---
+// --- 8. LÓGICA DE LA PESTAÑA: RETO NAVIDEÑO CON IMAGEN PERSONALIZADA Y REGALOS ---
 function inicializarRetoNavideno() {
   const xmasWeeksContainer = document.getElementById("xmasWeeks");
   const progresoNum = document.getElementById("xmasProgressNum");
@@ -323,21 +323,21 @@ function inicializarRetoNavideno() {
   xmasWeeksContainer.innerHTML = `
     <div style="display: flex; flex-direction: column; align-items: center; gap: 20px; margin: 20px 0; position: relative; min-height: 440px; width: 100%;">
       
-      <div style="display: flex; width: 100%; max-width: 350px; align-items: center; justify-content: space-between; position: relative;">
+      <div style="display: flex; width: 100%; max-width: 360px; align-items: center; justify-content: space-between; position: relative;">
         
-        <!-- Contenedor del Árbol de Navidad Fotorrealista Elegante -->
-        <div style="display: flex; flex-direction: column; align-items: center; width: 150px; position: relative; height: 240px; justify-content: flex-end;">
+        <!-- Contenedor del Árbol de Navidad Personalizado -->
+        <div style="display: flex; flex-direction: column; align-items: center; width: 160px; position: relative; height: 260px; justify-content: flex-end;">
           
-          <!-- Estrella Superior de Guía -->
-          <div id="starXmas" style="position: absolute; top: 0px; z-index: 10; font-size: 28px; color: #A0AAB2; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15)); transition: all 0.4s ease; user-select: none;">⭐</div>
+          <!-- Estrella Superior de Guía Interactiva -->
+          <div id="starXmas" style="position: absolute; top: -5px; z-index: 10; font-size: 32px; color: #A0AAB2; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15)); transition: all 0.4s ease; user-select: none;">⭐</div>
           
-          <!-- Imagen Fotorrealista de Árbol Navideño con Luces Fijas -->
-          <img src="https://images.unsplash.com/photo-1544984243-ec57ea16fe25?auto=format&fit=crop&q=80&w=300" 
+          <!-- Imagen de tu Árbol Navideño Definido -->
+          <img src="arbolito2.png" 
                alt="Árbol de Navidad MisCuartos" 
-               style="width: 130px; height: 190px; object-fit: contain; z-index: 3; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15)); margin-bottom: 10px;">
+               style="width: 150px; height: 210px; object-fit: contain; z-index: 3; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1)); margin-bottom: 8px;">
           
-          <!-- Capa Base: Regalos Semi-opacos Acumulados Cubriendo el Tronco -->
-          <div style="position: absolute; bottom: 5px; width: 140px; height: 45px; background-image: url('https://images.unsplash.com/photo-1543257580-7269da773bf5?auto=format&fit=crop&q=80&w=200'); background-size: cover; background-position: center; border-radius: 8px; z-index: 4; opacity: 0.75; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));"></div>
+          <!-- Capa Base: Regalos Semi-opacos Acumulados Cubriendo la Base -->
+          <div style="position: absolute; bottom: 0px; width: 140px; height: 45px; background-image: url('https://images.unsplash.com/photo-1543257580-7269da773bf5?auto=format&fit=crop&q=80&w=200'); background-size: cover; background-position: center; border-radius: 8px; z-index: 4; opacity: 0.75; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));"></div>
         </div>
 
         <!-- Panel de Control Lateral (Luces / Esferas Numéricas de Ahorro) -->
@@ -422,7 +422,6 @@ function inicializarRetoNavideno() {
 
 // --- 9. LÓGICA DE LA PESTAÑA: ACADEMIA Y SIMULADORES (CONTENIDO MEJORADO) ---
 function inicializarSimuladorAFP() {
-  // Ajustar el contenedor informativo de la Academia con la nueva propuesta comercial integrada
   const academiaIntroBox = document.getElementById("academiaIntroMessage");
   if (academiaIntroBox) {
     academiaIntroBox.innerHTML = `
@@ -524,7 +523,7 @@ function actualizarAnalisisDelCoach() {
 
     <details style="${estiloDetails}">
       <summary style="${estiloSummary}">
-        <span>⚠️ Un vistazo a la realidad (Punto A)</span>
+        <span>⚠️ Un vistazo a la reality (Punto A)</span>
         <span style="color: #999; font-size: 11px;">▼</span>
       </summary>
       <div style="${estiloContenido}">
