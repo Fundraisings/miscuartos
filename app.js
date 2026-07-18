@@ -325,16 +325,20 @@ function inicializarRetoNavideno() {
       
       <div style="display: flex; width: 100%; max-width: 360px; align-items: center; justify-content: space-between; position: relative;">
         
-        <!-- Contenedor del Árbol de Navidad Personalizado -->
-        <div style="display: flex; flex-direction: column; align-items: center; width: 160px; position: relative; height: 260px; justify-content: flex-end;">
+        <!-- Contenedor del Árbol de Navidad Personalizado con Dimensiones Seguras -->
+        <div style="display: flex; flex-direction: column; align-items: center; width: 160px; position: relative; height: 260px; justify-content: flex-end; background: transparent;">
           
           <!-- Estrella Superior de Guía Interactiva -->
           <div id="starXmas" style="position: absolute; top: -5px; z-index: 10; font-size: 32px; color: #A0AAB2; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15)); transition: all 0.4s ease; user-select: none;">⭐</div>
           
-          <!-- Imagen de tu Árbol Navideño Definido -->
-          <img src="arbolito2.png" 
-               alt="Árbol de Navidad MisCuartos" 
-               style="width: 150px; height: 210px; object-fit: contain; z-index: 3; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1)); margin-bottom: 8px;">
+          <!-- Imagen de tu Árbol Navideño Definido (Detecta tanto el nombre normal como el doble .png.png) -->
+          <div style="width: 150px; height: 210px; display: flex; align-items: center; justify-content: center; position: relative; z-index: 3; margin-bottom: 8px;">
+            <img src="arbolito2.png.png" 
+                 alt="🎄" 
+                 onerror="this.src='arbolito2.png'; this.onerror=function(){ this.style.display='none'; this.nextElementSibling.style.display='flex'; };"
+                 style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));">
+            <div style="display: none; width: 100%; height: 100%; background: #1B5E20; border-radius: 40% 40% 10% 10%; align-items: center; justify-content: center; font-size: 48px; box-shadow: inset 0 -10px 20px rgba(0,0,0,0.3);">🎄</div>
+          </div>
           
           <!-- Capa Base: Regalos Semi-opacos Acumulados Cubriendo la Base -->
           <div style="position: absolute; bottom: 0px; width: 140px; height: 45px; background-image: url('https://images.unsplash.com/photo-1543257580-7269da773bf5?auto=format&fit=crop&q=80&w=200'); background-size: cover; background-position: center; border-radius: 8px; z-index: 4; opacity: 0.75; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));"></div>
@@ -516,14 +520,19 @@ function actualizarAnalisisDelCoach() {
       📢 SUGERENCIAS DE TU COACH FINANCIERO
     </div>
     
-    <div style="background: #F4F7f9; padding: 12px; border-radius: 8px; margin-bottom: 16px; border-left: 4px solid #2D8ACE; font-size: 14px;">
+    <div style="background: #F4F7f9; padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid #2D8ACE; font-size: 14px;">
       Para lograr tu meta en el tiempo planeado, una buena referencia sería intentar separar unos 
       <strong style="color: #2D8ACE; font-size: 15px;">RD$ ${cuotaMensual.toLocaleString('es-DO', {maximumFractionDigits:2})}</strong> al mes.
     </div>
 
+    <!-- 💡 UBICACIÓN OPTIMIZADA DEL TIP DE AHORRO -->
+    <div style="background: #FFF9E6; border: 1px solid #FFEAA7; color: #D6A21E; padding: 10px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 6px;">
+      💡 Tip: Abre una cuenta de ahorro aparte. Dinero que entra ahí no se toca hasta diciembre, salvo una emergencia real de salud.
+    </div>
+
     <details style="${estiloDetails}">
       <summary style="${estiloSummary}">
-        <span>⚠️ Un vistazo a la reality (Punto A)</span>
+        <span>⚠️ Un vistazo a la realidad (Punto A)</span>
         <span style="color: #999; font-size: 11px;">▼</span>
       </summary>
       <div style="${estiloContenido}">
