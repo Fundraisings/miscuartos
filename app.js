@@ -154,6 +154,7 @@ function categoryAdvice(key, amount, income) {
 }
 
 function buildCategoryRows() {
+  if (!resultsEl) return; // Validación de seguridad
   let html = `
     <div class="sticky-total-box">
       <div class="sticky-total-num" id="stickyTotalNum">RD$0</div>
@@ -187,13 +188,14 @@ function buildCategoryRows() {
       updateCount();
       updateTotals(false);
     });
-    // La caja sticky "sigue" al campo donde estás parado — muestra el
-    // consejo de esa categoría mientras la llenas, no el total general.
     inp.addEventListener('focus', (e) => showActiveAdvice(e.target.dataset.key));
     inp.addEventListener('blur', () => updateTotals(true));
   });
 
-  document.getElementById('summaryBtn').addEventListener('click', openSummary);
+  const summaryBtn = document.getElementById('summaryBtn');
+  if (summaryBtn) {
+    summaryBtn.addEventListener('click', openSummary);
+  }
 
   Object.keys(categories).forEach(key => updateCategoryDot(key));
   updateCount();
@@ -206,7 +208,6 @@ function updateCount() {
   countTag.textContent = `${withAmount} con monto`;
 }
 
-// Solo el puntito de color de la fila — no satura la lista con texto.
 function updateCategoryDot(key) {
   const dot = document.getElementById(`dot-${key}`);
   if (!dot) return;
@@ -216,8 +217,6 @@ function updateCategoryDot(key) {
   dot.className = 'cat-dot' + (advice ? ` ${advice.level}` : '');
 }
 
-// Muestra en la caja sticky el consejo de la categoría donde el usuario
-// tiene el cursor ahora mismo — esto es lo que "baja con la lista".
 function showActiveAdvice(key) {
   const warnBox = document.getElementById('totalOverWarning');
   if (!warnBox) return;
@@ -249,10 +248,10 @@ function updateTotals(showOverallStatus) {
   const pct = income > 0 ? Math.min((total / income) * 100, 100) : 0;
   seg.style.width = `${pct}%`;
   seg.style.background = total > income && income > 0 ? '#B4432A' : 'var(--accent-solid)';
-  numEl.textContent = `RD$${fmt(total)}`;
-  ofEl.textContent = `de RD$${fmt(income)} ganado este mes`;
+  if (numEl) numEl.textContent = `RD$${fmt(total)}`;
+  if (ofEl) ofEl.textContent = `de RD$${fmt(income)} ganado este mes`;
 
-  if (!showOverallStatus) return; // el usuario sigue con el foco en un campo, no le tapes su consejo activo
+  if (!showOverallStatus) return;
 
   if (income > 0 && total > income) {
     const exceso = total - income;
@@ -278,7 +277,8 @@ function openSummary() {
   let total = 0;
   usedKeys.forEach(key => { total += (amounts[key] || 0); });
 
-  document.getElementById('summaryTotal').textContent = `RD$${fmt(total)}`;
+  const summaryTotalEl = document.getElementById('summaryTotal');
+  if (summaryTotalEl) summaryTotalEl.textContent = `RD$${fmt(total)}`;
 
   let rows = '';
   let waText = `📋 Los números de la casa este mes:\n\n`;
@@ -298,17 +298,24 @@ function openSummary() {
   }
   waText += `\n\nAsí quedamos este mes 🤝 (armado con Miscuartos)`;
 
-  document.getElementById('summaryRows').innerHTML = rows;
+  const summaryRowsEl = document.getElementById('summaryRows');
+  if (summaryRowsEl) summaryRowsEl.innerHTML = rows;
+  
   const waBtn = document.getElementById('whatsappBtn');
   if (waBtn) {
     waBtn.textContent = 'Enviar acuerdo del mes por WhatsApp';
     waBtn.href = `https://wa.me/?text=${encodeURIComponent(waText)}`;
   }
-  document.getElementById('modalOverlay').classList.add('show');
+  
+  const modalOverlay = document.getElementById('modalOverlay');
+  if (modalOverlay) modalOverlay.classList.add('show');
 }
 
 if (document.getElementById('closeModal')) {
-  document.getElementById('closeModal').addEventListener('click', () => document.getElementById('modalOverlay').classList.remove('show'));
+  document.getElementById('closeModal').addEventListener('click', () => {
+    const modalOverlay = document.getElementById('modalOverlay');
+    if (modalOverlay) modalOverlay.classList.remove('show');
+  });
 }
 
 /* ============ DINERO OCULTO ============ */
@@ -324,11 +331,15 @@ function buildLeaks() {
     item.addEventListener('click', () => {
       leakChecked[l.id] = !leakChecked[l.id];
       const checkbox = document.getElementById(`lbox-${l.id}`);
-      checkbox.classList.toggle('checked', leakChecked[l.id]);
-      checkbox.textContent = leakChecked[l.id] ? '✓' : '';
+      if (checkbox) {
+        checkbox.classList.toggle('checked', leakChecked[l.id]);
+        checkbox.textContent = leakChecked[l.id] ? '✓' : '';
+      }
       const totalLeak = leaks.reduce((s, curr) => s + (leakChecked[curr.id] ? curr.amount : 0), 0);
-      document.getElementById('leakAmount').textContent = `~RD$${fmt(totalLeak)}/mes`;
-      document.getElementById('leakMsg').textContent = totalLeak > 0 ? 'Esos cuartos se te van sin darte cuenta. Frenar un par te da control directo.' : '';
+      const leakAmountEl = document.getElementById('leakAmount');
+      const leakMsgEl = document.getElementById('leakMsg');
+      if (leakAmountEl) leakAmountEl.textContent = `~RD$${fmt(totalLeak)}/mes`;
+      if (leakMsgEl) leakMsgEl.textContent = totalLeak > 0 ? 'Esos cuartos se te van sin darte cuenta. Frenar un par te da control directo.' : '';
     });
     box.appendChild(item);
   });
@@ -365,8 +376,10 @@ function buildXmas() {
       row.addEventListener('click', () => {
         xmasChecked[w] = !xmasChecked[w];
         const checkbox = document.getElementById(`xbox-${w}`);
-        checkbox.classList.toggle('checked', xmasChecked[w]);
-        checkbox.textContent = xmasChecked[w] ? '✓' : '';
+        if (checkbox) {
+          checkbox.classList.toggle('checked', xmasChecked[w]);
+          checkbox.textContent = xmasChecked[w] ? '✓' : '';
+        }
         renderXmasProgress();
       });
       container.appendChild(row);
@@ -382,9 +395,14 @@ function renderXmasProgress() {
     if (xmasChecked[i]) saved += i * xmasLevel;
   }
   const totalGoal = xmasLevel * 253;
-  document.getElementById('xmasProgressNum').textContent = `RD$${fmt(saved)} de RD$${fmt(totalGoal)}`;
-  const weeksLeft = 22 - Object.values(xmasChecked).filter(Boolean).length;
-  document.getElementById('xmasProgressLbl').textContent = saved > 0 ? `¡Sigue así! Te faltan ${weeksLeft} semanas` : 'Marca las semanas que ya depositaste';
+  const progressNumEl = document.getElementById('xmasProgressNum');
+  const progressLblEl = document.getElementById('xmasProgressLbl');
+  
+  if (progressNumEl) progressNumEl.textContent = `RD$${fmt(saved)} de RD$${fmt(totalGoal)}`;
+  if (progressLblEl) {
+    const weeksLeft = 22 - Object.values(xmasChecked).filter(Boolean).length;
+    progressLblEl.textContent = saved > 0 ? `¡Sigue así! Te faltan ${weeksLeft} semanas` : 'Marca las semanas que ya depositaste';
+  }
 }
 
 document.querySelectorAll('.xmas-level').forEach(el => {
@@ -405,6 +423,7 @@ if (document.getElementById('afpSalario')) {
   document.getElementById('afpSalario').addEventListener('input', (e) => {
     const salario = parseFloat(e.target.value);
     const res = document.getElementById('afpSimResult');
+    if (!res) return;
     if (!salario || salario <= 0) { res.classList.remove('show'); return; }
     res.innerHTML = `Tu retención mensual es de <b>RD$${fmt(salario * 0.0287)}</b>. Tu empleador aporta obligatoriamente otros <b>RD$${fmt(salario * 0.0710)}</b> adicionales que van directos a tu fondo.`;
     res.classList.add('show');
@@ -422,24 +441,31 @@ function renderCreditSim() {
   const remaining = CREDIT_BALANCE - paid;
   const interest = Math.round(remaining * CREDIT_APR / 12);
 
-  document.getElementById('creditPctLabel').textContent = `${pct}%`;
-  document.getElementById('creditPaid').textContent = `RD$${fmt(paid)}`;
-  document.getElementById('creditRemaining').textContent = `RD$${fmt(remaining)}`;
-  document.getElementById('creditInterest').textContent = pct >= 100 ? 'RD$0' : `RD$${fmt(interest)}`;
+  const pctLabel = document.getElementById('creditPctLabel');
+  const creditPaid = document.getElementById('creditPaid');
+  const creditRemaining = document.getElementById('creditRemaining');
+  const creditInterest = document.getElementById('creditInterest');
+  
+  if (pctLabel) pctLabel.textContent = `${pct}%`;
+  if (creditPaid) creditPaid.textContent = `RD$${fmt(paid)}`;
+  if (creditRemaining) creditRemaining.textContent = `RD$${fmt(remaining)}`;
+  if (creditInterest) creditInterest.textContent = pct >= 100 ? 'RD$0' : `RD$${fmt(interest)}`;
 
   const tag = document.getElementById('creditTag');
-  if (pct >= 100) {
-    tag.textContent = 'Totalero — RD$0 en intereses';
-    tag.className = 'credit-slider-tag good';
-  } else if (pct >= 60) {
-    tag.textContent = 'Buen avance';
-    tag.className = 'credit-slider-tag good';
-  } else if (pct >= 20) {
-    tag.textContent = 'Riesgo moderado';
-    tag.className = 'credit-slider-tag warn';
-  } else {
-    tag.textContent = 'La trampa del mínimo';
-    tag.className = 'credit-slider-tag bad';
+  if (tag) {
+    if (pct >= 100) {
+      tag.textContent = 'Totalero — RD$0 en intereses';
+      tag.className = 'credit-slider-tag good';
+    } else if (pct >= 60) {
+      tag.textContent = 'Buen avance';
+      tag.className = 'credit-slider-tag good';
+    } else if (pct >= 20) {
+      tag.textContent = 'Riesgo moderado';
+      tag.className = 'credit-slider-tag warn';
+    } else {
+      tag.textContent = 'La trampa del mínimo';
+      tag.className = 'credit-slider-tag bad';
+    }
   }
 }
 if (creditSlider) {
@@ -453,6 +479,7 @@ if (document.getElementById('kidsUnlockBtn')) {
     document.getElementById('kidsPreview').style.display = 'none';
     document.getElementById('kidsFull').classList.add('show');
     const taskBox = document.getElementById('kidsTasks');
+    if (!taskBox) return;
     taskBox.innerHTML = '';
     kidsTasks.forEach(t => {
       const item = document.createElement('div');
@@ -461,10 +488,14 @@ if (document.getElementById('kidsUnlockBtn')) {
       makeKeyboardActivatable(item);
       item.addEventListener('click', () => {
         kidsChecked[t.id] = !kidsChecked[t.id];
-        document.getElementById(`kbox-${t.id}`).classList.toggle('checked', kidsChecked[t.id]);
-        document.getElementById(`kbox-${t.id}`).textContent = kidsChecked[t.id] ? '✓' : '';
+        const kbox = document.getElementById(`kbox-${t.id}`);
+        if (kbox) {
+          kbox.classList.toggle('checked', kidsChecked[t.id]);
+          kbox.textContent = kidsChecked[t.id] ? '✓' : '';
+        }
         const done = Object.values(kidsChecked).filter(Boolean).length;
-        document.getElementById('kidsProgress').textContent = `${done} de ${kidsTasks.length} retos completados`;
+        const kidsProgress = document.getElementById('kidsProgress');
+        if (kidsProgress) kidsProgress.textContent = `${done} de ${kidsTasks.length} retos completados`;
       });
       taskBox.appendChild(item);
     });
@@ -488,17 +519,20 @@ document.querySelectorAll('.type-btn').forEach(b => {
   b.addEventListener('click', () => {
     incomeType = b.dataset.type;
     document.querySelectorAll('.type-btn').forEach(btn => btn.classList.toggle('active', btn === b));
-    document.getElementById('variableBanner').classList.toggle('show', incomeType === 'variable');
+    const vBanner = document.getElementById('variableBanner');
+    if (vBanner) vBanner.classList.toggle('show', incomeType === 'variable');
     updateTotals();
   });
 });
 
-/* ============ INICIALIZADORES ============ */
-buildLeaks();
-buildXmas();
+/* ============ INICIALIZADORES SEGUROS ============ */
+document.addEventListener('DOMContentLoaded', () => {
+  buildLeaks();
+  buildXmas();
 
-if (incomeEl) {
-  incomeEl.addEventListener('input', () => updateTotals(true));
-}
+  if (incomeEl) {
+    incomeEl.addEventListener('input', () => updateTotals(true));
+  }
 
-buildCategoryRows();
+  buildCategoryRows();
+});
