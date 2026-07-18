@@ -75,8 +75,8 @@
         </div>
       </div>
 
-      <!-- CASILLA DE INGRESO UNIFICADA Y RESALTADA CON BORDE DE COLOR -->
-      <div class="income-card" style="border: 2px solid #FD8C45; border-radius: 16px; padding: 16px; background: var(--bg-card, #fff);">
+      <!-- CASILLA DE INGRESO UNIFICADA CON BORDE DE MARCA -->
+      <div class="income-card" style="border: 2px solid #FD8C45; border-radius: 16px; padding: 16px; background: var(--bg-card, #fff); margin-bottom: 24px;">
         <label for="income" style="display: block; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; color: var(--ink, #111);">Ingreso ganado este mes</label>
         <div class="income-input-row" style="display: flex; align-items: center; gap: 8px;">
           <span class="currency" style="font-size: 24px; font-weight: 700; color: #FD8C45;">$</span>
@@ -86,7 +86,7 @@
 
       <div class="section-title">Tus gastos este mes <span class="count" id="countTag">0 con monto</span></div>
       
-      <!-- Contenedor original donde app.js renderiza los resultados, cálculos y consejos -->
+      <!-- Contenedor original donde app.js renderiza las casillas de presupuesto -->
       <div id="results"></div>
     </section>
 
@@ -95,7 +95,12 @@
       <div class="intro-block">
         <h1>Mi Reto Navideño</h1>
         <p class="sub">De agosto a diciembre 2026 · 22 semanas</p>
-        <p class="sub" style="margin-top: 8px; font-size: 13px;">Elige tu nivel, aparta ese dinero en tu "cuenta candado" y marca cada semana al depositar. El compromiso es contigo mismo.</p>
+        <p class="sub" style="margin-top: 8px; font-size: 13.5px; line-height: 1.5; color: var(--muted, #666);">
+          Inspirado en el famoso reto de las 52 semanas, adaptamos esta versión para comenzar en la primera semana de agosto y acompañarte hasta diciembre 2026. ¡Tus ahorros de Navidad en solo 22 semanas!
+        </p>
+        <p class="sub" style="margin-top: 8px; font-size: 13.5px; line-height: 1.5; color: var(--muted, #666);">
+          Elige tu nivel, aparta el dinero en tu "cuenta candado" y marca cada semana completada. El compromiso es contigo mismo y con tu paz financiera en estas fiestas. ¿Arrancamos?
+        </p>
       </div>
 
       <div class="video-native-box">
@@ -122,6 +127,21 @@
             <div class="xmas-level-name">PRO</div>
             <div class="xmas-level-amt">+RD$100/sem</div>
             <div style="font-size: 10px; font-weight: 600; opacity: 0.8; margin-top: 4px;">Meta: RD$25,300</div>
+          </div>
+          <!-- NIVEL PERSONALIZADO AGREGADO -->
+          <div class="xmas-level" data-level="custom">
+            <div class="xmas-level-name">A TU MEDIDA</div>
+            <div class="xmas-level-amt">Personalizado</div>
+            <div id="xmasCustomMetaTag" style="font-size: 10px; font-weight: 600; opacity: 0.8; margin-top: 4px;">Meta: Dinámica</div>
+          </div>
+        </div>
+
+        <!-- INPUT EXTRA PARA EL MODO PERSONALIZADO -->
+        <div id="xmasCustomInputRow" style="display: none; margin: 16px 0; padding: 12px; border: 1px dashed #FD8C45; border-radius: 12px; background: rgba(253, 140, 69, 0.05);">
+          <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--ink);">¿Cuánto vas a sumar cada semana?</label>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-weight: 700; color: #FD8C45;">RD$</span>
+            <input type="number" id="xmasCustomAmount" placeholder="Ej. 200, 500, 1000" inputmode="numeric" style="width: 100%; border: none; background: transparent; font-size: 18px; font-weight: 700; outline: none; color: var(--ink);">
           </div>
         </div>
 
