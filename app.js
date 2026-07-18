@@ -1,16 +1,16 @@
 /* ============ DATOS ============ */
 const categories = {
   vivienda:   { label: 'Vivienda',       color: '#1F7A5C', maxRec: 0.35, tip: 'Alquiler, luz, agua, internet.' },
-  comida:     { label: 'Comida',          color: '#3E9C77', maxRec: 0.20, tip: 'Supermercado y compras fijas de alimentos.' },
-  transporte: { label: 'Transporte',      color: '#6BBE9A', maxRec: 0.15, tip: 'Combustible, concho y mantenimiento básico.' },
+  comida:     { label: 'Comida',         color: '#3E9C77', maxRec: 0.20, tip: 'Supermercado y compras fijas de alimentos.' },
+  transporte: { label: 'Transporte',     color: '#6BBE9A', maxRec: 0.15, tip: 'Combustible, concho y mantenimiento básico.' },
   colegio:    { label: 'Niños / Escuela', color: '#2D8ACE', tip: 'Mensualidades escolares y cuidado.' },
-  salud:      { label: 'Salud',            color: '#3AA0A0', tip: 'Medicamentos y consultas médicas fijas.' },
-  seguros:    { label: 'Seguros',         color: '#4C6B8A', tip: 'Cualquier póliza médica o de vehículo.' },
-  mascotas:   { label: 'Mascotas',        color: '#C2447A', tip: 'Comida y cuidados veterinarios.' },
-  deudas:     { label: 'Deudas',          color: '#8B5CF6', maxRec: 0.20, tip: 'Tarjetas o préstamos. Ataca la de mayor interés.' },
-  ahorro:     { label: 'Ahorro',          color: '#B4432A', minRec: 0.10, minRecVariable: 0.15, tip: 'Tu colchón de tranquilidad. Míralo como factura obligatoria.' },
+  salud:      { label: 'Salud',          color: '#3AA0A0', tip: 'Medicamentos y consultas médicas fijas.' },
+  seguros:    { label: 'Seguros',        color: '#4C6B8A', tip: 'Cualquier póliza médica o de vehículo.' },
+  mascotas:   { label: 'Mascotas',       color: '#C2447A', tip: 'Comida y cuidados veterinarios.' },
+  deudas:     { label: 'Deudas',         color: '#8B5CF6', maxRec: 0.20, tip: 'Tarjetas o préstamos. Ataca la de mayor interés.' },
+  ahorro:     { label: 'Ahorro',         color: '#B4432A', minRec: 0.10, minRecVariable: 0.15, tip: 'Tu colchón de tranquilidad. Míralo como factura obligatoria.' },
   familia:    { label: 'Remesas / Apoyo', color: '#E8A33D', tip: 'Dinero fijo enviado a padres o familiares.' },
-  diversion:  { label: 'Diversión',       color: '#66766D', tip: 'Salidas y gustos. Pequeño pero necesario para no rendirte.' }
+  diversion:  { label: 'Diversión',      color: '#66766D', tip: 'Salidas y gustos. Pequeño pero necesario para no rendirte.' }
 };
 
 let amounts = {};       // lo que la persona realmente escribe por categoría
@@ -235,7 +235,6 @@ function showActiveAdvice(key) {
   const advice = categoryAdvice(key, amounts[key] || 0, getIncome());
   
   if (!advice) { 
-    // Corregido: Evita bucle/pisado visual inmediato limpiando el estado global suavemente
     warnBox.style.display = 'none'; 
     return; 
   }
@@ -409,24 +408,32 @@ function buildXmas() {
     }
   });
 
-  totalXmasWeeks = weekNum - 1; // Corregido: Dinámico basado en la suma real de los meses
+  totalXmasWeeks = weekNum - 1; 
   renderXmasProgress();
+}
+
+function updateAllXmasLabels() {
+  for (let w = 1; w <= totalXmasWeeks; w++) {
+    const amtEl = document.getElementById(`xamt-${w}`);
+    if (amtEl) amtEl.textContent = `RD$${fmt(w * xmasLevel)}`;
+  }
 }
 
 function renderXmasProgress() {
   let saved = 0;
-  // Corregido: Usa el límite dinámico en vez de un 22 quemado
   for (let i = 1; i <= totalXmasWeeks; i++) {
     if (xmasChecked[i]) saved += i * xmasLevel;
   }
   
-  // Fórmula de la suma de Gauss dinámica para la meta total: (n * (n + 1)) / 2
   const totalGoal = xmasLevel * ((totalXmasWeeks * (totalXmasWeeks + 1)) / 2);
   
   const progressNumEl = document.getElementById('xmasProgressNum');
   const progressLblEl = document.getElementById('xmasProgressLbl');
+  const customMetaTag = document.getElementById('xmasCustomMetaTag');
   
   if (progressNumEl) progressNumEl.textContent = `RD$${fmt(saved)} de RD$${fmt(totalGoal)}`;
+  if (customMetaTag) customMetaTag.textContent = `Meta: RD$${fmt(totalGoal)}`; // Actualiza la etiqueta personalizada
+  
   if (progressLblEl) {
     const checkedCount = Object.values(xmasChecked).filter(Boolean).length;
     const weeksLeft = totalXmasWeeks - checkedCount;
@@ -434,18 +441,38 @@ function renderXmasProgress() {
   }
 }
 
+// Lógica de Niveles (Incluye el caso personalizado)
 document.querySelectorAll('.xmas-level').forEach(el => {
   makeKeyboardActivatable(el);
   el.addEventListener('click', () => {
-    xmasLevel = parseInt(el.dataset.level);
+    const levelVal = el.dataset.level;
+    const customRow = document.getElementById('xmasCustomInputRow');
+    
     document.querySelectorAll('.xmas-level').forEach(l => l.classList.toggle('active', l === el));
-    for (let w = 1; w <= totalXmasWeeks; w++) {
-      const amtEl = document.getElementById(`xamt-${w}`);
-      if (amtEl) amtEl.textContent = `RD$${fmt(w * xmasLevel)}`;
+    
+    if (levelVal === 'custom') {
+      if (customRow) customRow.style.display = 'block';
+      const customInput = document.getElementById('xmasCustomAmount');
+      xmasLevel = customInput ? (parseInt(customInput.value) || 0) : 0;
+    } else {
+      if (customRow) customRow.style.display = 'none';
+      xmasLevel = parseInt(levelVal);
     }
+    
+    updateAllXmasLabels();
     renderXmasProgress();
   });
 });
+
+// Escuchar input personalizado
+const customInput = document.getElementById('xmasCustomAmount');
+if (customInput) {
+  customInput.addEventListener('input', () => {
+    xmasLevel = parseInt(customInput.value) || 0;
+    updateAllXmasLabels();
+    renderXmasProgress();
+  });
+}
 
 /* ============ SIMULADOR AFP ============ */
 if (document.getElementById('afpSalario')) {
@@ -560,7 +587,6 @@ document.querySelectorAll('.type-btn').forEach(b => {
 });
 
 /* ============ INICIALIZADOR SEGURO ============ */
-// Corregido: Aseguramos que corra después del render del DOM completo
 const initApp = () => {
   Object.keys(categories).forEach(key => {
     if (amounts[key] == null) amounts[key] = 0;
