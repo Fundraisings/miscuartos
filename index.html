@@ -13,7 +13,6 @@
 <!-- PANTALLA DE INTRODUCCIÓN ESPECTACULAR (SPLASH SCREEN) -->
 <div id="app-splash" class="splash-screen">
   <div class="splash-content">
-    <!-- Brújula giratoria idéntica al logo -->
     <div class="splash-compass-wrap">
       <svg class="splash-compass" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
         <circle cx="50" cy="50" r="45" stroke="currentColor" stroke-width="6" fill="none"/>
@@ -60,6 +59,12 @@
     </div>
   </header>
 
+  <!-- CAJA FLOTANTE DE TOTALES REALMENTE FIXED/STICKY PARA MÓVIL -->
+  <div class="sticky-total-box" style="position: sticky; top: 0; z-index: 999; background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border-bottom: 1px solid #e2e8f0; margin-bottom: 16px;">
+    <div class="sticky-total-label">Balance Disponible</div>
+    <div id="totalBalance" class="sticky-total-num">RD$ 0.00</div>
+  </div>
+
   <main class="app-content">
 
     <!-- PESTAÑA 1: PRESUPUESTO -->
@@ -97,7 +102,7 @@
       <div class="intro-block">
         <h1>Mi Reto Navideño</h1>
         <p class="sub">De agosto a diciembre 2026 · 22 semanas</p>
-        <p class="sub" style="margin-top: 8px; font-size: 13px;">Elige tu nivel, aparta ese dinero en tu "cuenta candado" y marca cada semana al depositar. El compromiso es contigo mismo.</p>
+        <p class="sub" style="margin-top: 8px; font-size: 13px;">Elige tu level, aparta ese dinero en tu "cuenta candado" y marca cada semana al depositar. El compromiso es contigo mismo.</p>
       </div>
 
       <div class="video-native-box">
@@ -296,7 +301,6 @@
   </div>
 </div>
 
-<!-- CARGA NORMAL DEL SCRIPT (EL ATRIBUTO DEFER SE ENCARGA DEL RESTO EN EL NAVEGADOR) -->
 <script src="app.js" defer></script>
 </body>
 </html>
