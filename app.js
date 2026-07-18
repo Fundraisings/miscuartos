@@ -1,7 +1,7 @@
 /**
  * MISCUARTOS APP - SCRIPT PRINCIPAL COMPLETO (2026)
- * Contiene: Pantalla de inicio, navegación, presupuesto, reto navideño,
- * simulador AFP y los nuevos desplegables educativos del Coach.
+ * Contiene: Pantalla de inicio, navegación, presupuesto, reto navideño con árbol
+ * interactivo y estrella dinámica, simulador AFP y desplegables del Coach.
  */
 
 // --- 1. CONFIGURACIÓN DE DATOS GLOBALES ---
@@ -126,23 +126,116 @@ function calcularPresupuestoInstantaneo() {
   return totalGastos;
 }
 
-// --- 6. LÓGICA DE LA PESTAÑA: RETO NAVIDEÑO 2026 ---
+// --- 6. LÓGICA DE LA PESTAÑA: RETO NAVIDEÑO CON ÁRBOL E INTERACTIVIDAD ---
 function inicializarRetoNavideno() {
   const xmasWeeksContainer = document.getElementById("xmasWeeks");
+  const progresoNum = document.getElementById("xmasProgressNum");
   if (!xmasWeeksContainer) return;
 
-  xmasWeeksContainer.innerHTML = "";
+  // Inyectamos la estructura visual del arbolito y el panel derecho para las luces
+  xmasWeeksContainer.innerHTML = `
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 20px; margin: 20px 0; position: relative; min-height: 420px; width: 100%;">
+      
+      <!-- Contenedor Principal: Árbol Izquierda / Esferas Derecha -->
+      <div style="display: flex; width: 100%; max-width: 340px; align-items: center; justify-content: space-between; position: relative;">
+        
+        <!-- El Arbolito de Navidad en CSS Nativo (Lado Izquierdo) -->
+        <div style="display: flex; flex-direction: column; align-items: center; width: 140px; position: relative; margin-left: 10px;">
+          <!-- Copa 1 -->
+          <div style="width: 0; height: 0; border-left: 35px solid transparent; border-right: 35px solid transparent; border-bottom: 50px solid #1B4D3E; margin-bottom: -20px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));"></div>
+          <!-- Copa 2 -->
+          <div style="width: 0; height: 0; border-left: 50px solid transparent; border-right: 50px solid transparent; border-bottom: 65px solid #143D31; margin-bottom: -25px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));"></div>
+          <!-- Copa 3 (Base) -->
+          <div style="width: 0; height: 0; border-left: 65px solid transparent; border-right: 65px solid transparent; border-bottom: 80px solid #0F2E25; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));"></div>
+          <!-- Tronco -->
+          <div style="width: 25px; height: 30px; background: #5C4033; border-radius: 0 0 4px 4px;"></div>
+          
+          <!-- Estrella Superior Dinámica (Empieza apagada/grisácea) -->
+          <div id="starXmas" style="position: absolute; top: -25px; font-size: 24px; color: #A0AAB2; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2)); transition: all 0.4s ease; user-select: none;">⭐</div>
+        </div>
+
+        <!-- Panel de Luces / Esferas Numéricas (Lado Derecho) -->
+        <div id="lucesXmasContainer" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 170px; background: rgba(244, 247, 249, 0.7); padding: 10px; border-radius: 14px; border: 1px dashed #ced4da;">
+        </div>
+
+      </div>
+
+      <!-- Mensaje Dinámico de Logro Navideño -->
+      <div id="mensajeExitoNavidad" style="width: 100%; max-width: 320px; text-align: center; display: none; transition: all 0.3s ease;">
+        <div style="background: #E6F4EA; border: 2px solid #3E9C77; color: #0F3D2A; padding: 15px; border-radius: 12px; font-weight: bold; box-shadow: 0 4px 12px rgba(62,156,119,0.2);">
+          🎉 ¡Felicidades, meta cumplida! 🎄<br>
+          <span style="font-weight: 500; font-size: 13.5px; display: block; margin-top: 6px; color: #1B5E20;">
+            Completaste tus 22 semanas de ahorro. ¡Tu doble sueldo o meta navideña está asegurada sin deudas! 🇩🇴✨
+          </span>
+        </div>
+      </div>
+
+    </div>
+  `;
+
+  const lucesContainer = document.getElementById("lucesXmasContainer");
+  if (!lucesContainer) return;
+
+  const esferasCompletadas = new Set();
+
   for (let i = 1; i <= 22; i++) {
-    const weekBox = document.createElement("div");
-    weekBox.style = "display: inline-block; width: 45px; height: 45px; margin: 5px; line-height: 45px; text-align: center; border-radius: 8px; background: #FFF5EE; border: 1px solid #FD8C45; font-weight: 600; cursor: pointer; color: #111;";
-    weekBox.textContent = i;
-    weekBox.addEventListener("click", () => {
-      weekBox.style.background = weekBox.style.background === "rgb(62, 156, 119)" ? "#FFF5EE" : "#3E9C77";
-      weekBox.style.color = weekBox.style.background === "rgb(62, 156, 119)" ? "#fff" : "#111";
-      const progresoNum = document.getElementById("xmasProgressNum");
-      if (progresoNum) progresoNum.textContent = "¡Progreso actualizado con éxito!";
+    const esfera = document.createElement("div");
+    esfera.style = "width: 34px; height: 34px; border-radius: 50%; background: #E9ECEF; border: 2px solid #CED4DA; font-weight: bold; font-size: 12px; text-align: center; line-height: 30px; cursor: pointer; user-select: none; transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275); color: #495057; box-shadow: inset 0 -2px 4px rgba(0,0,0,0.1);";
+    esfera.textContent = i;
+
+    esfera.addEventListener("click", () => {
+      if (esferasCompletadas.has(i)) {
+        // APAGAR ESFERA
+        esferasCompletadas.delete(i);
+        esfera.style.background = "#E9ECEF";
+        esfera.style.borderColor = "#CED4DA";
+        esfera.style.color = "#495057";
+        esfera.style.boxShadow = "inset 0 -2px 4px rgba(0,0,0,0.1)";
+        esfera.style.transform = "scale(1)";
+      } else {
+        // ENCENDER ESFERA
+        esferasCompletadas.add(i);
+        
+        let colorBrillo = "#FF4136"; // Rojo
+        if (i % 3 === 0) colorBrillo = "#FFDC00"; // Amarillo oro
+        else if (i % 2 === 0) colorBrillo = "#2ECC40"; // Verde
+        
+        esfera.style.background = colorBrillo;
+        esfera.style.borderColor = "#FFF";
+        esfera.style.color = colorBrillo === "#FFDC00" ? "#111" : "#FFF";
+        esfera.style.boxShadow = `0 0 8px ${colorBrillo}, inset 0 -2px 4px rgba(0,0,0,0.2)`;
+        esfera.style.transform = "scale(1.12)";
+      }
+
+      // Validar estados e iluminación de la Estrella Superior
+      const exitoBox = document.getElementById("mensajeExitoNavidad");
+      const estrella = document.getElementById("starXmas");
+      
+      if (esferasCompletadas.size === 22) {
+        // META ALCANZADA: Encendemos la estrella e insertamos animación
+        if (estrella) {
+          estrella.style.color = "#FFD700";
+          estrella.style.filter = "drop-shadow(0 0 8px #FFD700)";
+          estrella.style.transform = "scale(1.3)";
+        }
+        if (exitoBox) exitoBox.style.display = "block";
+        if (progresoNum) progresoNum.style.display = "none";
+      } else {
+        // PROGRESO INCOMPLETO: Estrella permanece apagada
+        if (estrella) {
+          estrella.style.color = "#A0AAB2";
+          estrella.style.filter = "drop-shadow(0 1px 2px rgba(0,0,0,0.2))";
+          estrella.style.transform = "scale(1)";
+        }
+        if (exitoBox) exitoBox.style.display = "none";
+        if (progresoNum) {
+          progresoNum.style.display = "block";
+          progresoNum.textContent = `Llevas ${esferasCompletadas.size} de 22 semanas iluminadas.`;
+        }
+      }
     });
-    xmasWeeksContainer.appendChild(weekBox);
+
+    lucesContainer.appendChild(esfera);
   }
 }
 
@@ -174,7 +267,7 @@ function inicializarCreditoYOtros() {
   }
 }
 
-// --- 8. LÓGICA DE LA PESTAÑA: METAS Y ENFOQUE REDISEÑADO CON DESPLEGABLES ---
+// --- 8. LÓGICA DE LA PESTAÑA: METAS Y ENFOQUE CON DESPLEGABLES ---
 function inicializarMetasYEmprendimiento() {
   const targetAmount = document.getElementById("targetGoalAmount");
   const targetMonths = document.getElementById("targetGoalMonths");
