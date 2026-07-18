@@ -15,6 +15,7 @@ const categories = {
 
 let amounts = {};       // lo que la persona realmente escribe por categoría
 let incomeType = 'fijo';
+let totalXmasWeeks = 0; // Se calculará dinámicamente
 
 const VIDEO_LINKS = {
   tutorial: '',
@@ -43,7 +44,7 @@ const kidsTasks = [
 ];
 let kidsChecked = {};
 
-/* ============ ACCESIBILIDAD: helper para divs interactivos ============ */
+/* ============ ACCESIBILIDAD ============ */
 function makeKeyboardActivatable(el) {
   if (!el) return;
   el.setAttribute('tabindex', '0');
@@ -61,10 +62,12 @@ if (document.getElementById('enterAppBtn')) {
   document.getElementById('enterAppBtn').addEventListener('click', () => {
     const splash = document.getElementById('app-splash');
     const mainApp = document.getElementById('mainAppContainer');
-    splash.classList.add('fade-out');
-    mainApp.style.display = 'flex';
-    setTimeout(() => { splash.style.display = 'none'; }, 600);
-    lazyLoadVideos();
+    if(splash && mainApp) {
+      splash.classList.add('fade-out');
+      mainApp.style.display = 'flex';
+      setTimeout(() => { splash.style.display = 'none'; }, 600);
+      lazyLoadVideos();
+    }
   });
 }
 
@@ -74,7 +77,10 @@ document.querySelectorAll('.nav-item').forEach(btn => {
     document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
     document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
     btn.classList.add('active');
-    document.getElementById(`pane-${btn.dataset.tab}`).classList.add('active');
+    
+    const targetPane = document.getElementById(`pane-${btn.dataset.tab}`);
+    if (targetPane) targetPane.classList.add('active');
+    
     window.scrollTo({ top: 0, behavior: 'smooth' });
     lazyLoadVideos();
   });
@@ -83,17 +89,27 @@ document.querySelectorAll('.nav-item').forEach(btn => {
 function lazyLoadVideos() {
   const splash = document.getElementById('app-splash');
   if (splash && splash.style.display === 'none') {
-    if (document.getElementById('pane-presupuesto').classList.contains('active') && VIDEO_LINKS.tutorial) {
-      document.getElementById('embed-tutorial').innerHTML = `<iframe src="${VIDEO_LINKS.tutorial}" allowfullscreen></iframe>`;
+    const activePane = document.querySelector('.tab-pane.active');
+    if (!activePane) return;
+
+    if (activePane.id === 'pane-presupuesto' && VIDEO_LINKS.tutorial) {
+      const el = document.getElementById('embed-tutorial');
+      if (el) el.innerHTML = `<iframe src="${VIDEO_LINKS.tutorial}" allowfullscreen></iframe>`;
     }
-    if (document.getElementById('pane-reto').classList.contains('active') && VIDEO_LINKS.retoXmas) {
-      document.getElementById('embed-reto-xmas').innerHTML = `<iframe src="${VIDEO_LINKS.retoXmas}" allowfullscreen></iframe>`;
+    if (activePane.id === 'pane-reto' && VIDEO_LINKS.retoXmas) {
+      const el = document.getElementById('embed-reto-xmas');
+      if (el) el.innerHTML = `<iframe src="${VIDEO_LINKS.retoXmas}" allowfullscreen></iframe>`;
     }
-    if (document.getElementById('pane-academia').classList.contains('active')) {
-      if (VIDEO_LINKS.afp) document.getElementById('embed-afp').innerHTML = `<iframe src="${VIDEO_LINKS.afp}" allowfullscreen></iframe>`;
-      if (VIDEO_LINKS.curso1) document.getElementById('embed-curso').innerHTML = `<iframe src="${VIDEO_LINKS.curso1}" allowfullscreen></iframe>`;
-      if (VIDEO_LINKS.kids && document.getElementById('kidsFull').classList.contains('show')) {
-        document.getElementById('embed-kids').innerHTML = `<iframe src="${VIDEO_LINKS.kids}" allowfullscreen></iframe>`;
+    if (activePane.id === 'pane-academia') {
+      const afpEl = document.getElementById('embed-afp');
+      const cursoEl = document.getElementById('embed-curso');
+      const kidsEl = document.getElementById('embed-kids');
+      const kidsFull = document.getElementById('kidsFull');
+
+      if (VIDEO_LINKS.afp && afpEl) afpEl.innerHTML = `<iframe src="${VIDEO_LINKS.afp}" allowfullscreen></iframe>`;
+      if (VIDEO_LINKS.curso1 && cursoEl) cursoEl.innerHTML = `<iframe src="${VIDEO_LINKS.curso1}" allowfullscreen></iframe>`;
+      if (VIDEO_LINKS.kids && kidsFull && kidsFull.classList.contains('show') && kidsEl) {
+        kidsEl.innerHTML = `<iframe src="${VIDEO_LINKS.kids}" allowfullscreen></iframe>`;
       }
     }
   }
@@ -125,10 +141,10 @@ function categoryAdvice(key, amount, income) {
       const severo = amount > recommended * 1.15;
       return {
         level: severo ? 'red' : 'amber',
-        html: `Lo sano aquí sería no pasar de <b>RD$${fmt(recommended)}</b> (${Math.round(cat.maxRec * 100)}% de tu ingreso). Ahora mismo estás <b>RD$${fmt(exceso)}</b> por encima. Tus dos salidas reales: bajar este gasto en RD$${fmt(exceso)}, o subir tu ingreso a RD$${fmt(neededIncome)} (+${pctIncrease.toFixed(0)}%) para que este gasto deje de ahogarte.`
+        html: `Lo sano aquí sería no pasar de <b>RD$${fmt(recommended)}</b> (${Math.round(cat.maxRec * 100)}% de tu ingreso). Estás <b>RD$${fmt(exceso)}</b> por encima. Baja este gasto en RD$${fmt(exceso)}, o sube tu ingreso a RD$${fmt(neededIncome)} (+${pctIncrease.toFixed(0)}%).`
       };
     }
-    return { level: 'green', html: `Vas bien — estás dentro del ${Math.round(cat.maxRec * 100)}% recomendado (hasta RD$${fmt(recommended)}).` };
+    return { level: 'green', html: `Vas bien — estás dentro del ${Math.round(cat.maxRec * 100)}% recomendado.` };
   }
 
   if (cat.minRec != null) {
@@ -138,10 +154,10 @@ function categoryAdvice(key, amount, income) {
       const falta = recommended - amount;
       return {
         level: amount === 0 ? 'red' : 'amber',
-        html: `El mínimo saludable aquí sería <b>RD$${fmt(recommended)}</b> (${Math.round(minRec * 100)}% de tu ingreso). Te faltan RD$${fmt(falta)} para llegar — cada peso que sumes aquí es tranquilidad futura, no gasto.`
+        html: `El mínimo saludable sería <b>RD$${fmt(recommended)}</b> (${Math.round(minRec * 100)}% de tu ingreso). Te faltan RD$${fmt(falta)}.`
       };
     }
-    return { level: 'green', html: `¡Bien! Estás ahorrando por encima del ${Math.round(minRec * 100)}% mínimo recomendado.` };
+    return { level: 'green', html: `¡Bien! Estás ahorrando por encima del ${Math.round(minRec * 100)}% mínimo.` };
   }
 
   return null;
@@ -191,7 +207,6 @@ function buildCategoryRows() {
     summaryBtn.addEventListener('click', openSummary);
   }
 
-  // TIEMPO DE ESPERA DE SEGURIDAD PARA RENDERIZAR
   setTimeout(() => {
     Object.keys(categories).forEach(key => updateCategoryDot(key));
     updateCount();
@@ -218,7 +233,13 @@ function showActiveAdvice(key) {
   const warnBox = document.getElementById('totalOverWarning');
   if (!warnBox) return;
   const advice = categoryAdvice(key, amounts[key] || 0, getIncome());
-  if (!advice) { updateTotals(true); return; }
+  
+  if (!advice) { 
+    // Corregido: Evita bucle/pisado visual inmediato limpiando el estado global suavemente
+    warnBox.style.display = 'none'; 
+    return; 
+  }
+  
   const colors = {
     green: { bg: 'var(--accent-soft)', fg: 'var(--accent-solid)' },
     amber: { bg: 'var(--brand-orange-soft)', fg: 'var(--brand-orange)' },
@@ -297,7 +318,7 @@ function openSummary() {
   if (income > 0 && total > income) {
     waText += `\n⚠️ Nos pasamos por RD$${fmt(total - income)} — hay que ajustar algo.`;
   }
-  waText += `\n\nAsí quedamos este mes 🤝 (armado con Miscuartos)`;
+  waText += `\n\nAsí quedamos este mes 🤝`;
 
   const summaryRowsEl = document.getElementById('summaryRows');
   if (summaryRowsEl) summaryRowsEl.innerHTML = rows;
@@ -340,7 +361,7 @@ function buildLeaks() {
       const leakAmountEl = document.getElementById('leakAmount');
       const leakMsgEl = document.getElementById('leakMsg');
       if (leakAmountEl) leakAmountEl.textContent = `~RD$${fmt(totalLeak)}/mes`;
-      if (leakMsgEl) leakMsgEl.textContent = totalLeak > 0 ? 'Esos cuartos se te van sin darte cuenta. Frenar un par te da control directo.' : '';
+      if (leakMsgEl) leakMsgEl.textContent = totalLeak > 0 ? 'Esos cuartos se te van sin darte cuenta.' : '';
     });
     box.appendChild(item);
   });
@@ -356,12 +377,12 @@ function buildXmas() {
   if (!container) return;
   container.innerHTML = '';
   let weekNum = 1;
+  
   xmasMonths.forEach(([monthName, count]) => {
     const monthHeader = document.createElement('div');
     monthHeader.style.gridColumn = '1 / -1';
     monthHeader.style.fontSize = '11px';
     monthHeader.style.fontWeight = '700';
-    monthHeader.style.letterSpacing = '0.08em';
     monthHeader.style.color = 'var(--brand-orange)';
     monthHeader.style.marginTop = '14px';
     monthHeader.style.marginBottom = '4px';
@@ -387,21 +408,28 @@ function buildXmas() {
       weekNum++;
     }
   });
+
+  totalXmasWeeks = weekNum - 1; // Corregido: Dinámico basado en la suma real de los meses
   renderXmasProgress();
 }
 
 function renderXmasProgress() {
   let saved = 0;
-  for (let i = 1; i <= 22; i++) {
+  // Corregido: Usa el límite dinámico en vez de un 22 quemado
+  for (let i = 1; i <= totalXmasWeeks; i++) {
     if (xmasChecked[i]) saved += i * xmasLevel;
   }
-  const totalGoal = xmasLevel * 253;
+  
+  // Fórmula de la suma de Gauss dinámica para la meta total: (n * (n + 1)) / 2
+  const totalGoal = xmasLevel * ((totalXmasWeeks * (totalXmasWeeks + 1)) / 2);
+  
   const progressNumEl = document.getElementById('xmasProgressNum');
   const progressLblEl = document.getElementById('xmasProgressLbl');
   
   if (progressNumEl) progressNumEl.textContent = `RD$${fmt(saved)} de RD$${fmt(totalGoal)}`;
   if (progressLblEl) {
-    const weeksLeft = 22 - Object.values(xmasChecked).filter(Boolean).length;
+    const checkedCount = Object.values(xmasChecked).filter(Boolean).length;
+    const weeksLeft = totalXmasWeeks - checkedCount;
     progressLblEl.textContent = saved > 0 ? `¡Sigue así! Te faltan ${weeksLeft} semanas` : 'Marca las semanas que ya depositaste';
   }
 }
@@ -411,7 +439,7 @@ document.querySelectorAll('.xmas-level').forEach(el => {
   el.addEventListener('click', () => {
     xmasLevel = parseInt(el.dataset.level);
     document.querySelectorAll('.xmas-level').forEach(l => l.classList.toggle('active', l === el));
-    for (let w = 1; w <= 22; w++) {
+    for (let w = 1; w <= totalXmasWeeks; w++) {
       const amtEl = document.getElementById(`xamt-${w}`);
       if (amtEl) amtEl.textContent = `RD$${fmt(w * xmasLevel)}`;
     }
@@ -426,7 +454,7 @@ if (document.getElementById('afpSalario')) {
     const res = document.getElementById('afpSimResult');
     if (!res) return;
     if (!salario || salario <= 0) { res.classList.remove('show'); return; }
-    res.innerHTML = `Tu retención mensual es de <b>RD$${fmt(salario * 0.0287)}</b>. Tu empleador aporta obligatoriamente otros <b>RD$${fmt(salario * 0.0710)}</b> adicionales que van directos a tu fondo.`;
+    res.innerHTML = `Tu retención mensual es de <b>RD$${fmt(salario * 0.0287)}</b>. Tu empleador aporta obligatoriamente otros <b>RD$${fmt(salario * 0.0710)}</b> adicionales.`;
     res.classList.add('show');
   });
 }
@@ -435,6 +463,7 @@ if (document.getElementById('afpSalario')) {
 const CREDIT_BALANCE = 25000;
 const CREDIT_APR = 0.52;
 const creditSlider = document.getElementById('creditSlider');
+
 function renderCreditSim() {
   if (!creditSlider) return;
   const pct = parseInt(creditSlider.value);
@@ -474,13 +503,17 @@ if (creditSlider) {
   renderCreditSim();
 }
 
-/* ============ INTERACCIONES UPSELL NIÑOS ============ */
+/* ============ INTERACCIONES NIÑOS ============ */
 if (document.getElementById('kidsUnlockBtn')) {
   document.getElementById('kidsUnlockBtn').addEventListener('click', () => {
-    document.getElementById('kidsPreview').style.display = 'none';
-    document.getElementById('kidsFull').classList.add('show');
+    const preview = document.getElementById('kidsPreview');
+    const full = document.getElementById('kidsFull');
     const taskBox = document.getElementById('kidsTasks');
+    
+    if (preview) preview.style.display = 'none';
+    if (full) full.classList.add('show');
     if (!taskBox) return;
+    
     taskBox.innerHTML = '';
     kidsTasks.forEach(t => {
       const item = document.createElement('div');
@@ -504,13 +537,13 @@ if (document.getElementById('kidsUnlockBtn')) {
   });
 }
 
-/* ============ LECCIONES BLOQUEADAS DEL MINICURSO ============ */
+/* ============ LECCIONES BLOQUEADAS ============ */
 document.querySelectorAll('.course-item.locked').forEach(item => {
   makeKeyboardActivatable(item);
   item.addEventListener('click', () => {
     const titleEl = item.querySelector('.course-info-text b');
     const title = titleEl ? titleEl.textContent : 'Esta clase';
-    alert(`"${title}" se desbloquea con tu compra de Miscuartos ($9).`);
+    alert(`"${title}" se desbloquea con tu compra.`);
   });
 });
 
@@ -526,8 +559,9 @@ document.querySelectorAll('.type-btn').forEach(b => {
   });
 });
 
-/* ============ INICIALIZADORES SEGUROS ============ */
-document.addEventListener('DOMContentLoaded', () => {
+/* ============ INICIALIZADOR SEGURO ============ */
+// Corregido: Aseguramos que corra después del render del DOM completo
+const initApp = () => {
   Object.keys(categories).forEach(key => {
     if (amounts[key] == null) amounts[key] = 0;
   });
@@ -539,4 +573,10 @@ document.addEventListener('DOMContentLoaded', () => {
   if (incomeEl) {
     incomeEl.addEventListener('input', () => updateTotals(true));
   }
-});
+};
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
