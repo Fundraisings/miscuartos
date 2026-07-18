@@ -1,8 +1,8 @@
 /**
  * MISCUARTOS APP - SCRIPT PRINCIPAL COMPLETO (2026)
  * Contiene: Pantalla de inicio, navegación, presupuesto con inputs optimizados,
- * gráficos dinámicos por categorías, alertas de educación financiera, botón de WhatsApp,
- * reto con Árbol Navideño 3D Giratorio interactivo, simulador AFP y Coach.
+ * alertas de finanzas realistas personalizadas, pop-up de vista previa, botón de WhatsApp,
+ * reto con Árbol Navideño volumétrico 3D interactivo, simulador AFP y Coach.
  */
 
 // --- 1. CONFIGURACIÓN DE DATOS GLOBALES ---
@@ -17,9 +17,65 @@ document.addEventListener("DOMContentLoaded", () => {
   inicializarSimuladorAFP();
   inicializarCreditoYOtros();
   inicializarMetasYEmprendimiento();
+  inyectarEstilosGlobalesDinamicos();
 });
 
-// --- 3. LOGICA PANTALLA DE INICIO (BOTÓN VERDE) ---
+// --- 3. INYECCIÓN DE ESTILOS CSS REQUERIDOS (3D Y MODAL POP-UP) ---
+function inyectarEstilosGlobalesDinamicos() {
+  if (document.getElementById("appGlobalStyles")) return;
+  const styleTag = document.createElement("style");
+  styleTag.id = "appGlobalStyles";
+  styleTag.innerHTML = `
+    @keyframes spin3d {
+      0% { transform: rotateY(0deg); }
+      100% { transform: rotateY(360deg); }
+    }
+    .tree-3d-scene {
+      perspective: 800px;
+      width: 140px;
+      height: 200px;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .tree-3d-body {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      animation: spin3d 10s linear infinite;
+    }
+    .tree-layer {
+      position: absolute;
+      left: 50%;
+      transform-origin: 0% 50%;
+      backface-visibility: visible;
+    }
+    /* Estructura geométrica del árbol con degradados para dar volumen */
+    .layer-1 { top: 20px; border-left: 35px solid transparent; border-right: 35px solid transparent; border-bottom: 50px solid #1B4D3E; margin-left: -35px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); }
+    .layer-2 { top: 45px; border-left: 50px solid transparent; border-right: 50px solid transparent; border-bottom: 65px solid #143D31; margin-left: -50px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); }
+    .layer-3 { top: 75px; border-left: 65px solid transparent; border-right: 65px solid transparent; border-bottom: 80px solid #0F2E25; margin-left: -65px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15)); }
+
+    /* Modal Pop-up para la vista previa del Presupuesto */
+    .modal-preview-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5); display: flex; align-items: center;
+      justify-content: center; z-index: 9999; opacity: 0; pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+    .modal-preview-overlay.open { opacity: 1; pointer-events: auto; }
+    .modal-preview-box {
+      background: #fff; width: 90%; max-width: 400px; padding: 20px;
+      border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+      transform: translateY(20px); transition: transform 0.3s ease;
+    }
+    .modal-preview-overlay.open .modal-preview-box { transform: translateY(0); }
+  `;
+  document.head.appendChild(styleTag);
+}
+
+// --- 4. LOGICA PANTALLA DE INICIO ---
 function inicializarPantallaInicio() {
   const enterAppBtn = document.getElementById("enterAppBtn");
   const splashScreen = document.getElementById("app-splash");
@@ -34,7 +90,7 @@ function inicializarPantallaInicio() {
   }
 }
 
-// --- 4. CONTROL DE NAVEGACIÓN ENTRE PESTAÑAS ---
+// --- 5. CONTROL DE NAVEGACIÓN ---
 function inicializarNavegacion() {
   const navButtons = document.querySelectorAll(".nav-item");
   const tabPanes = document.querySelectorAll(".tab-pane");
@@ -42,7 +98,6 @@ function inicializarNavegacion() {
   navButtons.forEach(btn => {
     btn.addEventListener("click", () => {
       const targetTab = btn.getAttribute("data-tab");
-
       navButtons.forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
 
@@ -57,7 +112,17 @@ function inicializarNavegacion() {
   });
 }
 
-// --- 5. LÓGICA DE LA PESTAÑA: PRESUPUESTO ---
+// --- 6. LÓGICA DE LA PESTAÑA: PRESUPUESTO ---
+const infoCategoriasPresupuesto = [
+  { id: "vivienda", label: "🏠 Vivienda y Alquiler", placeholder: "Ej. 15,000", icon: "🏠", maxPct: 35, txtBase: "La vivienda idealmente no debe superar el 35% de tus ingresos para mantener tu salud financiera.", txtAlerta: "⚠️ ¡Alerta! Estás destinando más del 35% a vivienda. Aunque suele ser un gasto fijo difícil de bajar, intenta recortar con rigor en las demás casillas para compensar." },
+  { id: "alimentos", label: "🛒 Súper y Comida (Canasta básica)", placeholder: "Ej. 12,000", icon: "🛒", maxPct: 25, txtBase: "Súper y comida básica. La referencia de la canasta familiar nacional ronda los RD$ 49,268.", txtAlerta: "⚠️ ¡Alerta de Súper! Este monto consume una proporción muy alta de tu dinero. Planifica compras por volumen o marcas locales para optimizar." },
+  { id: "transporte", label: "🚗 Gasolina, Concho o Mototaxi", placeholder: "Ej. 4,000", icon: "🚗", maxPct: 15, txtBase: "Combustible, transporte público o mantenimiento. Intenta mantenerlo por debajo del 15%.", txtAlerta: "⚠️ ¡Alerta en transporte! Superas el 15% recomendado. Evalúa rutas alternativas o alternativas de movilidad para proteger tu bolsillo." },
+  { id: "servicios", label: "⚡ Luz, Agua, Internet y celular", placeholder: "Ej. 3,500", icon: "⚡", maxPct: 10, txtBase: "Servicios del hogar. Desconectar electrodomésticos y revisar planes de internet ayuda a reducirlo.", txtAlerta: "⚠️ ¡Cuidado con los servicios! El costo fijo del hogar supera el 10%. Revisa si hay fugas de energía o planes telefónicos sobrevalorados." },
+  { id: "entretenimiento", label: "🍗 Salidas, Coros y Delivery", placeholder: "Ej. 3,000", icon: "🍗", maxPct: 10, txtBase: "El área de disfrute y balance. El límite sugerido para cuidar tu liquidez es del 10%.", txtAlerta: "⚠️ ¡Alerta de 'Coros'! Estás gastando de más en salidas y deliverys. Los pequeños lujos de fin de semana pueden vaciar tu cuenta sin darte cuenta." },
+  { id: "mascotas", label: "🐶 Mascotas (Alimento y Vet)", placeholder: "Ej. 2,500", icon: "🐶", maxPct: 8, txtBase: "Comida, salud y bienestar de tus consentidos. Un gasto con amor pero controlado.", txtAlerta: "⚠️ ¡Alerta de mascotas! Evalúa alternativas de alimento o planes preventivos si este coste supera tu presupuesto holgado." },
+  { id: "deudas", label: "💳 Tarjetas y Préstamos", placeholder: "Ej. 5,000", icon: "💳", maxPct: 20, txtBase: "Pago de deudas y tarjetas. Lo ideal es no comprometer más del 20% de tus ingresos totales.", txtAlerta: "🚨 ¡Zona de peligro! Tus compromisos financieros absorben un porcentaje crítico. Evita tomar más créditos y prioriza salir de los actuales." }
+];
+
 function inicializarPresupuesto() {
   const incomeInput = document.getElementById("income");
   if (incomeInput) {
@@ -73,27 +138,15 @@ function renderizarCamposPresupuesto() {
   const resultsContainer = document.getElementById("results");
   if (!resultsContainer) return;
 
-  // 7 Items con sus iconos y placeholders correspondientes
-  const categorias = [
-    { id: "vivienda", label: "🏠 Vivienda y Alquiler", placeholder: "Ej. 15,000", icon: "🏠" },
-    { id: "alimentos", label: "🛒 Súper y Comida (Canasta básica)", placeholder: "Ej. 12,000", icon: "🛒" },
-    { id: "transporte", label: "🚗 Gasolina, Concho o Mototaxi", placeholder: "Ej. 4,000", icon: "🚗" },
-    { id: "servicios", label: "⚡ Luz, Agua, Internet y celular", placeholder: "Ej. 3,500", icon: "⚡" },
-    { id: "entretenimiento", label: "🍗 Salidas, Coros y Delivery", placeholder: "Ej. 3,000", icon: "🍗" },
-    { id: "mascotas", label: "🐶 Mascotas (Alimento y Vet)", placeholder: "Ej. 2,500", icon: "🐶" },
-    { id: "deudas", label: "💳 Tarjetas y Préstamos", placeholder: "Ej. 5,000", icon: "💳" }
-  ];
-
   resultsContainer.innerHTML = "";
   
-  categorias.forEach(cat => {
+  infoCategoriasPresupuesto.forEach(cat => {
     const card = document.createElement("div");
     card.style = "background: #fff; padding: 16px; border-radius: 14px; margin-bottom: 14px; border: 1px solid #e1e6eb; display: flex; flex-direction: column; gap: 8px; transition: all 0.3s ease;";
     card.id = `card-${cat.id}`;
     
     card.innerHTML = `
       <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
-        <!-- Bloque Izquierdo: Textos e Input abajo -->
         <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
           <label for="${cat.id}" style="font-size: 14px; font-weight: 600; color: #111;">${cat.label}</label>
           <div style="display: flex; align-items: center; gap: 6px; background: #f8f9fa; border: 1px solid #ced4da; border-radius: 8px; padding: 6px 10px; max-width: 180px;">
@@ -101,32 +154,27 @@ function renderizarCamposPresupuesto() {
             <input type="number" id="${cat.id}" placeholder="${cat.placeholder}" inputmode="numeric" class="gastos-input" data-id="${cat.id}" data-label="${cat.label}" style="width: 100%; border: none; background: transparent; font-size: 14px; text-align: right; outline: none; font-weight: 600;">
           </div>
         </div>
-        
-        <!-- Bloque Derecho: Recuadro con Gráfico/Icono Visual Dinámico -->
         <div id="visual-${cat.id}" style="width: 52px; height: 52px; border-radius: 12px; background: #e9ecef; border: 1px solid #ced4da; display: flex; align-items: center; justify-content: center; font-size: 24px; transition: all 0.3s ease; box-shadow: inset 0 -2px 4px rgba(0,0,0,0.05);">
           ${cat.icon}
         </div>
       </div>
-      
-      <!-- Contenedor dinámico para Educación Financiera y Alertas según el % -->
       <div id="edu-${cat.id}" style="font-size: 12px; color: #666; font-weight: 500; transition: all 0.3s ease; margin-top: 2px;">
-        Introduce un monto para evaluar el impacto en tus ingresos.
+        ${cat.txtBase}
       </div>
     `;
     resultsContainer.appendChild(card);
   });
 
-  // Botón de WhatsApp
+  // Botón de Apertura de Vista Previa
   const whatsappBtnContainer = document.createElement("div");
   whatsappBtnContainer.style = "margin-top: 24px; text-align: center;";
   whatsappBtnContainer.innerHTML = `
-    <button id="shareWhatsappBtn" style="background-color: #25D366; color: white; border: none; padding: 14px 28px; font-size: 15px; font-weight: bold; border-radius: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(37,211,102,0.25); transition: transform 0.2s, background 0.2s;">
-      🟢 Enviar por WhatsApp
+    <button id="previewPresupuestoBtn" style="background-color: #007AFF; color: white; border: none; padding: 14px 28px; font-size: 15px; font-weight: bold; border-radius: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0,122,255,0.25); transition: background 0.2s;">
+      📝 Revisar y Enviar Presupuesto
     </button>
   `;
   resultsContainer.appendChild(whatsappBtnContainer);
 
-  // Escuchar cambios
   document.querySelectorAll(".gastos-input").forEach(input => {
     input.addEventListener("input", () => {
       calcularPresupuestoInstantaneo();
@@ -134,9 +182,9 @@ function renderizarCamposPresupuesto() {
     });
   });
 
-  const shareBtn = document.getElementById("shareWhatsappBtn");
-  if (shareBtn) {
-    shareBtn.addEventListener("click", enviarPresupuestoWhatsApp);
+  const previewBtn = document.getElementById("previewPresupuestoBtn");
+  if (previewBtn) {
+    previewBtn.addEventListener("click", abrirPopUpVistaPrevia);
   }
 }
 
@@ -145,7 +193,6 @@ function calcularPresupuestoInstantaneo() {
   let totalGastos = 0;
   let camposConMonto = 0;
 
-  // Primero calculamos el total
   document.querySelectorAll(".gastos-input").forEach(input => {
     const valor = parseFloat(input.value) || 0;
     if (valor > 0) {
@@ -154,40 +201,44 @@ function calcularPresupuestoInstantaneo() {
     }
   });
 
-  // Actualizamos cada tarjeta dinámicamente con alertas y colores
-  document.querySelectorAll(".gastos-input").forEach(input => {
-    const id = input.getAttribute("data-id");
-    const valor = parseFloat(input.value) || 0;
-    const boxVisual = document.getElementById(`visual-${id}`);
-    const eduTexto = document.getElementById(`edu-${id}`);
+  infoCategoriasPresupuesto.forEach(cat => {
+    const input = document.getElementById(cat.id);
+    const valor = input ? parseFloat(input.value) || 0 : 0;
+    const boxVisual = document.getElementById(`visual-${cat.id}`);
+    const eduTexto = document.getElementById(`edu-${cat.id}`);
     
     if (!boxVisual || !eduTexto) return;
 
     if (valor <= 0) {
-      // ESTADO APAGADO (GRIS)
       boxVisual.style.background = "#e9ecef";
       boxVisual.style.borderColor = "#ced4da";
       boxVisual.style.boxShadow = "inset 0 -2px 4px rgba(0,0,0,0.05)";
-      eduTexto.innerHTML = "Introduce un monto para evaluar el impacto en tus ingresos.";
+      eduTexto.innerHTML = cat.txtBase;
       eduTexto.style.color = "#666";
     } else {
-      // Calcular porcentaje en base al sueldo disponible
-      const porcentaje = sueldo > 0 ? (valor / sueldo) * 100 : 0;
-
-      if (porcentaje > 35) {
-        // ESTADO ALERTA CRÍTICA (ROJO)
-        boxVisual.style.background = "#FFEBE9";
-        boxVisual.style.borderColor = "#FF8170";
-        boxVisual.style.boxShadow = "0 0 8px rgba(255,129,112,0.4)";
-        eduTexto.innerHTML = `⚠️ <strong>¡Alerta!</strong> Este gasto representa el <strong>${porcentaje.toFixed(1)}%</strong> de tus ingresos. Supera el límite recomendado del 35%. Podría comprometer tu salud financiera total mensual.`;
-        eduTexto.style.color = "#D9381E";
-      } else {
-        // ESTADO CONTROLADO (VERDE)
+      if (sueldo <= 0) {
+        // Si no hay salario pero hay gasto, se enciende en verde por control simple inicial
         boxVisual.style.background = "#E6F4EA";
         boxVisual.style.borderColor = "#57B988";
         boxVisual.style.boxShadow = "0 0 8px rgba(87,185,136,0.4)";
-        eduTexto.innerHTML = `✅ Gasto controlado: Representa el <strong>${porcentaje.toFixed(1)}%</strong> de tus ingresos totales. ¡Buen manejo dentro del presupuesto recomendado!`;
+        eduTexto.innerHTML = `💸 Has registrado RD$ ${valor.toLocaleString()}. Introduce tu ingreso mensual arriba para calcular el porcentaje exacto de impacto diario.`;
         eduTexto.style.color = "#137333";
+      } else {
+        const porcentaje = (valor / sueldo) * 100;
+
+        if (porcentaje > cat.maxPct) {
+          boxVisual.style.background = "#FFEBE9";
+          boxVisual.style.borderColor = "#FF8170";
+          boxVisual.style.boxShadow = "0 0 8px rgba(255,129,112,0.4)";
+          eduTexto.innerHTML = `${cat.txtAlerta} (Impacto actual: <strong>${porcentaje.toFixed(1)}%</strong> de tus ingresos).`;
+          eduTexto.style.color = "#D9381E";
+        } else {
+          boxVisual.style.background = "#E6F4EA";
+          boxVisual.style.borderColor = "#57B988";
+          boxVisual.style.boxShadow = "0 0 8px rgba(87,185,136,0.4)";
+          eduTexto.innerHTML = `✅ Gasto controlado: Representa el <strong>${porcentaje.toFixed(1)}%</strong> de tus ingresos totales. ¡Buen manejo dentro del presupuesto recomendado de hasta un ${cat.maxPct}%!`;
+          eduTexto.style.color = "#137333";
+        }
       }
     }
   });
@@ -200,31 +251,99 @@ function calcularPresupuestoInstantaneo() {
   return totalGastos;
 }
 
-function enviarPresupuestoWhatsApp() {
+// --- 7. SISTEMA DE POP-UP MODAL NATIVO (VISTA PREVIA DE GASTOS) ---
+function abrirPopUpVistaPrevia() {
   const sueldo = parseFloat(document.getElementById("income").value) || 0;
-  let mensaje = `📊 *MI PRESUPUESTO - MISCUARTOS APP*\n`;
-  mensaje += `💰 *Ingresos mensuales:* RD$ ${sueldo.toLocaleString('es-DO')}\n\n`;
-  mensaje += `📝 *Detalle de Gastos registrados:*\n`;
-
   let totalGastos = 0;
+  let listaHtml = "";
   let hayGastos = false;
 
-  document.querySelectorAll(".gastos-input").forEach(input => {
-    const valor = parseFloat(input.value) || 0;
+  infoCategoriasPresupuesto.forEach(cat => {
+    const input = document.getElementById(cat.id);
+    const valor = input ? parseFloat(input.value) || 0 : 0;
     if (valor > 0) {
-      const label = input.getAttribute("data-label");
-      mensaje += `${label}: RD$ ${valor.toLocaleString('es-DO')}\n`;
+      listaHtml += `
+        <div style="display:flex; justify-content:space-between; font-size:14px; padding:6px 0; border-bottom:1px dashed #e1e6eb;">
+          <span style="color:#444;">${cat.label}</span>
+          <span style="font-weight:700; color:#111;">RD$ ${valor.toLocaleString('es-DO')}</span>
+        </div>`;
       totalGastos += valor;
       hayGastos = true;
     }
   });
 
   if (!hayGastos) {
-    alert("Por favor, ingresa al menos un monto en tus gastos antes de enviar.");
+    alert("Por favor, ingresa al menos un monto en tus gastos antes de generar la vista previa.");
     return;
   }
 
   const balance = sueldo - totalGastos;
+
+  // Remover modal previo si existiese
+  const oldModal = document.getElementById("modalPreviewWhatsapp");
+  if (oldModal) oldModal.remove();
+
+  // Crear contenedor modal flotante
+  const overlay = document.createElement("div");
+  overlay.id = "modalPreviewWhatsapp";
+  overlay.className = "modal-preview-overlay";
+  
+  overlay.innerHTML = `
+    <div class="modal-preview-box">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:2px solid #f1f3f5; padding-bottom:8px;">
+        <h3 style="margin:0; font-size:16px; color:#111; font-weight:700;">📝 Vista Previa del Reporte</h3>
+        <button id="closeModalPreview" style="background:none; border:none; font-size:20px; cursor:pointer; color:#999; line-height:1;">&times;</button>
+      </div>
+      
+      <div style="max-height:260px; overflow-y:auto; margin-bottom:16px; padding-right:4px;">
+        <p style="margin:0 0 10px 0; font-size:13px; color:#666;">Confirma los datos acumulados antes de realizar el envío:</p>
+        <div style="font-size:14px; padding:6px 0; font-weight:600; color:#007AFF;">Ingresos: RD$ ${sueldo.toLocaleString('es-DO')}</div>
+        ${listaHtml}
+        <div style="margin-top:12px; font-size:14px; font-weight:700; display:flex; justify-content:between; border-top:1px solid #111; padding-top:8px;">
+          <span style="flex:1;">Total Gastos:</span>
+          <span>RD$ ${totalGastos.toLocaleString('es-DO')}</span>
+        </div>
+        <div style="font-size:14px; font-weight:700; display:flex; justify-content:between; color:${balance >= 0 ? '#137333' : '#D9381E'};">
+          <span style="flex:1;">Balance Libre:</span>
+          <span>RD$ ${balance.toLocaleString('es-DO')}</span>
+        </div>
+      </div>
+      
+      <button id="sendModalWhatsappAction" style="background-color:#25D366; color:white; border:none; width:100%; padding:12px; font-size:15px; font-weight:bold; border-radius:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 10px rgba(37,211,102,0.2);">
+        🟢 Enviar por WhatsApp
+      </button>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  // Forzar reflow para animación
+  setTimeout(() => overlay.classList.add("open"), 20);
+
+  // Eventos de cierre y envío
+  document.getElementById("closeModalPreview").addEventListener("click", () => {
+    overlay.classList.remove("open");
+    setTimeout(() => overlay.remove(), 300);
+  });
+
+  document.getElementById("sendModalWhatsappAction").addEventListener("click", () => {
+    enviarPresupuestoWhatsApp(sueldo, totalGastos, balance);
+  });
+}
+
+function enviarPresupuestoWhatsApp(sueldo, totalGastos, balance) {
+  let mensaje = `📊 *MI PRESUPUESTO - MISCUARTOS APP*\n`;
+  mensaje += `💰 *Ingresos mensuales:* RD$ ${sueldo.toLocaleString('es-DO')}\n\n`;
+  mensaje += `📝 *Detalle de Gastos registrados:*\n`;
+
+  infoCategoriasPresupuesto.forEach(cat => {
+    const input = document.getElementById(cat.id);
+    const valor = input ? parseFloat(input.value) || 0 : 0;
+    if (valor > 0) {
+      mensaje += `${cat.label}: RD$ ${valor.toLocaleString('es-DO')}\n`;
+    }
+  });
+
   mensaje += `\n📉 *Total Gastos:* RD$ ${totalGastos.toLocaleString('es-DO')}\n`;
   mensaje += `💵 *Balance Libre:* RD$ ${balance.toLocaleString('es-DO')}\n\n`;
   mensaje += `_Generado desde mi App de Control Financiero 2026._`;
@@ -233,79 +352,53 @@ function enviarPresupuestoWhatsApp() {
   window.open(url, '_blank');
 }
 
-// --- 6. LÓGICA DE LA PESTAÑA: RETO NAVIDEÑO CON ÁRBOL 3D GIRATORIO ---
+// --- 8. LÓGICA DE LA PESTAÑA: RETO NAVIDEÑO CON ÁRBOL 3D REAL (VOLUMÉTRICO) ---
 function inicializarRetoNavideno() {
   const xmasWeeksContainer = document.getElementById("xmasWeeks");
   const progresoNum = document.getElementById("xmasProgressNum");
   if (!xmasWeeksContainer) return;
-
-  // Inyección de estilos CSS para la perspectiva y rotación 3D nativa
-  if (!document.getElementById("xmas3dStyles")) {
-    const styleTag = document.createElement("style");
-    styleTag.id = "xmas3dStyles";
-    styleTag.innerHTML = `
-      @keyframes spin3d {
-        0% { transform: rotateY(0deg); }
-        100% { transform: rotateY(360deg); }
-      }
-      .tree-3d-scene {
-        perspective: 600px;
-        width: 140px;
-        height: 200px;
-        position: relative;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-      .tree-3d-body {
-        width: 100%;
-        height: 100%;
-        position: relative;
-        transform-style: preserve-3d;
-        animation: spin3d 8s linear infinite;
-      }
-      .tree-layer {
-        position: absolute;
-        left: 50%;
-        transform-origin: 0% 50%;
-      }
-      .layer-1 { top: 20px; border-left: 35px solid transparent; border-right: 35px solid transparent; border-bottom: 50px solid #1B4D3E; margin-left: -35px; }
-      .layer-2 { top: 45px; border-left: 50px solid transparent; border-right: 50px solid transparent; border-bottom: 65px solid #143D31; margin-left: -50px; }
-      .layer-3 { top: 75px; border-left: 65px solid transparent; border-right: 65px solid transparent; border-bottom: 80px solid #0F2E25; margin-left: -65px; }
-    `;
-    document.head.appendChild(styleTag);
-  }
 
   xmasWeeksContainer.innerHTML = `
     <div style="display: flex; flex-direction: column; align-items: center; gap: 20px; margin: 20px 0; position: relative; min-height: 440px; width: 100%;">
       
       <div style="display: flex; width: 100%; max-width: 340px; align-items: center; justify-content: space-between; position: relative;">
         
-        <!-- Escena y Objeto del Árbol 3D en Rotación Continua -->
+        <!-- Contenedor del Árbol de Navidad Volumétrico 3D -->
         <div style="display: flex; flex-direction: column; align-items: center; width: 140px; position: relative; margin-left: 10px;">
           
-          <!-- Estrella Superior Fija en el eje z exterior -->
+          <!-- Estrella Superior Fija Externa -->
           <div id="starXmas" style="position: absolute; top: -15px; z-index: 10; font-size: 26px; color: #A0AAB2; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2)); transition: all 0.4s ease; user-select: none;">⭐</div>
           
           <div class="tree-3d-scene">
             <div class="tree-3d-body">
-              <!-- Cara A (Frontal) -->
+              <!-- Render de 4 Planos Entrelazados en ángulos equidistantes para conformar volumen con sombreado -->
+              <!-- Plano 0° -->
               <div class="tree-layer layer-1" style="transform: rotateY(0deg);"></div>
               <div class="tree-layer layer-2" style="transform: rotateY(0deg);"></div>
               <div class="tree-layer layer-3" style="transform: rotateY(0deg);"></div>
               
-              <!-- Cara B (Cruzada 90 grados para efecto volumétrico 3D) -->
-              <div class="tree-layer layer-1" style="transform: rotateY(90deg);"></div>
-              <div class="tree-layer layer-2" style="transform: rotateY(90deg);"></div>
-              <div class="tree-layer layer-3" style="transform: rotateY(90deg);"></div>
+              <!-- Plano 45° -->
+              <div class="tree-layer layer-1" style="transform: rotateY(45deg); filter: brightness(0.9);"></div>
+              <div class="tree-layer layer-2" style="transform: rotateY(45deg); filter: brightness(0.9);"></div>
+              <div class="tree-layer layer-3" style="transform: rotateY(45deg); filter: brightness(0.9);"></div>
+
+              <!-- Plano 90° -->
+              <div class="tree-layer layer-1" style="transform: rotateY(90deg); filter: brightness(0.8);"></div>
+              <div class="tree-layer layer-2" style="transform: rotateY(90deg); filter: brightness(0.8);"></div>
+              <div class="tree-layer layer-3" style="transform: rotateY(90deg); filter: brightness(0.8);"></div>
+
+              <!-- Plano 135° -->
+              <div class="tree-layer layer-1" style="transform: rotateY(135deg); filter: brightness(0.85);"></div>
+              <div class="tree-layer layer-2" style="transform: rotateY(135deg); filter: brightness(0.85);"></div>
+              <div class="tree-layer layer-3" style="transform: rotateY(135deg); filter: brightness(0.85);"></div>
             </div>
           </div>
           
-          <!-- Tronco del árbol -->
+          <!-- Tronco de soporte -->
           <div style="width: 24px; height: 32px; background: #5C4033; border-radius: 0 0 4px 4px; margin-top: -15px; z-index: 2;"></div>
         </div>
 
-        <!-- Panel de Luces / Esferas Numéricas (Lado Derecho) -->
+        <!-- Panel de Luces / Esferas Numéricas (Derecha) -->
         <div id="lucesXmasContainer" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 170px; background: rgba(244, 247, 249, 0.7); padding: 10px; border-radius: 14px; border: 1px dashed #ced4da; z-index: 5;">
         </div>
 
@@ -385,7 +478,7 @@ function inicializarRetoNavideno() {
   }
 }
 
-// --- 7. LÓGICA DE LA PESTAÑA: ACADEMIA Y SIMULADORES ---
+// --- 9. LÓGICA DE LA PESTAÑA: ACADEMIA Y SIMULADORES ---
 function inicializarSimuladorAFP() {
   const afpSalario = document.getElementById("afpSalario");
   if (afpSalario) {
@@ -413,7 +506,7 @@ function inicializarCreditoYOtros() {
   }
 }
 
-// --- 8. LÓGICA DE LA PESTAÑA: METAS Y ENFOQUE CON DESPLEGABLES ---
+// --- 10. LÓGICA DE LA PESTAÑA: METAS Y ENFOQUE CON DESPLEGABLES ---
 function inicializarMetasYEmprendimiento() {
   const targetAmount = document.getElementById("targetGoalAmount");
   const targetMonths = document.getElementById("targetGoalMonths");
