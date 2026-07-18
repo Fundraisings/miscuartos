@@ -1,13 +1,10 @@
 /* ============ DATOS ============ */
-// Ya NO reparte automático por peso. Cada categoría solo trae un tip base
-// y, cuando aplica, un benchmark de "rango sano" (maxRec) o mínimo recomendado (minRec)
-// para poder darle asesoría dinámica a lo que la persona escriba.
 const categories = {
-  vivienda:   { label: 'Vivienda',        color: '#1F7A5C', maxRec: 0.35, tip: 'Alquiler, luz, agua, internet.' },
-  comida:     { label: 'Comida',          color: '#3E9C77', maxRec: 0.20, tip: 'Supermercado y compras fijas de alimentos.' },
+  vivienda:    { label: 'Vivienda',       color: '#1F7A5C', maxRec: 0.35, tip: 'Alquiler, luz, agua, internet.' },
+  comida:      { label: 'Comida',          color: '#3E9C77', maxRec: 0.20, tip: 'Supermercado y compras fijas de alimentos.' },
   transporte: { label: 'Transporte',      color: '#6BBE9A', maxRec: 0.15, tip: 'Combustible, concho y mantenimiento básico.' },
   colegio:    { label: 'Niños / Escuela', color: '#2D8ACE', tip: 'Mensualidades escolares y cuidado.' },
-  salud:      { label: 'Salud',           color: '#3AA0A0', tip: 'Medicamentos y consultas médicas fijas.' },
+  salud:      { label: 'Salud',            color: '#3AA0A0', tip: 'Medicamentos y consultas médicas fijas.' },
   seguros:    { label: 'Seguros',         color: '#4C6B8A', tip: 'Cualquier póliza médica o de vehículo.' },
   mascotas:   { label: 'Mascotas',        color: '#C2447A', tip: 'Comida y cuidados veterinarios.' },
   deudas:     { label: 'Deudas',          color: '#8B5CF6', maxRec: 0.20, tip: 'Tarjetas o préstamos. Ataca la de mayor interés.' },
@@ -47,9 +44,8 @@ const kidsTasks = [
 let kidsChecked = {};
 
 /* ============ ACCESIBILIDAD: helper para divs interactivos ============ */
-// Cualquier div que se comporte como botón necesita poder alcanzarse con Tab
-// y activarse con Enter/Espacio, no solo con clic de mouse.
 function makeKeyboardActivatable(el) {
+  if (!el) return;
   el.setAttribute('tabindex', '0');
   el.setAttribute('role', 'button');
   el.addEventListener('keydown', (e) => {
@@ -103,7 +99,7 @@ function lazyLoadVideos() {
   }
 }
 
-/* ============ PRESUPUESTO: lista única con casilla de dinero + consejo activo ============ */
+/* ============ PRESUPUESTO ============ */
 const resultsEl = document.getElementById('results');
 const incomeEl = document.getElementById('income');
 const countTag = document.getElementById('countTag');
@@ -116,8 +112,6 @@ function getIncome() {
   return isNaN(v) || v < 0 ? 0 : v;
 }
 
-// Calcula la asesoría dinámica para UNA categoría, según lo que la persona
-// realmente escribió — no reparte nada, solo evalúa qué tan sano es.
 function categoryAdvice(key, amount, income) {
   const cat = categories[key];
   if (!income || income <= 0) return null;
@@ -150,11 +144,11 @@ function categoryAdvice(key, amount, income) {
     return { level: 'green', html: `¡Bien! Estás ahorrando por encima del ${Math.round(minRec * 100)}% mínimo recomendado.` };
   }
 
-  return null; // categorías sin benchmark: solo se queda el tip base, sin semáforo
+  return null;
 }
 
 function buildCategoryRows() {
-  if (!resultsEl) return; // Validación de seguridad
+  if (!resultsEl) return;
   let html = `
     <div class="sticky-total-box">
       <div class="sticky-total-num" id="stickyTotalNum">RD$0</div>
@@ -170,7 +164,7 @@ function buildCategoryRows() {
         <div class="cat-row-label"><span class="cat-dot" id="dot-${key}"></span>${cat.label}</div>
         <div class="cat-row-input-wrap">
           <span class="amt-currency">RD$</span>
-          <input class="amt-input" type="number" inputmode="decimal" data-key="${key}" placeholder="0" value="${amounts[key] != null ? amounts[key] : ''}">
+          <input class="amt-input" type="number" inputmode="decimal" data-key="${key}" placeholder="0" value="${amounts[key] ? amounts[key] : ''}">
         </div>
       </div>`;
   });
@@ -197,9 +191,12 @@ function buildCategoryRows() {
     summaryBtn.addEventListener('click', openSummary);
   }
 
-  Object.keys(categories).forEach(key => updateCategoryDot(key));
-  updateCount();
-  updateTotals(true);
+  // TIEMPO DE ESPERA DE SEGURIDAD PARA RENDERIZAR
+  setTimeout(() => {
+    Object.keys(categories).forEach(key => updateCategoryDot(key));
+    updateCount();
+    updateTotals(true);
+  }, 0);
 }
 
 function updateCount() {
@@ -255,15 +252,19 @@ function updateTotals(showOverallStatus) {
 
   if (income > 0 && total > income) {
     const exceso = total - income;
-    warnBox.style.display = 'block';
-    warnBox.style.background = 'rgba(180,67,42,0.08)';
-    warnBox.style.color = '#8a3320';
-    warnBox.innerHTML = `RD$${fmt(exceso)} por encima de lo que ganas. No es un error — es información real.`;
+    if (warnBox) {
+      warnBox.style.display = 'block';
+      warnBox.style.background = 'rgba(180,67,42,0.08)';
+      warnBox.style.color = '#8a3320';
+      warnBox.innerHTML = `RD$${fmt(exceso)} por encima de lo que ganas. No es un error — es información real.`;
+    }
   } else if (income > 0 && total > 0) {
-    warnBox.style.display = 'block';
-    warnBox.style.background = 'var(--accent-soft)';
-    warnBox.style.color = 'var(--accent-solid)';
-    warnBox.innerHTML = `Te queda RD$${fmt(income - total)} sin asignar todavía.`;
+    if (warnBox) {
+      warnBox.style.display = 'block';
+      warnBox.style.background = 'var(--accent-soft)';
+      warnBox.style.color = 'var(--accent-solid)';
+      warnBox.innerHTML = `Te queda RD$${fmt(income - total)} sin asignar todavía.`;
+    }
   } else if (warnBox) {
     warnBox.style.display = 'none';
   }
@@ -521,18 +522,21 @@ document.querySelectorAll('.type-btn').forEach(b => {
     document.querySelectorAll('.type-btn').forEach(btn => btn.classList.toggle('active', btn === b));
     const vBanner = document.getElementById('variableBanner');
     if (vBanner) vBanner.classList.toggle('show', incomeType === 'variable');
-    updateTotals();
+    updateTotals(true);
   });
 });
 
 /* ============ INICIALIZADORES SEGUROS ============ */
 document.addEventListener('DOMContentLoaded', () => {
+  Object.keys(categories).forEach(key => {
+    if (amounts[key] == null) amounts[key] = 0;
+  });
+
   buildLeaks();
   buildXmas();
+  buildCategoryRows();
 
   if (incomeEl) {
     incomeEl.addEventListener('input', () => updateTotals(true));
   }
-
-  buildCategoryRows();
 });
