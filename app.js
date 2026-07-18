@@ -1,8 +1,9 @@
 /**
- * MISCUARTOS APP - SCRIPT PRINCIPAL COMPLETO (2026)
+ * MISCUARTOS APP - SCRIPT PRINCIPAL COMPLETO (JULIO 2026)
  * Contiene: Pantalla de inicio, navegación, presupuesto con inputs optimizados,
  * alertas de finanzas realistas, pop-up de vista previa, botón de WhatsApp,
- * reto con Árbol Navideño Personalizado limpio, simulador AFP y Coach con Tips Dinámicos.
+ * reto con Árbol Navideño Personalizado limpio, sección interactiva de Dinero Oculto,
+ * simulador AFP y Coach con Tips Dinámicos y desplegables.
  */
 
 // --- 1. CONFIGURACIÓN DE DATOS GLOBALES ---
@@ -14,6 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
   inicializarNavegacion();
   inicializarPresupuesto();
   inicializarRetoNavideno();
+  inicializarDineroOculto();
   inicializarSimuladorAFP();
   inicializarCreditoYOtros();
   inicializarMetasYEmprendimiento();
@@ -373,7 +375,6 @@ function inicializarRetoNavideno() {
 
   const esferasCompletadas = new Set();
 
-  // Diccionario de consejos educativos gatillados cada 5 marcas
   const consejosEducativos = {
     5: "💡 <strong>¡Primer logro (Día 5)!</strong> La constancia hace al maestro. Recuerda que ahorrar no es lo que te sobra, es separar tu futuro antes de gastar.",
     10: "🚀 <strong>¡Día 10 superado!</strong> Mantener el ritmo es el secreto. Evita los 'gastos hormiga' de esta semana para que tu meta no pierda fuerza.",
@@ -412,7 +413,6 @@ function inicializarRetoNavideno() {
       const exitoBox = document.getElementById("mensajeExitoNavidad");
       const estrella = document.getElementById("starXmas");
       
-      // Actualización de los consejos dinámicos según el volumen guardado
       if (totalMarcadas === 0) {
         recompensaBox.innerHTML = `<div style="background: #F4F7F9; border: 1px solid #CED4DA; color: #495057; padding: 12px 16px; border-radius: 12px; font-size: 13px; text-align: center;">🎯 <strong>¡Comienza el reto!</strong> Ilumina tus primeras esferas de ahorro para desbloquear consejos de constancia financiera.</div>`;
       } else if (totalMarcadas >= 20) {
@@ -455,7 +455,99 @@ function inicializarRetoNavideno() {
   }
 }
 
-// --- 9. LÓGICA DE LA PESTAÑA: ACADEMIA Y SIMULADORES (CONTENIDO MEJORADO) ---
+// --- 9. LÓGICA DE LA PESTAÑA: ACADEMIA Y SIMULADORES INTERACTIVOS ---
+function inicializarDineroOculto() {
+  const dineroOcultoContainer = document.getElementById("dineroOcultoContainer");
+  if (!dineroOcultoContainer) return;
+
+  const listaHabitos = [
+    { id: "habito_cafe", label: "☕ Cafecito o empanada en la calle", costo: 150, frecuencia: "veces por semana" },
+    { id: "habito_delivery", label: "🍗 Delivery de cena por antojo", costo: 600, frecuencia: "veces por semana" },
+    { id: "habito_streaming", label: "📺 Suscripción de streaming sin usar", costo: 550, frecuencia: "al mes (fijo)" },
+    { id: "habito_antojos", label: "🍬 Refrescos, picaderas o golosinas", costo: 100, frecuencia: "veces por semana" }
+  ];
+
+  let htmlContenido = `
+    <div style="background: #FFF9E6; border: 1px solid #FFEAA7; padding: 16px; border-radius: 14px; margin-bottom: 16px;">
+      <h4 style="margin: 0 0 6px 0; font-size: 14px; color: #8A6D1C; font-weight: 700;">🔍 DIAGNÓSTICO: DINERO OCULTO</h4>
+      <p style="margin: 0 0 12px 0; font-size: 12.5px; color: #555; line-height: 1.4;">
+        Los pequeños consumos de la semana se vuelven gigantes al mes. Selecciona con qué frecuencia realizas estos hábitos para descubrir tu fuga de dinero:
+      </p>
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+  `;
+
+  listaHabitos.forEach(habito => {
+    if (habito.frecuencia.includes("semana")) {
+      htmlContenido += `
+        <div style="display: flex; flex-direction: column; gap: 4px; background: #fff; padding: 10px; border-radius: 10px; border: 1px solid #e1e6eb;">
+          <label style="font-size: 13px; font-weight: 600; color: #222;">${habito.label}</label>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 2px;">
+            <span style="font-size: 11.5px; color: #666;">Costo apróx: RD$ ${habito.costo}</span>
+            <select class="input-habito-hormiga" data-id="${habito.id}" data-costo="${habito.costo}" data-tipo="semanal" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #ced4da; font-size: 12.5px; background: #f8f9fa; outline: none; font-weight: 600; color: #333;">
+              <option value="0">Nunca</option>
+              <option value="1">1 vez x semana</option>
+              <option value="3">3 veces x semana</option>
+              <option value="5">5 veces x semana</option>
+            </select>
+          </div>
+        </div>
+      `;
+    } else {
+      htmlContenido += `
+        <div style="display: flex; flex-direction: column; gap: 4px; background: #fff; padding: 10px; border-radius: 10px; border: 1px solid #e1e6eb;">
+          <label style="font-size: 13px; font-weight: 600; color: #222;">${habito.label}</label>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 2px;">
+            <span style="font-size: 11.5px; color: #666;">Costo fijo: RD$ ${habito.costo} / mes</span>
+            <select class="input-habito-hormiga" data-id="${habito.id}" data-costo="${habito.costo}" data-tipo="mensual" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #ced4da; font-size: 12.5px; background: #f8f9fa; outline: none; font-weight: 600; color: #333;">
+              <option value="0">No lo tengo</option>
+              <option value="1">Sí, lo pago mensual</option>
+            </select>
+          </div>
+        </div>
+      `;
+    }
+  });
+
+  htmlContenido += `
+      </div>
+      <div style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed #FFEAA7; text-align: center;">
+        <div style="font-size: 13px; font-weight: 600; color: #444;">Fuga mensual estimada:</div>
+        <div id="totalDineroOcultoMensual" style="font-size: 20px; font-weight: 800; color: #D9381E; margin: 2px 0;">RD$ 0</div>
+        <div id="totalDineroOcultoAnual" style="font-size: 11.5px; color: #666; font-weight: 500;">Equivale a RD$ 0 asignados al año</div>
+      </div>
+    </div>
+  `;
+
+  dineroOcultoContainer.innerHTML = htmlContenido;
+
+  document.querySelectorAll(".input-habito-hormiga").forEach(select => {
+    select.addEventListener("change", calcularFugaDineroOculto);
+  });
+}
+
+function calcularFugaDineroOculto() {
+  let totalMensual = 0;
+
+  document.querySelectorAll(".input-habito-hormiga").forEach(select => {
+    const valor = parseFloat(select.value) || 0;
+    const costo = parseFloat(select.getAttribute("data-costo")) || 0;
+    const tipo = select.getAttribute("data-tipo");
+
+    if (tipo === "semanal") {
+      totalMensual += (valor * costo * 4.3333);
+    } else if (tipo === "mensual") {
+      totalMensual += (valor * costo);
+    }
+  });
+
+  const totalAnual = totalMensual * 12;
+  const txtMensual = document.getElementById("totalDineroOcultoMensual");
+  const txtAnual = document.getElementById("totalDineroOcultoAnual");
+
+  if (txtMensual) txtMensual.textContent = `RD$ ${Math.round(totalMensual).toLocaleString('es-DO')}`;
+  if (txtAnual) txtAnual.textContent = `💡 ¡Son RD$ ${Math.round(totalAnual).toLocaleString('es-DO')} al año! Imagina meter eso al Arbolito.`;
+}
+
 function inicializarSimuladorAFP() {
   const academiaIntroBox = document.getElementById("academiaIntroMessage");
   if (academiaIntroBox) {
@@ -556,7 +648,7 @@ function actualizarAnalisisDelCoach() {
       <strong style="color: #2D8ACE; font-size: 15px;">RD$ ${cuotaMensual.toLocaleString('es-DO', {maximumFractionDigits:2})}</strong> al mes.
     </div>
 
-    <!-- 💡 UBICACIÓN OPTIMIZADA DEL TIP PRINCIPAL DE COMPROMISO -->
+    <!-- UBICACIÓN OPTIMIZADA DEL TIP PRINCIPAL DE COMPROMISO -->
     <div style="background: #FFF9E6; border: 1px solid #FFEAA7; color: #D6A21E; padding: 10px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 6px; text-align: left; line-height: 1.4;">
       💡 Tip: Abre una cuenta de ahorro aparte. Dinero que entra ahí no se toca hasta diciembre, salvo una emergencia real de salud.
     </div>
@@ -633,7 +725,7 @@ function renderizarIdeasDeEmprendimiento(cuotaNecesaria) {
   const ideas = [
     { titulo: "📸 Gestión de Redes para Negocios", desc: "Muchos salones o comercios locales necesitan apoyo digital. Manejar un par de cuentas de forma independiente podría aportar un estimado de...", ingreso: 10000 },
     { titulo: "🧁 Venta de Postres o Snacks", desc: "Preparar opciones bajo pedido para conocidos u oficinas los fines de semana suele generar ingresos extras de aproximadamente...", ingreso: 7500 },
-    { titulo: "🚗 Tutorías o Asesorías", desc: "Compartir tus conocimientos en áreas como inglés, contabilidad o informática en tus tiempos libres puede sumarte un extra estimado de...", ingreso: 8000 }
+    { titulo: "🚗 Tutorías o Asesorías", desc: "Compartir tus conocimientos en áreas como inglés, contabilidad o informática en tus tiempos libres puede sumanter un extra estimado de...", ingreso: 8000 }
   ];
 
   container.innerHTML = "";
