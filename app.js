@@ -2,7 +2,7 @@
  * MISCUARTOS APP - SCRIPT PRINCIPAL COMPLETO (2026)
  * Contiene: Pantalla de inicio, navegación, presupuesto con inputs optimizados,
  * alertas de finanzas realistas, pop-up de vista previa, botón de WhatsApp,
- * reto con Árbol Navideño Personalizado (arbolito2.png) y regalos, simulador AFP y Coach.
+ * reto con Árbol Navideño Personalizado limpio, simulador AFP y Coach con Tips Dinámicos.
  */
 
 // --- 1. CONFIGURACIÓN DE DATOS GLOBALES ---
@@ -314,44 +314,48 @@ function enviarPresupuestoWhatsApp(sueldo, totalGastos, balance) {
   window.open(url, '_blank');
 }
 
-// --- 8. LÓGICA DE LA PESTAÑA: RETO NAVIDEÑO CON IMAGEN PERSONALIZADA Y REGALOS ---
+// --- 8. LÓGICA DE LA PESTAÑA: RETO NAVIDEÑO CON SECCIÓN DE CONSEJOS DINÁMICOS ---
 function inicializarRetoNavideno() {
   const xmasWeeksContainer = document.getElementById("xmasWeeks");
   const progresoNum = document.getElementById("xmasProgressNum");
   if (!xmasWeeksContainer) return;
 
   xmasWeeksContainer.innerHTML = `
-    <div style="display: flex; flex-direction: column; align-items: center; gap: 20px; margin: 20px 0; position: relative; min-height: 440px; width: 100%;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 20px; margin: 20px 0; position: relative; min-height: 460px; width: 100%;">
       
       <div style="display: flex; width: 100%; max-width: 360px; align-items: center; justify-content: space-between; position: relative;">
         
-        <!-- Contenedor del Árbol de Navidad Personalizado con Dimensiones Seguras -->
-        <div style="display: flex; flex-direction: column; align-items: center; width: 160px; position: relative; height: 260px; justify-content: flex-end; background: transparent;">
+        <!-- Contenedor del Árbol de Navidad Totalmente Limpio en su Base -->
+        <div style="display: flex; flex-direction: column; align-items: center; width: 160px; position: relative; height: 230px; justify-content: flex-end; background: transparent; padding-bottom: 10px;">
           
-          <!-- Estrella Superior de Guía Interactiva -->
+          <!-- Estrella Superior Interactiva -->
           <div id="starXmas" style="position: absolute; top: -5px; z-index: 10; font-size: 32px; color: #A0AAB2; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15)); transition: all 0.4s ease; user-select: none;">⭐</div>
           
-          <!-- Imagen de tu Árbol Navideño Definido (Detecta tanto el nombre normal como el doble .png.png) -->
-          <div style="width: 150px; height: 210px; display: flex; align-items: center; justify-content: center; position: relative; z-index: 3; margin-bottom: 8px;">
+          <!-- Imagen del Árbol sin fondos feos debajo -->
+          <div style="width: 150px; height: 210px; display: flex; align-items: center; justify-content: center; position: relative; z-index: 3;">
             <img src="arbolito2.png.png" 
                  alt="🎄" 
                  onerror="this.src='arbolito2.png'; this.onerror=function(){ this.style.display='none'; this.nextElementSibling.style.display='flex'; };"
                  style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));">
             <div style="display: none; width: 100%; height: 100%; background: #1B5E20; border-radius: 40% 40% 10% 10%; align-items: center; justify-content: center; font-size: 48px; box-shadow: inset 0 -10px 20px rgba(0,0,0,0.3);">🎄</div>
           </div>
-          
-          <!-- Capa Base: Regalos Semi-opacos Acumulados Cubriendo la Base -->
-          <div style="position: absolute; bottom: 0px; width: 140px; height: 45px; background-image: url('https://images.unsplash.com/photo-1543257580-7269da773bf5?auto=format&fit=crop&q=80&w=200'); background-size: cover; background-position: center; border-radius: 8px; z-index: 4; opacity: 0.75; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));"></div>
         </div>
 
-        <!-- Panel de Control Lateral (Luces / Esferas Numéricas de Ahorro) -->
+        <!-- Panel de Control Lateral (Bloques de 4 columnas perfectos) -->
         <div id="lucesXmasContainer" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 170px; background: rgba(244, 247, 249, 0.7); padding: 10px; border-radius: 14px; border: 1px dashed #ced4da; z-index: 5;">
         </div>
 
       </div>
 
-      <!-- Mensaje Dinámico de Logro Navideño -->
-      <div id="mensajeExitoNavidad" style="width: 100%; max-width: 320px; text-align: center; display: none; transition: all 0.3s ease;">
+      <!-- SECCIÓN DINÁMICA DE CONSEJOS EDUCATIVOS Y MOTIVACIONALES (CADA 5 DÍAS) -->
+      <div id="recompensaProgresoNavidad" style="width: 100%; max-width: 340px; display: block; transition: all 0.3s ease;">
+        <div style="background: #F4F7F9; border: 1px solid #CED4DA; color: #495057; padding: 12px 16px; border-radius: 12px; font-size: 13px; line-height: 1.4; text-align: center;">
+          🎯 <strong>¡Comienza el reto!</strong> Ilumina tus primeras esferas de ahorro para desbloquear consejos de constancia financiera.
+        </div>
+      </div>
+
+      <!-- Mensaje Final de Éxito Completado -->
+      <div id="mensajeExitoNavidad" style="width: 100%; max-width: 340px; text-align: center; display: none; transition: all 0.3s ease;">
         <div style="background: #E6F4EA; border: 2px solid #3E9C77; color: #0F3D2A; padding: 15px; border-radius: 12px; font-weight: bold; box-shadow: 0 4px 12px rgba(62,156,119,0.2);">
           🎉 ¡Felicidades, meta cumplida! 🎄<br>
           <span style="font-weight: 500; font-size: 13.5px; display: block; margin-top: 6px; color: #1B5E20;">
@@ -364,9 +368,18 @@ function inicializarRetoNavideno() {
   `;
 
   const lucesContainer = document.getElementById("lucesXmasContainer");
+  const recompensaBox = document.getElementById("recompensaProgresoNavidad");
   if (!lucesContainer) return;
 
   const esferasCompletadas = new Set();
+
+  // Diccionario de consejos educativos gatillados cada 5 marcas
+  const consejosEducativos = {
+    5: "💡 <strong>¡Primer logro (Día 5)!</strong> La constancia hace al maestro. Recuerda que ahorrar no es lo que te sobra, es separar tu futuro antes de gastar.",
+    10: "🚀 <strong>¡Día 10 superado!</strong> Mantener el ritmo es el secreto. Evita los 'gastos hormiga' de esta semana para que tu meta no pierda fuerza.",
+    15: "🛡️ <strong>¡Día 15 encendido!</strong> Estás protegiendo tu paz mental. Tener dinero apartado te aleja de los préstamos informales de última hora.",
+    20: "🌟 <strong>¡Día 20 en la bolsa!</strong> Estás a nada de la meta. La disciplina que construyes hoy pagará los mejores intereses en tu diciembre."
+  };
 
   for (let i = 1; i <= 22; i++) {
     const esfera = document.createElement("div");
@@ -395,10 +408,26 @@ function inicializarRetoNavideno() {
         esfera.style.transform = "scale(1.12)";
       }
 
+      const totalMarcadas = esferasCompletadas.size;
       const exitoBox = document.getElementById("mensajeExitoNavidad");
       const estrella = document.getElementById("starXmas");
       
-      if (esferasCompletadas.size === 22) {
+      // Actualización de los consejos dinámicos según el volumen guardado
+      if (totalMarcadas === 0) {
+        recompensaBox.innerHTML = `<div style="background: #F4F7F9; border: 1px solid #CED4DA; color: #495057; padding: 12px 16px; border-radius: 12px; font-size: 13px; text-align: center;">🎯 <strong>¡Comienza el reto!</strong> Ilumina tus primeras esferas de ahorro para desbloquear consejos de constancia financiera.</div>`;
+      } else if (totalMarcadas >= 20) {
+        recompensaBox.innerHTML = `<div style="background: #EBF7FF; border: 1px solid #BCE1FF; color: #005499; padding: 12px 16px; border-radius: 12px; font-size: 13px; text-align: center;">${consejosEducativos[20]}</div>`;
+      } else if (totalMarcadas >= 15) {
+        recompensaBox.innerHTML = `<div style="background: #EBF7FF; border: 1px solid #BCE1FF; color: #005499; padding: 12px 16px; border-radius: 12px; font-size: 13px; text-align: center;">${consejosEducativos[15]}</div>`;
+      } else if (totalMarcadas >= 10) {
+        recompensaBox.innerHTML = `<div style="background: #EBF7FF; border: 1px solid #BCE1FF; color: #005499; padding: 12px 16px; border-radius: 12px; font-size: 13px; text-align: center;">${consejosEducativos[10]}</div>`;
+      } else if (totalMarcadas >= 5) {
+        recompensaBox.innerHTML = `<div style="background: #EBF7FF; border: 1px solid #BCE1FF; color: #005499; padding: 12px 16px; border-radius: 12px; font-size: 13px; text-align: center;">${consejosEducativos[5]}</div>`;
+      } else {
+        recompensaBox.innerHTML = `<div style="background: #FFF9E6; border: 1px solid #FFEAA7; color: #8A6D1C; padding: 12px 16px; border-radius: 12px; font-size: 13px; text-align: center;">⚡ Llevas <strong>${totalMarcadas}</strong> esferas encendidas. ¡Sigue así para activar el próximo consejo de educación financiera!</div>`;
+      }
+
+      if (totalMarcadas === 22) {
         if (estrella) {
           estrella.style.color = "#FFD700";
           estrella.style.filter = "drop-shadow(0 0 12px #FFD700) drop-shadow(0 0 25px #FFDC00)";
@@ -406,6 +435,7 @@ function inicializarRetoNavideno() {
         }
         if (exitoBox) exitoBox.style.display = "block";
         if (progresoNum) progresoNum.style.display = "none";
+        recompensaBox.style.display = "none";
       } else {
         if (estrella) {
           estrella.style.color = "#A0AAB2";
@@ -413,9 +443,10 @@ function inicializarRetoNavideno() {
           estrella.style.transform = "scale(1)";
         }
         if (exitoBox) exitoBox.style.display = "none";
+        recompensaBox.style.display = "block";
         if (progresoNum) {
           progresoNum.style.display = "block";
-          progresoNum.textContent = `Llevas ${esferasCompletadas.size} de 22 semanas iluminadas.`;
+          progresoNum.textContent = `Llevas ${totalMarcadas} de 22 semanas iluminadas.`;
         }
       }
     });
@@ -525,8 +556,8 @@ function actualizarAnalisisDelCoach() {
       <strong style="color: #2D8ACE; font-size: 15px;">RD$ ${cuotaMensual.toLocaleString('es-DO', {maximumFractionDigits:2})}</strong> al mes.
     </div>
 
-    <!-- 💡 UBICACIÓN OPTIMIZADA DEL TIP DE AHORRO -->
-    <div style="background: #FFF9E6; border: 1px solid #FFEAA7; color: #D6A21E; padding: 10px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 6px;">
+    <!-- 💡 UBICACIÓN OPTIMIZADA DEL TIP PRINCIPAL DE COMPROMISO -->
+    <div style="background: #FFF9E6; border: 1px solid #FFEAA7; color: #D6A21E; padding: 10px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 6px; text-align: left; line-height: 1.4;">
       💡 Tip: Abre una cuenta de ahorro aparte. Dinero que entra ahí no se toca hasta diciembre, salvo una emergencia real de salud.
     </div>
 
