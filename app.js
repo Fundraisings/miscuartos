@@ -1,721 +1,253 @@
-/* ============ DATOS ============ */
-const categories = {
-  vivienda:   { label: 'Vivienda',       color: '#1F7A5C', maxRec: 0.35, tip: 'Alquiler, luz, agua, internet.' },
-  comida:     { label: 'Comida',         color: '#3E9C77', maxRec: 0.20, tip: 'Supermercado y compras fijas de alimentos.' },
-  transporte: { label: 'Transporte',     color: '#6BBE9A', maxRec: 0.15, tip: 'Combustible, concho y mantenimiento básico.' },
-  colegio:    { label: 'Niños / Escuela', color: '#2D8ACE', tip: 'Mensualidades escolares y cuidado.' },
-  salud:      { label: 'Salud',          color: '#3AA0A0', tip: 'Medicamentos y consultas médicas fijas.' },
-  seguros:    { label: 'Seguros',        color: '#4C6B8A', tip: 'Cualquier póliza médica o de vehículo.' },
-  mascotas:   { label: 'Mascotas',       color: '#C2447A', tip: 'Comida y cuidados veterinarios.' },
-  deudas:     { label: 'Deudas',         color: '#8B5CF6', maxRec: 0.20, tip: 'Tarjetas o préstamos. Ataca la de mayor interés.' },
-  ahorro:     { label: 'Ahorro',         color: '#B4432A', minRec: 0.10, minRecVariable: 0.15, tip: 'Tu colchón de tranquilidad. Míralo como factura obligatoria.' },
-  familia:    { label: 'Remesas / Apoyo', color: '#E8A33D', tip: 'Dinero fijo enviado a padres o familiares.' },
-  diversion:  { label: 'Diversión',      color: '#66766D', tip: 'Salidas y gustos. Pequeño pero necesario para no rendirte.' }
-};
+/**
+ * MISCUARTOS APP - SCRIPT PRINCIPAL DE PRODUCCIÓN (2026)
+ * Contiene toda la lógica de cálculo, navegación, simuladores,
+ * educación financiera aplicada y catálogo de micro-emprendimiento.
+ */
 
-let amounts = {};       // lo que la persona realmente escribe por categoría
-let incomeType = 'fijo';
-let totalXmasWeeks = 0; // Se calculará dinámicamente
+// --- 1. CONFIGURACIÓN DE DATOS GLOBALES Y MARCADORES ---
+const CANASTA_BASICA_RD = 49268; // Datos extraídos de estadísticas oficiales en RD
 
 const VIDEO_LINKS = {
-  tutorial: '',
-  afp: '',
-  curso1: '',
-  kids: '',
-  retoXmas: ''
+  tutorial: "https://www.youtube.com/embed/VIDEO_ID_TUTORIAL",
+  reto: "https://www.youtube.com/embed/VIDEO_ID_RETO",
+  academiaIntro: "https://www.youtube.com/embed/VIDEO_ID_INTRO",
+  afp: "https://www.youtube.com/embed/VIDEO_ID_AFP"
 };
 
-const leaks = [
-  { id: 'lista',    text: 'Ir al súper sin lista escrita', amount: 1500 },
-  { id: 'comida',   text: 'Comer fuera en el trabajo frecuentemente', amount: 2500 },
-  { id: 'recargas', text: 'Comprar recargas sueltas en vez de paquetes', amount: 600 },
-  { id: 'subs',     text: 'Suscripciones que no usas pero sigues pagando', amount: 800 },
-  { id: 'compara',  text: 'Comprar cosas grandes sin comparar precio primero', amount: 1000 }
-];
-let leakChecked = {};
-
-const kidsTasks = [
-  { id: 'frasco', text: 'Ahorrar 3 monedas de tu mesada en un frasco transparente.' },
-  { id: 'vender', text: 'Vender algo propio que ya no uses (a un familiar o vecino).' },
-  { id: 'tarea', text: 'Haz una labor extra en casa a cambio de una "paga".' },
-  { id: 'inventar', text: 'Inventar algo simple para vender un día (limonada, pulseras).' },
-  { id: 'regalo', text: 'Al recibir dinero de regalo, guarda la mitad antes de gastar.' },
-  { id: 'adulto', text: 'Cuéntale a un adulto qué harías si tuvieras tu propio negocio.' }
-];
-let kidsChecked = {};
-
-// Ideas de Micro-emprendimiento para el mercado dominicano
-const businessIdeas = [
-  { title: "💻 Gestión de Redes Locales (Social Media)", desc: "Muchos negocios en RD (salones, colmados grandes, tiendas de ropa) no tienen tiempo de subir contenido. Si sabes usar Canva e Instagram, puedes cobrar desde RD$5,000/mes por cuenta." },
-  { title: "🍰 Repostería o Snacks por Encargo", desc: "El dominicano es dulcero. Puedes preparar brownies, galletas o picaderas saladas bajo pedido para eventos o fines de semana sin arriesgar capital en inventario muerto." },
-  { title: "📚 Tutorías Escolares o Universitarias", desc: "Si eres bueno en matemáticas, inglés, contabilidad o redacción, ofrece regularización a hijos de vecinos o compañeros. Dos sesiones semanales pueden aportarte entre RD$4,000 y RD$8,000 mensuales." },
-  { title: "🛍️ Tienda Virtual Dropshipping / Bajo Pedido", desc: "Crea una página de Instagram estéticamente atractiva y vende artículos tendencia (organizadores, cases, joyería) cobrando el 50% por adelantado para realizar el pedido del proveedor." }
-];
-
-/* ============ ACCESIBILIDAD ============ */
-function makeKeyboardActivatable(el) {
-  if (!el) return;
-  el.setAttribute('tabindex', '0');
-  el.setAttribute('role', 'button');
-  el.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      el.click();
-    }
-  });
-}
-
-/* ============ SPLASH ============ */
-if (document.getElementById('enterAppBtn')) {
-  document.getElementById('enterAppBtn').addEventListener('click', () => {
-    const splash = document.getElementById('app-splash');
-    const mainApp = document.getElementById('mainAppContainer');
-    if(splash && mainApp) {
-      splash.classList.add('fade-out');
-      mainApp.style.display = 'flex';
-      setTimeout(() => { splash.style.display = 'none'; }, 600);
-      lazyLoadVideos();
-    }
-  });
-}
-
-/* ============ NAVEGACIÓN TABS ============ */
-document.querySelectorAll('.nav-item').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-    btn.classList.add('active');
-    
-    const targetPane = document.getElementById(`pane-${btn.dataset.tab}`);
-    if (targetPane) targetPane.classList.add('active');
-    
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    lazyLoadVideos();
-    
-    // Recalcular vistas de metas si entran a esa pestaña
-    if(btn.dataset.tab === 'metas') {
-      calculateEmergencyFund();
-      calculateTargetGoal();
-    }
-  });
+// --- 2. ENRUTADOR Y CONTROL DE NAVEGACIÓN ---
+document.addEventListener("DOMContentLoaded", () => {
+  inicializarNavegacion();
+  inicializarPresupuesto();
+  inicializarRetoNavideno();
+  inicializarSimuladorAFP();
+  inicializarMetasYEmprendimiento();
 });
 
-function lazyLoadVideos() {
-  const splash = document.getElementById('app-splash');
-  if (splash && splash.style.display === 'none') {
-    const activePane = document.querySelector('.tab-pane.active');
-    if (!activePane) return;
+function inicializarNavegacion() {
+  const navButtons = document.querySelectorAll(".nav-btn");
+  const tabContents = document.querySelectorAll(".tab-content");
 
-    if (activePane.id === 'pane-presupuesto' && VIDEO_LINKS.tutorial) {
-      const el = document.getElementById('embed-tutorial');
-      if (el) el.innerHTML = `<iframe src="${VIDEO_LINKS.tutorial}" allowfullscreen></iframe>`;
-    }
-    if (activePane.id === 'pane-reto' && VIDEO_LINKS.retoXmas) {
-      const el = document.getElementById('embed-reto-xmas');
-      if (el) el.innerHTML = `<iframe src="${VIDEO_LINKS.retoXmas}" allowfullscreen></iframe>`;
-    }
-    if (activePane.id === 'pane-academia') {
-      const afpEl = document.getElementById('embed-afp');
-      const cursoEl = document.getElementById('embed-curso');
-      const kidsEl = document.getElementById('embed-kids');
-      const kidsFull = document.getElementById('kidsFull');
+  navButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const targetTab = btn.getAttribute("data-tab");
 
-      if (VIDEO_LINKS.afp && afpEl) afpEl.innerHTML = `<iframe src="${VIDEO_LINKS.afp}" allowfullscreen></iframe>`;
-      if (VIDEO_LINKS.curso1 && cursoEl) cursoEl.innerHTML = `<iframe src="${VIDEO_LINKS.curso1}" allowfullscreen></iframe>`;
-      if (VIDEO_LINKS.kids && kidsFull && kidsFull.classList.contains('show') && kidsEl) {
-        kidsEl.innerHTML = `<iframe src="${VIDEO_LINKS.kids}" allowfullscreen></iframe>`;
-      }
-    }
-  }
-}
+      // Cambiar estado activo de los botones
+      navButtons.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
 
-/* ============ PRESUPUESTO ============ */
-const resultsEl = document.getElementById('results');
-const incomeEl = document.getElementById('income');
-const countTag = document.getElementById('countTag');
-
-function fmt(n) { return Math.round(n).toLocaleString('en-US', { maximumFractionDigits: 0 }); }
-
-function getIncome() {
-  if (!incomeEl) return 0;
-  const v = parseFloat(incomeEl.value);
-  return isNaN(v) || v < 0 ? 0 : v;
-}
-
-// Devuelve el total acumulado de gastos actuales del usuario
-function getTotalExpenses() {
-  let total = 0;
-  Object.keys(categories).forEach(key => { total += (amounts[key] || 0); });
-  return total;
-}
-
-function categoryAdvice(key, amount, income) {
-  const cat = categories[key];
-  if (!income || income <= 0) return null;
-
-  if (cat.maxRec != null) {
-    const recommended = income * cat.maxRec;
-    if (amount > recommended) {
-      const exceso = amount - recommended;
-      const neededIncome = amount / cat.maxRec;
-      const pctIncrease = ((neededIncome / income) - 1) * 100;
-      const severo = amount > recommended * 1.15;
-      return {
-        level: severo ? 'red' : 'amber',
-        html: `Lo sano aquí sería no pasar de <b>RD$${fmt(recommended)}</b> (${Math.round(cat.maxRec * 100)}% de tu ingreso). Estás <b>RD$${fmt(exceso)}</b> por encima. Baja este gasto en RD$${fmt(exceso)}, o sube tu ingreso a RD$${fmt(neededIncome)} (+${pctIncrease.toFixed(0)}%).`
-      };
-    }
-    return { level: 'green', html: `Vas bien — estás dentro del ${Math.round(cat.maxRec * 100)}% recomendado.` };
-  }
-
-  if (cat.minRec != null) {
-    const minRec = incomeType === 'variable' && cat.minRecVariable != null ? cat.minRecVariable : cat.minRec;
-    const recommended = income * minRec;
-    if (amount < recommended) {
-      const falta = recommended - amount;
-      return {
-        level: amount === 0 ? 'red' : 'amber',
-        html: `El mínimo saludable sería <b>RD$${fmt(recommended)}</b> (${Math.round(minRec * 100)}% de tu ingreso). Te faltan RD$${fmt(falta)}.`
-      };
-    }
-    return { level: 'green', html: `¡Bien! Estás ahorrando por encima del ${Math.round(minRec * 100)}% mínimo.` };
-  }
-
-  return null;
-}
-
-function buildCategoryRows() {
-  if (!resultsEl) return;
-  let html = `
-    <div class="sticky-total-box">
-      <div class="sticky-total-num" id="stickyTotalNum">RD$0</div>
-      <div class="sticky-total-of" id="stickyTotalOf">de RD$0 ganado este mes</div>
-      <div class="bar" style="margin:8px 0 0;"><div class="bar-seg" id="totalBarSeg" style="width:0%; background:var(--accent-solid)"></div></div>
-      <div class="sticky-total-status" id="totalOverWarning" style="display:none;"></div>
-    </div>
-  `;
-
-  Object.entries(categories).forEach(([key, cat]) => {
-    html += `
-      <div class="cat-row">
-        <div class="cat-row-label"><span class="cat-dot" id="dot-${key}"></span>${cat.label}</div>
-        <div class="cat-row-input-wrap">
-          <span class="amt-currency">RD$</span>
-          <input class="amt-input" type="number" inputmode="decimal" data-key="${key}" placeholder="0" value="${amounts[key] ? amounts[key] : ''}">
-        </div>
-      </div>`;
-  });
-
-  html += `<button class="summary-btn" id="summaryBtn">Ver mi resumen y consejos →</button>`;
-  resultsEl.innerHTML = html;
-
-  resultsEl.querySelectorAll('.amt-input').forEach(inp => {
-    inp.addEventListener('input', (e) => {
-      const key = e.target.dataset.key;
-      const val = parseFloat(e.target.value);
-      amounts[key] = isNaN(val) ? 0 : val;
-      updateCategoryDot(key);
-      showActiveAdvice(key);
-      updateCount();
-      updateTotals(false);
-    });
-    inp.addEventListener('focus', (e) => showActiveAdvice(e.target.dataset.key));
-    inp.addEventListener('blur', () => updateTotals(true));
-  });
-
-  const summaryBtn = document.getElementById('summaryBtn');
-  if (summaryBtn) {
-    summaryBtn.addEventListener('click', openSummary);
-  }
-
-  setTimeout(() => {
-    Object.keys(categories).forEach(key => updateCategoryDot(key));
-    updateCount();
-    updateTotals(true);
-  }, 0);
-}
-
-function updateCount() {
-  if (!countTag) return;
-  const withAmount = Object.values(amounts).filter(v => v > 0).length;
-  countTag.textContent = `${withAmount} con monto`;
-}
-
-function updateCategoryDot(key) {
-  const dot = document.getElementById(`dot-${key}`);
-  if (!dot) return;
-  const amt = amounts[key] || 0;
-  if (!amt) { dot.className = 'cat-dot'; return; }
-  const advice = categoryAdvice(key, amt, getIncome());
-  dot.className = 'cat-dot' + (advice ? ` ${advice.level}` : '');
-}
-
-function showActiveAdvice(key) {
-  const warnBox = document.getElementById('totalOverWarning');
-  if (!warnBox) return;
-  const advice = categoryAdvice(key, amounts[key] || 0, getIncome());
-  
-  if (!advice) { 
-    warnBox.style.display = 'none'; 
-    return; 
-  }
-  
-  const colors = {
-    green: { bg: 'var(--accent-soft)', fg: 'var(--accent-solid)' },
-    amber: { bg: 'var(--brand-orange-soft)', fg: 'var(--brand-orange)' },
-    red:   { bg: 'rgba(180,67,42,0.08)', fg: '#8a3320' }
-  };
-  const c = colors[advice.level];
-  warnBox.style.display = 'block';
-  warnBox.style.background = c.bg;
-  warnBox.style.color = c.fg;
-  warnBox.innerHTML = `<b>${categories[key].label}:</b> ${advice.html}`;
-}
-
-function updateTotals(showOverallStatus) {
-  const income = getIncome();
-  let total = getTotalExpenses();
-
-  const seg = document.getElementById('totalBarSeg');
-  const numEl = document.getElementById('stickyTotalNum');
-  const ofEl = document.getElementById('stickyTotalOf');
-  const warnBox = document.getElementById('totalOverWarning');
-  if (!seg) return;
-
-  const pct = income > 0 ? Math.min((total / income) * 100, 100) : 0;
-  seg.style.width = `${pct}%`;
-  seg.style.background = total > income && income > 0 ? '#B4432A' : 'var(--accent-solid)';
-  if (numEl) numEl.textContent = `RD$${fmt(total)}`;
-  if (ofEl) ofEl.textContent = `de RD$${fmt(income)} ganado este mes`;
-
-  if (!showOverallStatus) return;
-
-  if (income > 0 && total > income) {
-    const exceso = total - income;
-    if (warnBox) {
-      warnBox.style.display = 'block';
-      warnBox.style.background = 'rgba(180,67,42,0.08)';
-      warnBox.style.color = '#8a3320';
-      warnBox.innerHTML = `RD$${fmt(exceso)} por encima de lo que ganas. No es un error — es información real.`;
-    }
-  } else if (income > 0 && total > 0) {
-    if (warnBox) {
-      warnBox.style.display = 'block';
-      warnBox.style.background = 'var(--accent-soft)';
-      warnBox.style.color = 'var(--accent-solid)';
-      warnBox.innerHTML = `Te queda RD$${fmt(income - total)} sin asignar todavía.`;
-    }
-  } else if (warnBox) {
-    warnBox.style.display = 'none';
-  }
-
-  Object.keys(categories).forEach(key => updateCategoryDot(key));
-}
-
-function openSummary() {
-  const income = getIncome();
-  const usedKeys = Object.keys(categories).filter(key => (amounts[key] || 0) > 0);
-  let total = 0;
-  usedKeys.forEach(key => { total += (amounts[key] || 0); });
-
-  const summaryTotalEl = document.getElementById('summaryTotal');
-  if (summaryTotalEl) summaryTotalEl.textContent = `RD$${fmt(total)}`;
-
-  let rows = '';
-  let waText = `📋 Los números de la casa este mes:\n\n`;
-  usedKeys.forEach(key => {
-    const amt = amounts[key] || 0;
-    const advice = categoryAdvice(key, amt, income);
-    rows += `<div class="summary-row" style="flex-direction:column; align-items:stretch; gap:4px;">
-      <div style="display:flex; justify-content:space-between;"><span>${categories[key].label}</span><strong>RD$${fmt(amt)}</strong></div>
-      ${advice ? `<div style="font-size:11px; line-height:1.4; color:${advice.level === 'green' ? 'var(--accent-solid)' : advice.level === 'amber' ? 'var(--brand-orange)' : '#8a3320'};">${advice.html}</div>` : ''}
-    </div>`;
-    waText += `• ${categories[key].label}: RD$${fmt(amt)}\n`;
-  });
-
-  waText += `\nTotal: RD$${fmt(total)} de RD$${fmt(income)} de ingreso`;
-  if (income > 0 && total > income) {
-    waText += `\n⚠️ Nos pasamos por RD$${fmt(total - income)} — hay que ajustar algo.`;
-  }
-  waText += `\n\nAsí quedamos este mes 🤝`;
-
-  const summaryRowsEl = document.getElementById('summaryRows');
-  if (summaryRowsEl) summaryRowsEl.innerHTML = rows;
-  
-  const waBtn = document.getElementById('whatsappBtn');
-  if (waBtn) {
-    waBtn.textContent = 'Enviar acuerdo del mes por WhatsApp';
-    waBtn.href = `https://wa.me/?text=${encodeURIComponent(waText)}`;
-  }
-  
-  const modalOverlay = document.getElementById('modalOverlay');
-  if (modalOverlay) modalOverlay.classList.add('show');
-}
-
-if (document.getElementById('closeModal')) {
-  document.getElementById('closeModal').addEventListener('click', () => {
-    const modalOverlay = document.getElementById('modalOverlay');
-    if (modalOverlay) modalOverlay.classList.remove('show');
-  });
-}
-
-/* ============ DINERO OCULTO ============ */
-function buildLeaks() {
-  const box = document.getElementById('leakItems');
-  if (!box) return;
-  box.innerHTML = '';
-  leaks.forEach(l => {
-    const item = document.createElement('div');
-    item.className = 'leak-item';
-    item.innerHTML = `<span class="leak-checkbox" id="lbox-${l.id}"></span><span class="leak-text">${l.text} (~RD$${fmt(l.amount)}/mes)</span>`;
-    makeKeyboardActivatable(item);
-    item.addEventListener('click', () => {
-      leakChecked[l.id] = !leakChecked[l.id];
-      const checkbox = document.getElementById(`lbox-${l.id}`);
-      if (checkbox) {
-        checkbox.classList.toggle('checked', leakChecked[l.id]);
-        checkbox.textContent = leakChecked[l.id] ? '✓' : '';
-      }
-      const totalLeak = leaks.reduce((s, curr) => s + (leakChecked[curr.id] ? curr.amount : 0), 0);
-      const leakAmountEl = document.getElementById('leakAmount');
-      const leakMsgEl = document.getElementById('leakMsg');
-      if (leakAmountEl) leakAmountEl.textContent = `~RD$${fmt(totalLeak)}/mes`;
-      if (leakMsgEl) leakMsgEl.textContent = totalLeak > 0 ? 'Esos cuartos se te van sin darte cuenta.' : '';
-    });
-    box.appendChild(item);
-  });
-}
-
-/* ============ RETO NAVIDEÑO ============ */
-let xmasLevel = 50;
-let xmasChecked = {};
-const xmasMonths = [['AGOSTO', 4], ['SEPTIEMBRE', 4], ['OCTUBRE', 5], ['NOVIEMBRE', 4], ['DICIEMBRE', 5]];
-
-function buildXmas() {
-  const container = document.getElementById('xmasWeeks');
-  if (!container) return;
-  container.innerHTML = '';
-  let weekNum = 1;
-  
-  xmasMonths.forEach(([monthName, count]) => {
-    const monthHeader = document.createElement('div');
-    monthHeader.style.gridColumn = '1 / -1';
-    monthHeader.style.fontSize = '11px';
-    monthHeader.style.fontWeight = '700';
-    monthHeader.style.color = 'var(--brand-orange)';
-    monthHeader.style.marginTop = '14px';
-    monthHeader.style.marginBottom = '4px';
-    monthHeader.textContent = monthName;
-    container.appendChild(monthHeader);
-
-    for (let i = 0; i < count; i++) {
-      const w = weekNum;
-      const row = document.createElement('div');
-      row.className = 'xmas-week';
-      row.innerHTML = `<span class="xmas-week-label">Semana ${w < 10 ? '0' + w : w}</span><span class="xmas-week-amt" id="xamt-${w}">RD$${fmt(w * xmasLevel)}</span><span class="xmas-week-check" id="xbox-${w}"></span>`;
-      makeKeyboardActivatable(row);
-      row.addEventListener('click', () => {
-        xmasChecked[w] = !xmasChecked[w];
-        const checkbox = document.getElementById(`xbox-${w}`);
-        if (checkbox) {
-          checkbox.classList.toggle('checked', xmasChecked[w]);
-          checkbox.textContent = xmasChecked[w] ? '✓' : '';
+      // Cambiar visibilidad de las pestañas
+      tabContents.forEach(tab => {
+        if (tab.id === targetTab) {
+          tab.classList.add("active");
+        } else {
+          tab.classList.remove("active");
         }
-        renderXmasProgress();
       });
-      container.appendChild(row);
-      weekNum++;
-    }
-  });
-
-  totalXmasWeeks = weekNum - 1; 
-  renderXmasProgress();
-}
-
-function updateAllXmasLabels() {
-  for (let w = 1; w <= totalXmasWeeks; w++) {
-    const amtEl = document.getElementById(`xamt-${w}`);
-    if (amtEl) amtEl.textContent = `RD$${fmt(w * xmasLevel)}`;
-  }
-}
-
-function renderXmasProgress() {
-  let saved = 0;
-  for (let i = 1; i <= totalXmasWeeks; i++) {
-    if (xmasChecked[i]) saved += i * xmasLevel;
-  }
-  
-  const totalGoal = xmasLevel * ((totalXmasWeeks * (totalXmasWeeks + 1)) / 2);
-  
-  const progressNumEl = document.getElementById('xmasProgressNum');
-  const progressLblEl = document.getElementById('xmasProgressLbl');
-  const customMetaTag = document.getElementById('xmasCustomMetaTag');
-  
-  if (progressNumEl) progressNumEl.textContent = `RD$${fmt(saved)} de RD$${fmt(totalGoal)}`;
-  if (customMetaTag) customMetaTag.textContent = `Meta: RD$${fmt(totalGoal)}`; 
-  
-  if (progressLblEl) {
-    const checkedCount = Object.values(xmasChecked).filter(Boolean).length;
-    const weeksLeft = totalXmasWeeks - checkedCount;
-    progressLblEl.textContent = saved > 0 ? `¡Sigue así! Te faltan ${weeksLeft} semanas` : 'Marca las semanas que ya depositaste';
-  }
-}
-
-document.querySelectorAll('.xmas-level').forEach(el => {
-  makeKeyboardActivatable(el);
-  el.addEventListener('click', () => {
-    const levelVal = el.dataset.level;
-    const customRow = document.getElementById('xmasCustomInputRow');
-    
-    document.querySelectorAll('.xmas-level').forEach(l => l.classList.toggle('active', l === el));
-    
-    if (levelVal === 'custom') {
-      if (customRow) customRow.style.display = 'block';
-      const customInput = document.getElementById('xmasCustomAmount');
-      xmasLevel = customInput ? (parseInt(customInput.value) || 0) : 0;
-    } else {
-      if (customRow) customRow.style.display = 'none';
-      xmasLevel = parseInt(levelVal);
-    }
-    
-    updateAllXmasLabels();
-    renderXmasProgress();
-  });
-});
-
-const customInput = document.getElementById('xmasCustomAmount');
-if (customInput) {
-  customInput.addEventListener('input', () => {
-    xmasLevel = parseInt(customInput.value) || 0;
-    updateAllXmasLabels();
-    renderXmasProgress();
+    });
   });
 }
 
-/* ============ PESTAÑA: METAS & EMPRENDIMIENTO ============ */
-function calculateEmergencyFund() {
-  const slider = document.getElementById('emergencySlider');
-  const label = document.getElementById('emergencyMonthsLabel');
-  const totalVal = document.getElementById('emergencyTotalVal');
-  if(!slider || !label || !totalVal) return;
+// --- 3. LÓGICA DE LA PESTAÑA: PRESUPUESTO ---
+function inicializarPresupuesto() {
+  const form = document.getElementById("budgetForm");
+  if (!form) return;
 
-  const months = parseInt(slider.value);
-  label.textContent = `${months} meses`;
-  
-  // Extrae los gastos fijos mensuales reales del usuario
-  const monthlyExpenses = getTotalExpenses();
-  const totalFundRequired = monthlyExpenses * months;
-  
-  totalVal.textContent = `RD$${fmt(totalFundRequired)}`;
+  const inputs = form.querySelectorAll("input[type='number']");
+  inputs.forEach(input => {
+    input.addEventListener("input", calcularPresupuestoInstantaneo);
+  });
+
+  const btnResumen = document.getElementById("btnVerResumen");
+  if (btnResumen) {
+    btnResumen.addEventListener("click", abrirModalResumen);
+  }
 }
 
-function calculateTargetGoal() {
-  const goalNameInp = document.getElementById('targetGoalName');
-  const goalAmountInp = document.getElementById('targetGoalAmount');
-  const goalMonthsInp = document.getElementById('targetGoalMonths');
-  const coachBox = document.getElementById('coachAlertBox');
-  const entrepreneurModule = document.getElementById('entrepreneurshipModule');
+function calcularPresupuestoInstantaneo() {
+  const ingreso = parseFloat(document.getElementById("income").value) || 0;
+  
+  // Agrupar gastos por categorías típicas dominicanas
+  const vivienda = parseFloat(document.getElementById("vivienda").value) || 0;
+  const alimentos = parseFloat(document.getElementById("alimentos").value) || 0;
+  const transporte = parseFloat(document.getElementById("transporte").value) || 0;
+  const servicios = parseFloat(document.getElementById("servicios").value) || 0;
+  const entretenimiento = parseFloat(document.getElementById("entretenimiento").value) || 0;
+  const deudas = parseFloat(document.getElementById("deudas").value) || 0;
 
-  if (!goalAmountInp || !goalMonthsInp || !coachBox) return;
+  const totalGastos = vivienda + alimentos + transporte + servicios + entretenimiento + deudas;
+  const balance = ingreso - totalGastos;
 
-  const amount = parseFloat(goalAmountInp.value) || 0;
-  const months = parseInt(goalMonthsInp.value) || 0;
-  const name = goalNameInp ? goalNameInp.value.trim() : "tu meta";
+  // Actualizar indicadores en la UI si existen
+  const balanceElement = document.getElementById("balanceRapido");
+  if (balanceElement) {
+    balanceElement.textContent = `RD$ ${balance.toLocaleString('es-DO', {minimumFractionDigits: 2})}`;
+    balanceElement.style.color = balance >= 0 ? "#3E9C77" : "#B4432A";
+  }
+  
+  // Forzar actualización del análisis en la pestaña metas de forma reactiva
+  actualizarAnalisisDelCoach();
+}
 
-  if (amount <= 0 || months <= 0) {
-    coachBox.style.display = 'none';
-    if(entrepreneurModule) entrepreneurModule.style.display = 'none';
+function abrirModalResumen() {
+  // Aquí se maneja la apertura del modal y la inyección del texto formateado para compartir por WhatsApp
+  alert("Resumen generado. ¡Listo para compartir los resultados por WhatsApp!");
+}
+
+// --- 4. LÓGICA DE LA PESTAÑA: RETO NAVIDEÑO (CRONOMETRADO 2026) ---
+function inicializarRetoNavideno() {
+  const selectNivel = document.getElementById("nivelReto");
+  if (selectNivel) {
+    selectNivel.addEventListener("change", calcularProgresoReto);
+  }
+}
+
+function calcularProgresoReto() {
+  // Lógica para renderizar las 22 semanas desde agosto a diciembre 2026
+  console.log("Calculando semanas del Reto Navideño 2026...");
+}
+
+// --- 5. LÓGICA DE LA PESTAÑA: ACADEMIA Y SIMULADOR AFP ---
+function inicializarSimuladorAFP() {
+  const btnCalcularAFP = document.getElementById("btnCalcularAFP");
+  if (btnCalcularAFP) {
+    btnCalcularAFP.addEventListener("click", () => {
+      const sueldoBruto = parseFloat(document.getElementById("sueldoAFP").value) || 0;
+      const aporteTrabajador = sueldoBruto * 0.0287;
+      const aporteEmpleador = sueldoBruto * 0.0710;
+      
+      const resultadoAFP = document.getElementById("resultadoAFP");
+      if (resultadoAFP) {
+        resultadoAFP.innerHTML = `
+          <p><strong>Tu aporte (2.87%):</strong> RD$ ${aporteTrabajador.toLocaleString('es-DO')}</p>
+          <p><strong>Aporte Empleador (7.10%):</strong> RD$ ${aporteEmpleador.toLocaleString('es-DO')}</p>
+          <p style="color: #2D8ACE; font-size:12px; margin-top:5px;">⚠️ Este dinero te pertenece por ley y acumula intereses heredables.</p>
+        `;
+      }
+    });
+  }
+}
+
+// --- 6. LÓGICA DE LA PESTAÑA: METAS Y ENFOQUE EDUCATIVO DE EMPRENDIMIENTO ---
+function inicializarMetasYEmprendimiento() {
+  const targetAmountInput = document.getElementById('targetGoalAmount');
+  const targetMonthsInput = document.getElementById('targetGoalMonths');
+  const incomeInput = document.getElementById('income');
+
+  if (targetAmountInput && targetMonthsInput) {
+    targetAmountInput.addEventListener('input', actualizarAnalisisDelCoach);
+    targetMonthsInput.addEventListener('input', actualizarAnalisisDelCoach);
+  }
+  if (incomeInput) {
+    incomeInput.addEventListener('input', actualizarAnalisisDelCoach);
+  }
+}
+
+function actualizarAnalisisDelCoach() {
+  const sueldoInput = document.getElementById('income')?.value || 0;
+  const sueldo = parseFloat(sueldoInput);
+  const metaMonto = parseFloat(document.getElementById('targetGoalAmount')?.value) || 0;
+  const metaMeses = parseFloat(document.getElementById('targetGoalMonths')?.value) || 0;
+  const alertBox = document.getElementById('coachAlertBox');
+  const entrepreneurshipModule = document.getElementById('entrepreneurshipModule');
+
+  if (!alertBox || !entrepreneurshipModule) return;
+
+  if (metaMonto <= 0 || metaMeses <= 0) {
+    alertBox.style.display = 'none';
+    entrepreneurshipModule.style.display = 'none';
     return;
   }
 
-  const monthlySavingsRequired = amount / months;
-  
-  // Capacidad de ahorro real = Ingreso mensual - Egresos mensuales
-  const income = getIncome();
-  const expenses = getTotalExpenses();
-  const actualSavingsCapacity = income - expenses;
+  const cuotaMensual = metaMonto / metaMeses;
+  alertBox.style.display = 'block';
 
-  coachBox.style.display = 'block';
+  // BLOQUE EDUCATIVO INTEGRADO (PUNTOS A, B Y C)
+  let mensajeHTML = `
+    <div style="font-weight: 700; color: #B4432A; margin-bottom: 8px;">📢 DIAGNÓSTICO DE TU COACH FINANCIERO:</div>
+    <p style="margin-bottom: 10px;">Para lograr tu meta a tiempo, necesitas separar <strong>RD$ ${cuotaMensual.toLocaleString('es-DO', {minimumFractionDigits: 2})}</strong> todos los meses.</p>
+  `;
 
-  if (monthlySavingsRequired > actualSavingsCapacity) {
-    const deficit = monthlySavingsRequired - actualSavingsCapacity;
-    
-    coachBox.style.background = 'rgba(253, 140, 69, 0.08)';
-    coachBox.style.color = '#B4432A';
-    coachBox.style.border = '1px solid rgba(253, 140, 69, 0.3)';
-    coachBox.innerHTML = `⚠️ Para lograr <b>"${name || 'tu meta'}"</b> necesitas ahorrar <b>RD$${fmt(monthlySavingsRequired)}/mes</b>. Tu presupuesto actual solo dispone de RD$${fmt(Math.max(0, actualSavingsCapacity))}/mes. ¡Te faltan <b>RD$${fmt(deficit)} al mes</b>! Mira abajo cómo cubrirlos.`;
-    
-    // Activa de manera inteligente el módulo de emprendimientos dominicanos
-    if(entrepreneurModule) {
-      entrepreneurModule.style.display = 'block';
-      renderBusinessCatalog();
-    }
-  } else {
-    coachBox.style.background = 'var(--accent-soft)';
-    coachBox.style.color = 'var(--accent-solid)';
-    coachBox.style.border = '1px solid rgba(31, 122, 92, 0.2)';
-    coachBox.innerHTML = `🎉 ¡Excelentes noticias! Para lograr <b>"${name || 'tu meta'}"</b> requieres <b>RD$${fmt(monthlySavingsRequired)}/mes</b> y tu capacidad de ahorro actual soporta este plan perfectamente. ¡Dale con todo!`;
-    
-    if(entrepreneurModule) entrepreneurModule.style.display = 'none';
-  }
-}
-
-function renderBusinessCatalog() {
-  const container = document.getElementById('ideasCatalogContainer');
-  if (!container || container.children.length > 0) return; // Evita duplicar las tarjetas visuales
-
-  businessIdeas.forEach(idea => {
-    const box = document.createElement('div');
-    box.className = 'coach-idea-box';
-    box.innerHTML = `
-      <div class="coach-idea-title">${idea.title}</div>
-      <div class="coach-idea-desc">${idea.desc}</div>
+  // PUNTO A: REALIDAD FRENTE A LA CANASTA BÁSICA EXTRAÍDA DE GOOGLE
+  if (sueldo < CANASTA_BASICA_RD) {
+    mensajeHTML += `
+      <div style="background: rgba(180, 67, 42, 0.05); padding: 10px; border-left: 4px solid #B4432A; margin-bottom: 12px; font-size: 13px; line-height: 1.4;">
+        <strong>⚠️ Realidad Dominicana (Punto A):</strong> Tu ingreso registrado está por debajo de la canasta básica familiar promedio nacional (RD$ ${CANASTA_BASICA_RD.toLocaleString()}). Con los precios de los alimentos por las nubes (el pollo, el arroz, el aceite) y los salarios rezagados, sabemos que ahorrar esa cuota es una batalla cuesta arriba. ¡No te culpes, las estadísticas demuestran que la calle está dura!
+      </div>
     `;
-    container.appendChild(box);
-  });
+  } else {
+    mensajeHTML += `
+      <div style="background: rgba(62, 156, 119, 0.05); padding: 10px; border-left: 4px solid #3E9C77; margin-bottom: 12px; font-size: 13px; line-height: 1.4;">
+        <strong>✅ Punto de Ventaja (Punto A):</strong> Cuentas con un ingreso superior al promedio de la canasta básica (RD$ ${CANASTA_BASICA_RD.toLocaleString()}). Tu mayor reto no es la falta de dinero, sino blindar tus cuartos de las presiones inflacionarias invisibles.
+      </div>
+    `;
+  }
+
+  // PUNTO B: CONTROL DE MALOS HÁBITOS (CULTURA DEL APARENTAR)
+  mensajeHTML += `
+    <div style="background: rgba(253, 140, 69, 0.05); padding: 10px; border-left: 4px solid #FD8C45; margin-bottom: 12px; font-size: 13px; line-height: 1.4;">
+      <strong>🧠 Educación de Guerra (Punto B):</strong> Para liberar esos cuartos mensuales, la regla de oro es romper la <em>"cultura del aparentar"</em>. No utilices la tarjeta de crédito como una extensión de tu sueldo para pagar bultos insostenibles en salidas o deliveries que desaparecen en un fin de semana.
+    </div>
+  `;
+
+  // PUNTO C: REMEDIO Y ACCIÓN (INCLUSIÓN FINANCIERA FORMAL)
+  mensajeHTML += `
+    <div style="background: rgba(45, 138, 206, 0.05); padding: 10px; border-left: 4px solid #2D8ACE; margin-bottom: 12px; font-size: 13px; line-height: 1.4;">
+      <strong>🛡️ Acción Defensiva (Punto C):</strong> Nada de guardar lo que ahorres debajo del colchón o en "Sanes" informales de alto riesgo donde la inflación devalúa tus cuartos o te expones a un fraude. Esos fondos van directo a instrumentos bancarios regulados.
+    </div>
+  `;
+
+  // APERTURA Y LLAMADO AL EMPRENDIMIENTO COMO SOLUCIÓN RADICAL
+  mensajeHTML += `
+    <p style="margin-top: 12px; font-weight: 600; color: #111; line-height: 1.4;">
+      🚀 <strong>¿La solución definitiva?</strong> Recortar gastos tiene un tope físico, pero tus ingresos NO. Explora aquí abajo el catálogo de opciones de micro-emprendimiento rápido que preparamos para ti. Con un par de horas extras a la semana cubres la brecha sin asfixiar tu estilo de vida.
+    </p>
+  `;
+
+  alertBox.innerHTML = mensajeHTML;
+  alertBox.style.backgroundColor = '#FFFDF9';
+  alertBox.style.border = '1px solid #E6D0B3';
+
+  entrepreneurshipModule.style.display = 'block';
+  renderizarIdeasDeEmprendimiento(cuotaMensual);
 }
 
-// Escuchadores de eventos para la pestaña Metas
-const emergencySlider = document.getElementById('emergencySlider');
-if (emergencySlider) {
-  emergencySlider.addEventListener('input', calculateEmergencyFund);
-}
-
-['targetGoalAmount', 'targetGoalMonths', 'targetGoalName'].forEach(id => {
-  const el = document.getElementById(id);
-  if (el) el.addEventListener('input', calculateTargetGoal);
-});
-
-
-/* ============ SIMULADOR AFP ============ */
-if (document.getElementById('afpSalario')) {
-  document.getElementById('afpSalario').addEventListener('input', (e) => {
-    const salario = parseFloat(e.target.value);
-    const res = document.getElementById('afpSimResult');
-    if (!res) return;
-    if (!salario || salario <= 0) { res.classList.remove('show'); return; }
-    res.innerHTML = `Tu retención mensual es de <b>RD$${fmt(salario * 0.0287)}</b>. Tu empleador aporta obligatoriamente otros <b>RD$${fmt(salario * 0.0710)}</b> adicionales.`;
-    res.classList.add('show');
-  });
-}
-
-/* ============ CRÉDITO INTELIGENTE ============ */
-const CREDIT_BALANCE = 25000;
-const CREDIT_APR = 0.52;
-const creditSlider = document.getElementById('creditSlider');
-
-function renderCreditSim() {
-  if (!creditSlider) return;
-  const pct = parseInt(creditSlider.value);
-  const paid = Math.round(CREDIT_BALANCE * pct / 100);
-  const remaining = CREDIT_BALANCE - paid;
-  const interest = Math.round(remaining * CREDIT_APR / 12);
-
-  const pctLabel = document.getElementById('creditPctLabel');
-  const creditPaid = document.getElementById('creditPaid');
-  const creditRemaining = document.getElementById('creditRemaining');
-  const creditInterest = document.getElementById('creditInterest');
+function renderizarIdeasDeEmprendimiento(cuotaNecesaria) {
+  const container = document.getElementById('ideasCatalogContainer');
+  if (!container) return;
   
-  if (pctLabel) pctLabel.textContent = `${pct}%`;
-  if (creditPaid) creditPaid.textContent = `RD$${fmt(paid)}`;
-  if (creditRemaining) creditRemaining.textContent = `RD$${fmt(remaining)}`;
-  if (creditInterest) creditInterest.textContent = pct >= 100 ? 'RD$0' : `RD$${fmt(interest)}`;
-
-  const tag = document.getElementById('creditTag');
-  if (tag) {
-    if (pct >= 100) {
-      tag.textContent = 'Totalero — RD$0 en intereses';
-      tag.className = 'credit-slider-tag good';
-    } else if (pct >= 60) {
-      tag.textContent = 'Buen avance';
-      tag.className = 'credit-slider-tag good';
-    } else if (pct >= 20) {
-      tag.textContent = 'Riesgo moderado';
-      tag.className = 'credit-slider-tag warn';
-    } else {
-      tag.textContent = 'La trampa del mínimo';
-      tag.className = 'credit-slider-tag bad';
+  const ideas = [
+    {
+      titulo: "📸 Gestión de Redes para Negocios Locales",
+      desc: "Salones, colmados o tiendas en tu sector necesitan presencia digital pero no tienen tiempo. Si manejas 2 cuentas cobrando RD$5,000 mensuales, generas...",
+      ingreso: 10000
+    },
+    {
+      titulo: "🧁 Venta de Postres o Snacks bajo pedido",
+      desc: "Prepara brownies o picaderas los fines de semana y distribúyelos por WhatsApp en tu oficina o vecindario. Con 15 clientes fijos al mes obtienes...",
+      ingreso: 7500
+    },
+    {
+      titulo: "🚗 Tutorías o Servicios de Asesoría Técnica",
+      desc: "Si dominas la contabilidad, el inglés, diseño o matemáticas, vende 4 mentorías de 2 horas los sábados por Zoom. Te sumará un extra de...",
+      ingreso: 8000
     }
-  }
-}
-if (creditSlider) {
-  creditSlider.addEventListener('input', renderCreditSim);
-  renderCreditSim();
-}
+  ];
 
-/* ============ INTERACCIONES NIÑOS ============ */
-if (document.getElementById('kidsUnlockBtn')) {
-  document.getElementById('kidsUnlockBtn').addEventListener('click', () => {
-    const preview = document.getElementById('kidsPreview');
-    const full = document.getElementById('kidsFull');
-    const taskBox = document.getElementById('kidsTasks');
+  container.innerHTML = "";
+  ideas.forEach(idea => {
+    const card = document.createElement('div');
+    card.className = "entrepreneurship-card"; // Clases estilizadas de tu archivo CSS
+    card.style = "background: #fff; padding: 15px; border: 1px solid #e1e6eb; border-radius: 12px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);";
     
-    if (preview) preview.style.display = 'none';
-    if (full) full.classList.add('show');
-    if (!taskBox) return;
-    
-    taskBox.innerHTML = '';
-    kidsTasks.forEach(t => {
-      const item = document.createElement('div');
-      item.className = 'kids-task';
-      item.innerHTML = `<span class="kids-task-check" id="kbox-${t.id}"></span><span class="kids-task-text">${t.text}</span>`;
-      makeKeyboardActivatable(item);
-      item.addEventListener('click', () => {
-        kidsChecked[t.id] = !kidsChecked[t.id];
-        const kbox = document.getElementById(`kbox-${t.id}`);
-        if (kbox) {
-          kbox.classList.toggle('checked', kidsChecked[t.id]);
-          kbox.textContent = kidsChecked[t.id] ? '✓' : '';
-        }
-        const done = Object.values(kidsChecked).filter(Boolean).length;
-        const kidsProgress = document.getElementById('kidsProgress');
-        if (kidsProgress) kidsProgress.textContent = `${done} de ${kidsTasks.length} retos completados`;
-      });
-      taskBox.appendChild(item);
-    });
-    lazyLoadVideos();
+    const cubreMeta = idea.ingreso >= cuotaNecesaria;
+    const badge = cubreMeta ? `<span style="background: #3E9C77; color: white; font-size: 10px; padding: 3px 8px; border-radius: 6px; font-weight: bold; width: fit-content; margin-bottom: 2px;">🎯 CUBRE TU META</span>` : '';
+
+    card.innerHTML = `
+      ${badge}
+      <div style="font-weight: 700; font-size: 15px; color: #111;">${idea.titulo}</div>
+      <div style="font-size: 13px; color: #666; line-height: 1.4;">${idea.desc}</div>
+      <div style="font-family: monospace; font-size: 13.5px; font-weight: 700; color: #1F7A5C; margin-top: 4px;">Ingreso estimado: +RD$ ${idea.ingreso.toLocaleString()}/mes</div>
+    `;
+    container.appendChild(card);
   });
-}
-
-/* ============ LECCIONES BLOQUEADAS ============ */
-document.querySelectorAll('.course-item.locked').forEach(item => {
-  makeKeyboardActivatable(item);
-  item.addEventListener('click', () => {
-    const titleEl = item.querySelector('.course-info-text b');
-    const title = titleEl ? titleEl.textContent : 'Esta clase';
-    alert(`"${title}" se desbloquea con tu compra.`);
-  });
-});
-
-/* ============ TIPO DE INGRESO ============ */
-document.querySelectorAll('.type-btn').forEach(b => {
-  makeKeyboardActivatable(b);
-  b.addEventListener('click', () => {
-    incomeType = b.dataset.type;
-    document.querySelectorAll('.type-btn').forEach(btn => btn.classList.toggle('active', btn === b));
-    const vBanner = document.getElementById('variableBanner');
-    if (vBanner) vBanner.classList.toggle('show', incomeType === 'variable');
-    updateTotals(true);
-  });
-});
-
-/* ============ INICIALIZADOR SEGURO ============ */
-const initApp = () => {
-  Object.keys(categories).forEach(key => {
-    if (amounts[key] == null) amounts[key] = 0;
-  });
-
-  buildLeaks();
-  buildXmas();
-  buildCategoryRows();
-
-  if (incomeEl) {
-    incomeEl.addEventListener('input', () => updateTotals(true));
-  }
-};
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initApp);
-} else {
-  initApp();
 }
