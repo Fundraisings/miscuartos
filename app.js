@@ -1,7 +1,7 @@
 /* ============ DATOS ============ */
 const categories = {
-  vivienda:    { label: 'Vivienda',       color: '#1F7A5C', maxRec: 0.35, tip: 'Alquiler, luz, agua, internet.' },
-  comida:      { label: 'Comida',          color: '#3E9C77', maxRec: 0.20, tip: 'Supermercado y compras fijas de alimentos.' },
+  vivienda:   { label: 'Vivienda',       color: '#1F7A5C', maxRec: 0.35, tip: 'Alquiler, luz, agua, internet.' },
+  comida:     { label: 'Comida',          color: '#3E9C77', maxRec: 0.20, tip: 'Supermercado y compras fijas de alimentos.' },
   transporte: { label: 'Transporte',      color: '#6BBE9A', maxRec: 0.15, tip: 'Combustible, concho y mantenimiento básico.' },
   colegio:    { label: 'Niños / Escuela', color: '#2D8ACE', tip: 'Mensualidades escolares y cuidado.' },
   salud:      { label: 'Salud',            color: '#3AA0A0', tip: 'Medicamentos y consultas médicas fijas.' },
