@@ -1,205 +1,264 @@
 /**
  * MISCUARTOS APP - SCRIPT PRINCIPAL DE PRODUCCIÓN (2026)
- * Contiene toda la lógica de cálculo, navegación, simuladores,
- * educación financiera aplicada y catálogo de micro-emprendimiento.
+ * Contiene toda la lógica de la pantalla de inicio, navegación,
+ * presupuesto, reto navideño, simuladores y metas con enfoque educativo.
  */
 
-// --- 1. CONFIGURACIÓN DE DATOS GLOBALES Y MARCADORES ---
-const CANASTA_BASICA_RD = 49268; // Datos extraídos de estadísticas oficiales en RD
+// --- 1. CONFIGURACIÓN DE DATOS GLOBALES ---
+const CANASTA_BASICA_RD = 49268;
 
-const VIDEO_LINKS = {
-  tutorial: "https://www.youtube.com/embed/VIDEO_ID_TUTORIAL",
-  reto: "https://www.youtube.com/embed/VIDEO_ID_RETO",
-  academiaIntro: "https://www.youtube.com/embed/VIDEO_ID_INTRO",
-  afp: "https://www.youtube.com/embed/VIDEO_ID_AFP"
-};
-
-// --- 2. ENRUTADOR Y CONTROL DE NAVEGACIÓN ---
+// --- 2. INICIALIZADOR DE LA APP ---
 document.addEventListener("DOMContentLoaded", () => {
+  inicializarPantallaInicio();
   inicializarNavegacion();
   inicializarPresupuesto();
   inicializarRetoNavideno();
   inicializarSimuladorAFP();
+  inicializarCreditoYOtros();
   inicializarMetasYEmprendimiento();
 });
 
+// --- 3. LOGICA PANTALLA DE INICIO (SPLASH SCREEN) ---
+function inicializarPantallaInicio() {
+  const enterAppBtn = document.getElementById("enterAppBtn");
+  const splashScreen = document.getElementById("app-splash");
+  const mainAppContainer = document.getElementById("mainAppContainer");
+
+  if (enterAppBtn && splashScreen && mainAppContainer) {
+    enterAppBtn.addEventListener("click", () => {
+      splashScreen.style.display = "none";
+      mainAppContainer.style.display = "block";
+      // Forzar recálculo inicial por si hay datos precargados
+      calcularPresupuestoInstantaneo();
+    });
+  }
+}
+
+// --- 4. ENRUTADOR Y CONTROL DE NAVEGACIÓN ---
 function inicializarNavegacion() {
-  const navButtons = document.querySelectorAll(".nav-btn");
-  const tabContents = document.querySelectorAll(".tab-content");
+  const navButtons = document.querySelectorAll(".nav-item");
+  const tabPanes = document.querySelectorAll(".tab-pane");
 
   navButtons.forEach(btn => {
     btn.addEventListener("click", () => {
       const targetTab = btn.getAttribute("data-tab");
 
-      // Cambiar estado activo de los botones
+      // Cambiar estado activo de los botones inferiores
       navButtons.forEach(b => b.classList.remove("active"));
       btn.classList.add("active");
 
-      // Cambiar visibilidad de las pestañas
-      tabContents.forEach(tab => {
-        if (tab.id === targetTab) {
-          tab.classList.add("active");
+      // Cambiar visibilidad de las pestañas de contenido
+      tabPanes.forEach(pane => {
+        if (pane.id === `pane-${targetTab}`) {
+          pane.classList.add("active");
         } else {
-          tab.classList.remove("active");
+          pane.classList.remove("active");
         }
       });
     });
   });
 }
 
-// --- 3. LÓGICA DE LA PESTAÑA: PRESUPUESTO ---
+// --- 5. LÓGICA DE LA PESTAÑA: PRESUPUESTO ---
 function inicializarPresupuesto() {
-  const form = document.getElementById("budgetForm");
-  if (!form) return;
+  const incomeInput = document.getElementById("income");
+  if (incomeInput) {
+    incomeInput.addEventListener("input", () => {
+      calcularPresupuestoInstantaneo();
+      actualizarAnalisisDelCoach();
+    });
+  }
 
-  const inputs = form.querySelectorAll("input[type='number']");
-  inputs.forEach(input => {
-    input.addEventListener("input", calcularPresupuestoInstantaneo);
+  // Renderizar las casillas dinámicas dentro del contenedor #results
+  renderizarCamposPresupuesto();
+}
+
+function renderizarCamposPresupuesto() {
+  const resultsContainer = document.getElementById("results");
+  if (!resultsContainer) return;
+
+  const categorias = [
+    { id: "vivienda", label: "🏠 Vivienda y Alquiler", placeholder: "Ej. 15,000" },
+    { id: "alimentos", label: "🛒 Súper y Comida (Canasta básica)", placeholder: "Ej. 12,000" },
+    { id: "transporte", label: "🚗 Gasolina, Concho o Mototaxi", placeholder: "Ej. 4,000" },
+    { id: "servicios", label: "⚡ Luz, Agua, Internet y celular", placeholder: "Ej. 3,500" },
+    { id: "entretenimiento", label: "🍗 Salidas, Coros y Delivery", placeholder: "Ej. 3,000" },
+    { id: "deudas", label: "💳 Tarjetas y Préstamos", placeholder: "Ej. 5,000" }
+  ];
+
+  resultsContainer.innerHTML = "";
+  categorias.forEach(cat => {
+    const row = document.createElement("div");
+    row.style = "background: var(--bg-card, #fff); padding: 14px; border-radius: 12px; margin-bottom: 12px; border: 1px solid var(--line, #e1e6eb); display: flex; justify-content: space-between; align-items: center; gap: 12px;";
+    row.innerHTML = `
+      <label for="${cat.id}" style="font-size: 14px; font-weight: 500; color: var(--ink, #111);">${cat.label}</label>
+      <div style="display: flex; align-items: center; gap: 4px;">
+        <span style="font-weight: 600; color: var(--muted, #666);">RD$</span>
+        <input type="number" id="${cat.id}" placeholder="${cat.placeholder}" inputmode="numeric" class="gastos-input" style="width: 100px; padding: 6px 10px; border: 1px solid var(--line, #e1e6eb); border-radius: 8px; font-size: 14px; text-align: right; outline: none;">
+      </div>
+    `;
+    resultsContainer.appendChild(row);
   });
 
-  const btnResumen = document.getElementById("btnVerResumen");
-  if (btnResumen) {
-    btnResumen.addEventListener("click", abrirModalResumen);
-  }
+  // Escuchar cambios en los nuevos inputs generados
+  document.querySelectorAll(".gastos-input").forEach(input => {
+    input.addEventListener("input", () => {
+      calcularPresupuestoInstantaneo();
+      actualizarAnalisisDelCoach();
+    });
+  });
 }
 
 function calcularPresupuestoInstantaneo() {
-  const ingreso = parseFloat(document.getElementById("income").value) || 0;
-  
-  // Agrupar gastos por categorías típicas dominicanas
-  const vivienda = parseFloat(document.getElementById("vivienda").value) || 0;
-  const alimentos = parseFloat(document.getElementById("alimentos").value) || 0;
-  const transporte = parseFloat(document.getElementById("transporte").value) || 0;
-  const servicios = parseFloat(document.getElementById("servicios").value) || 0;
-  const entretenimiento = parseFloat(document.getElementById("entretenimiento").value) || 0;
-  const deudas = parseFloat(document.getElementById("deudas").value) || 0;
+  let totalGastos = 0;
+  let camposConMonto = 0;
 
-  const totalGastos = vivienda + alimentos + transporte + servicios + entretenimiento + deudas;
-  const balance = ingreso - totalGastos;
+  document.querySelectorAll(".gastos-input").forEach(input => {
+    const valor = parseFloat(input.value) || 0;
+    if (valor > 0) {
+      totalGastos += valor;
+      camposConMonto++;
+    }
+  });
 
-  // Actualizar indicadores en la UI si existen
-  const balanceElement = document.getElementById("balanceRapido");
-  if (balanceElement) {
-    balanceElement.textContent = `RD$ ${balance.toLocaleString('es-DO', {minimumFractionDigits: 2})}`;
-    balanceElement.style.color = balance >= 0 ? "#3E9C77" : "#B4432A";
+  const countTag = document.getElementById("countTag");
+  if (countTag) {
+    countTag.textContent = `${camposConMonto} con monto`;
   }
-  
-  // Forzar actualización del análisis en la pestaña metas de forma reactiva
-  actualizarAnalisisDelCoach();
+
+  return totalGastos;
 }
 
-function abrirModalResumen() {
-  // Aquí se maneja la apertura del modal y la inyección del texto formateado para compartir por WhatsApp
-  alert("Resumen generado. ¡Listo para compartir los resultados por WhatsApp!");
-}
-
-// --- 4. LÓGICA DE LA PESTAÑA: RETO NAVIDEÑO (CRONOMETRADO 2026) ---
+// --- 6. LÓGICA DE LA PESTAÑA: RETO NAVIDEÑO 2026 ---
 function inicializarRetoNavideno() {
-  const selectNivel = document.getElementById("nivelReto");
-  if (selectNivel) {
-    selectNivel.addEventListener("change", calcularProgresoReto);
+  const xmasWeeksContainer = document.getElementById("xmasWeeks");
+  if (!xmasWeeksContainer) return;
+
+  // Renderizar las 22 semanas de agosto a diciembre de 2026
+  xmasWeeksContainer.innerHTML = "";
+  for (let i = 1; i <= 22; i++) {
+    const weekBox = document.createElement("div");
+    weekBox.style = "display: inline-block; width: 45px; height: 45px; margin: 5px; line-height: 45px; text-align: center; border-radius: 8px; background: #FFF5EE; border: 1px solid #FD8C45; font-weight: 600; cursor: pointer; color: #111;";
+    weekBox.textContent = i;
+    weekBox.addEventListener("click", () => {
+      weekBox.style.background = weekBox.style.background === "rgb(62, 156, 119)" ? "#FFF5EE" : "#3E9C77";
+      weekBox.style.color = weekBox.style.background === "rgb(62, 156, 119)" ? "#fff" : "#111";
+      // Actualizar progreso simulado
+      const progresoNum = document.getElementById("xmasProgressNum");
+      if (progresoNum) progresoNum.textContent = "¡Progreso actualizado con éxito!";
+    });
+    xmasWeeksContainer.appendChild(weekBox);
   }
 }
 
-function calcularProgresoReto() {
-  // Lógica para renderizar las 22 semanas desde agosto a diciembre 2026
-  console.log("Calculando semanas del Reto Navideño 2026...");
-}
-
-// --- 5. LÓGICA DE LA PESTAÑA: ACADEMIA Y SIMULADOR AFP ---
+// --- 7. LÓGICA DE LA PESTAÑA: ACADEMIA Y SIMULADORES ---
 function inicializarSimuladorAFP() {
-  const btnCalcularAFP = document.getElementById("btnCalcularAFP");
-  if (btnCalcularAFP) {
-    btnCalcularAFP.addEventListener("click", () => {
-      const sueldoBruto = parseFloat(document.getElementById("sueldoAFP").value) || 0;
-      const aporteTrabajador = sueldoBruto * 0.0287;
-      const aporteEmpleador = sueldoBruto * 0.0710;
-      
-      const resultadoAFP = document.getElementById("resultadoAFP");
-      if (resultadoAFP) {
-        resultadoAFP.innerHTML = `
-          <p><strong>Tu aporte (2.87%):</strong> RD$ ${aporteTrabajador.toLocaleString('es-DO')}</p>
-          <p><strong>Aporte Empleador (7.10%):</strong> RD$ ${aporteEmpleador.toLocaleString('es-DO')}</p>
-          <p style="color: #2D8ACE; font-size:12px; margin-top:5px;">⚠️ Este dinero te pertenece por ley y acumula intereses heredables.</p>
-        `;
+  const afpSalario = document.getElementById("afpSalario");
+  if (afpSalario) {
+    afpSalario.addEventListener("input", () => {
+      const sueldo = parseFloat(afpSalario.value) || 0;
+      const tuAporte = sueldo * 0.0287;
+      const resultado = document.getElementById("afpSimResult");
+      if (resultado) {
+        resultado.innerHTML = `Tu aporte mensual obligado (2.87%): <strong style="color: #FD8C45;">RD$ ${tuAporte.toLocaleString('es-DO', {maximumFractionDigits:2})}</strong><br><span style="font-size:11px; color:#666;">Tu empleador aporta otro 7.10% en segundo plano.</span>`;
       }
     });
   }
 }
 
-// --- 6. LÓGICA DE LA PESTAÑA: METAS Y ENFOQUE EDUCATIVO DE EMPRENDIMIENTO ---
-function inicializarMetasYEmprendimiento() {
-  const targetAmountInput = document.getElementById('targetGoalAmount');
-  const targetMonthsInput = document.getElementById('targetGoalMonths');
-  const incomeInput = document.getElementById('income');
-
-  if (targetAmountInput && targetMonthsInput) {
-    targetAmountInput.addEventListener('input', actualizarAnalisisDelCoach);
-    targetMonthsInput.addEventListener('input', actualizarAnalisisDelCoach);
+function inicializarCreditoYOtros() {
+  const creditSlider = document.getElementById("creditSlider");
+  if (creditSlider) {
+    creditSlider.addEventListener("input", () => {
+      const val = creditSlider.value;
+      const paid = document.getElementById("creditPaid");
+      const label = document.getElementById("creditPctLabel");
+      if (label) label.textContent = `${val}%`;
+      if (paid) paid.textContent = `RD$ ${(25000 * (val/100)).toLocaleString('es-DO')}`;
+    });
   }
-  if (incomeInput) {
-    incomeInput.addEventListener('input', actualizarAnalisisDelCoach);
+}
+
+// --- 8. LÓGICA DE LA PESTAÑA: METAS Y ENFOQUE EDUCATIVO ---
+function inicializarMetasYEmprendimiento() {
+  const targetAmount = document.getElementById("targetGoalAmount");
+  const targetMonths = document.getElementById("targetGoalMonths");
+  const emergencySlider = document.getElementById("emergencySlider");
+
+  if (targetAmount) targetAmount.addEventListener("input", actualizarAnalisisDelCoach);
+  if (targetMonths) targetMonths.addEventListener("input", actualizarAnalisisDelCoach);
+  
+  if (emergencySlider) {
+    emergencySlider.addEventListener("input", () => {
+      const meses = emergencySlider.value;
+      const label = document.getElementById("emergencyMonthsLabel");
+      const totalVal = document.getElementById("emergencyTotalVal");
+      
+      let gastosFijos = calcularPresupuestoInstantaneo();
+      if (gastosFijos <= 0) gastosFijos = 25000; // Backup si no han llenado presupuesto
+
+      if (label) label.textContent = `${meses} meses`;
+      if (totalVal) totalVal.textContent = `RD$ ${(gastosFijos * meses).toLocaleString('es-DO')}`;
+    });
   }
 }
 
 function actualizarAnalisisDelCoach() {
-  const sueldoInput = document.getElementById('income')?.value || 0;
-  const sueldo = parseFloat(sueldoInput);
-  const metaMonto = parseFloat(document.getElementById('targetGoalAmount')?.value) || 0;
-  const metaMeses = parseFloat(document.getElementById('targetGoalMonths')?.value) || 0;
-  const alertBox = document.getElementById('coachAlertBox');
-  const entrepreneurshipModule = document.getElementById('entrepreneurshipModule');
+  const sueldo = parseFloat(document.getElementById("income").value) || 0;
+  const metaMonto = parseFloat(document.getElementById("targetGoalAmount").value) || 0;
+  const metaMeses = parseFloat(document.getElementById("targetGoalMonths").value) || 0;
+  
+  const alertBox = document.getElementById("coachAlertBox");
+  const entrepreneurshipModule = document.getElementById("entrepreneurshipModule");
 
   if (!alertBox || !entrepreneurshipModule) return;
 
   if (metaMonto <= 0 || metaMeses <= 0) {
-    alertBox.style.display = 'none';
-    entrepreneurshipModule.style.display = 'none';
+    alertBox.style.display = "none";
+    entrepreneurshipModule.style.display = "none";
     return;
   }
 
   const cuotaMensual = metaMonto / metaMeses;
-  alertBox.style.display = 'block';
+  alertBox.style.display = "block";
 
-  // BLOQUE EDUCATIVO INTEGRADO (PUNTOS A, B Y C)
   let mensajeHTML = `
     <div style="font-weight: 700; color: #B4432A; margin-bottom: 8px;">📢 DIAGNÓSTICO DE TU COACH FINANCIERO:</div>
-    <p style="margin-bottom: 10px;">Para lograr tu meta a tiempo, necesitas separar <strong>RD$ ${cuotaMensual.toLocaleString('es-DO', {minimumFractionDigits: 2})}</strong> todos los meses.</p>
+    <p style="margin-bottom: 10px;">Para lograr tu meta a tiempo, necesitas separar <strong>RD$ ${cuotaMensual.toLocaleString('es-DO', {maximumFractionDigits:2})}</strong> todos los meses.</p>
   `;
 
-  // PUNTO A: REALIDAD FRENTE A LA CANASTA BÁSICA EXTRAÍDA DE GOOGLE
+  // PUNTO A: REALIDAD FRENTE A LA CANASTA BÁSICA
   if (sueldo < CANASTA_BASICA_RD) {
     mensajeHTML += `
       <div style="background: rgba(180, 67, 42, 0.05); padding: 10px; border-left: 4px solid #B4432A; margin-bottom: 12px; font-size: 13px; line-height: 1.4;">
-        <strong>⚠️ Realidad Dominicana (Punto A):</strong> Tu ingreso registrado está por debajo de la canasta básica familiar promedio nacional (RD$ ${CANASTA_BASICA_RD.toLocaleString()}). Con los precios de los alimentos por las nubes (el pollo, el arroz, el aceite) y los salarios rezagados, sabemos que ahorrar esa cuota es una batalla cuesta arriba. ¡No te culpes, las estadísticas demuestran que la calle está dura!
+        <strong>⚠️ Realidad Dominicana (Punto A):</strong> Tu ingreso está por debajo de la canasta básica familiar promedio nacional (RD$ ${CANASTA_BASICA_RD.toLocaleString()}). Con los alimentos por las nubes (el pollo, el arroz, el aceite), sabemos que ahorrar esa cuota es una batalla cuesta arriba. ¡No te culpes, la calle está dura!
       </div>
     `;
   } else {
     mensajeHTML += `
       <div style="background: rgba(62, 156, 119, 0.05); padding: 10px; border-left: 4px solid #3E9C77; margin-bottom: 12px; font-size: 13px; line-height: 1.4;">
-        <strong>✅ Punto de Ventaja (Punto A):</strong> Cuentas con un ingreso superior al promedio de la canasta básica (RD$ ${CANASTA_BASICA_RD.toLocaleString()}). Tu mayor reto no es la falta de dinero, sino blindar tus cuartos de las presiones inflacionarias invisibles.
+        <strong>✅ Punto de Ventaja (Punto A):</strong> Cuentas con un ingreso superior al promedio de la canasta básica (RD$ ${CANASTA_BASICA_RD.toLocaleString()}). Tu reto es blindar tus cuartos frente a la inflación.
       </div>
     `;
   }
 
-  // PUNTO B: CONTROL DE MALOS HÁBITOS (CULTURA DEL APARENTAR)
+  // PUNTO B: CONTROL DE MALOS HÁBITOS
   mensajeHTML += `
     <div style="background: rgba(253, 140, 69, 0.05); padding: 10px; border-left: 4px solid #FD8C45; margin-bottom: 12px; font-size: 13px; line-height: 1.4;">
-      <strong>🧠 Educación de Guerra (Punto B):</strong> Para liberar esos cuartos mensuales, la regla de oro es romper la <em>"cultura del aparentar"</em>. No utilices la tarjeta de crédito como una extensión de tu sueldo para pagar bultos insostenibles en salidas o deliveries que desaparecen en un fin de semana.
+      <strong>🧠 Educación de Guerra (Punto B):</strong> Para liberar esos cuartos, rompe la <em>"cultura del aparentar"</em>. No uses la tarjeta como extensión de sueldo para pagar bultos en salidas que desaparecen en un fin de semana.
     </div>
   `;
 
-  // PUNTO C: REMEDIO Y ACCIÓN (INCLUSIÓN FINANCIERA FORMAL)
+  // PUNTO C: INCLUSIÓN FINANCIERA FORMAL
   mensajeHTML += `
     <div style="background: rgba(45, 138, 206, 0.05); padding: 10px; border-left: 4px solid #2D8ACE; margin-bottom: 12px; font-size: 13px; line-height: 1.4;">
-      <strong>🛡️ Acción Defensiva (Punto C):</strong> Nada de guardar lo que ahorres debajo del colchón o en "Sanes" informales de alto riesgo donde la inflación devalúa tus cuartos o te expones a un fraude. Esos fondos van directo a instrumentos bancarios regulados.
+      <strong>🛡️ Acción Defensiva (Punto C):</strong> Nada de guardar tus ahorros bajo el colchón o en "Sanes" informales peligrosos. El dinero se guarda en instrumentos bancarios regulados en RD.
     </div>
   `;
 
-  // APERTURA Y LLAMADO AL EMPRENDIMIENTO COMO SOLUCIÓN RADICAL
   mensajeHTML += `
     <p style="margin-top: 12px; font-weight: 600; color: #111; line-height: 1.4;">
-      🚀 <strong>¿La solución definitiva?</strong> Recortar gastos tiene un tope físico, pero tus ingresos NO. Explora aquí abajo el catálogo de opciones de micro-emprendimiento rápido que preparamos para ti. Con un par de horas extras a la semana cubres la brecha sin asfixiar tu estilo de vida.
+      🚀 <strong>¿La solución definitiva?</strong> Como recortar gastos tiene un tope, mira abajo las opciones de micro-emprendimiento rápido que preparamos para ti para cubrir esta brecha sin asfixiarte.
     </p>
   `;
 
@@ -207,40 +266,27 @@ function actualizarAnalisisDelCoach() {
   alertBox.style.backgroundColor = '#FFFDF9';
   alertBox.style.border = '1px solid #E6D0B3';
 
-  entrepreneurshipModule.style.display = 'block';
+  entrepreneurshipModule.style.display = "block";
   renderizarIdeasDeEmprendimiento(cuotaMensual);
 }
 
 function renderizarIdeasDeEmprendimiento(cuotaNecesaria) {
-  const container = document.getElementById('ideasCatalogContainer');
+  const container = document.getElementById("ideasCatalogContainer");
   if (!container) return;
   
   const ideas = [
-    {
-      titulo: "📸 Gestión de Redes para Negocios Locales",
-      desc: "Salones, colmados o tiendas en tu sector necesitan presencia digital pero no tienen tiempo. Si manejas 2 cuentas cobrando RD$5,000 mensuales, generas...",
-      ingreso: 10000
-    },
-    {
-      titulo: "🧁 Venta de Postres o Snacks bajo pedido",
-      desc: "Prepara brownies o picaderas los fines de semana y distribúyelos por WhatsApp en tu oficina o vecindario. Con 15 clientes fijos al mes obtienes...",
-      ingreso: 7500
-    },
-    {
-      titulo: "🚗 Tutorías o Servicios de Asesoría Técnica",
-      desc: "Si dominas la contabilidad, el inglés, diseño o matemáticas, vende 4 mentorías de 2 horas los sábados por Zoom. Te sumará un extra de...",
-      ingreso: 8000
-    }
+    { titulo: "📸 Gestión de Redes para Negocios Locales", desc: "Salones o colmados necesitan presencia digital. Si manejas 2 cuentas cobrando RD$5,000, generas...", ingreso: 10000 },
+    { titulo: "🧁 Venta de Postres bajo pedido", desc: "Prepara brownies o picaderas y distribúyelos por WhatsApp en tu oficina o vecindario.", ingreso: 7500 },
+    { titulo: "🚗 Tutorías o Asesorías Técnicas", desc: "Vende mentorías de lo que domines (inglés, matemáticas, contabilidad) los sábados por Zoom.", ingreso: 8000 }
   ];
 
   container.innerHTML = "";
   ideas.forEach(idea => {
-    const card = document.createElement('div');
-    card.className = "entrepreneurship-card"; // Clases estilizadas de tu archivo CSS
-    card.style = "background: #fff; padding: 15px; border: 1px solid #e1e6eb; border-radius: 12px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);";
+    const card = document.createElement("div");
+    card.style = "background: #fff; padding: 15px; border: 1px solid #e1e6eb; border-radius: 12px; display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px;";
     
     const cubreMeta = idea.ingreso >= cuotaNecesaria;
-    const badge = cubreMeta ? `<span style="background: #3E9C77; color: white; font-size: 10px; padding: 3px 8px; border-radius: 6px; font-weight: bold; width: fit-content; margin-bottom: 2px;">🎯 CUBRE TU META</span>` : '';
+    const badge = cubreMeta ? `<span style="background: #3E9C77; color: white; font-size: 10px; padding: 3px 8px; border-radius: 6px; font-weight: bold; width: fit-content;">🎯 CUBRE TU META</span>` : '';
 
     card.innerHTML = `
       ${badge}
