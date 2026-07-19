@@ -19,6 +19,13 @@
       --text-muted: #64748b;
       --border-color: #e2e8f0;
       --bg-card: #ffffff;
+      --nav-bg: #ffffff;
+      
+      /* Colores reto navideño */
+      --christmas-red: #dc2626;
+      --christmas-green: #16a34a;
+      --christmas-gold: #eab308;
+      --ornament-off: #cbd5e1;
     }
 
     * {
@@ -48,6 +55,7 @@
       position: relative;
       box-shadow: 0 0 24px rgba(0,0,0,0.07);
       overflow-x: hidden;
+      padding-bottom: 70px; /* Espacio para barra de navegación inferior */
     }
 
     /* 🧭 PANTALLA SPLASH / INTRO */
@@ -128,9 +136,9 @@
       transform: scale(0.98);
     }
 
-    /* 💰 MAIN APP / SECCIÓN PRESUPUESTO */
+    /* 💰 MAIN APP CONTAINER */
     .main-app-container {
-      display: none; /* Se activa al presionar comenzar */
+      display: none; 
       flex-direction: column;
       flex: 1;
     }
@@ -144,12 +152,18 @@
       z-index: 100;
     }
 
-    .app-body {
+    /* Vistas de pestañas */
+    .app-view {
+      display: none;
       padding: 20px 16px;
       flex: 1;
     }
 
-    /* Tarjeta de bienvenida del video */
+    .app-view.active {
+      display: block;
+    }
+
+    /* Elementos comunes */
     .welcome-card {
       background: #eff6ff;
       border: 1px solid #bfdbfe;
@@ -196,6 +210,7 @@
       margin-bottom: 20px;
     }
 
+    /* Inputs y Formularios */
     .input-group {
       background: var(--bg-card);
       padding: 14px 16px;
@@ -236,7 +251,7 @@
       outline: none;
     }
 
-    /* Lista de gastos por categorías */
+    /* PESTAÑA: PRESUPUESTO */
     .expenses-list-title {
       font-size: 14px;
       font-weight: 700;
@@ -290,16 +305,6 @@
       outline: none;
     }
 
-    /* Quitar flechas por defecto en inputs numéricos */
-    input[type="number"]::-webkit-outer-spin-button,
-    input[type="number"]::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-    input[type="number"] {
-      -moz-appearance: textfield;
-    }
-
     .btn-submit-budget {
       background: var(--primary);
       color: #ffffff;
@@ -313,6 +318,271 @@
       text-align: center;
       box-shadow: 0 4px 12px rgba(30, 41, 59, 0.15);
       margin-bottom: 20px;
+    }
+
+    /* 🎄 PESTAÑA: RETO NAVIDEÑO */
+    .christmas-card {
+      background: #fef2f2;
+      border: 1px solid #fca5a5;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+
+    .christmas-card p {
+      font-size: 13px;
+      color: #991b1b;
+      line-height: 1.5;
+    }
+
+    /* Tabla de Niveles */
+    .levels-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg-card);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+      margin-bottom: 20px;
+    }
+
+    .levels-table th {
+      background: #f1f5f9;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 10px 12px;
+      text-align: left;
+    }
+
+    .levels-table td {
+      padding: 12px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    .levels-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .levels-table tr.selected {
+      background: #f0fdf4;
+    }
+
+    .radio-cell {
+      width: 30px;
+      text-align: center;
+    }
+
+    /* Sección nivel personalizado */
+    .custom-level-box {
+      display: none;
+      background: var(--bg-card);
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 20px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .custom-level-title {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--primary);
+    }
+
+    /* Resumen de meta activa */
+    .meta-summary-box {
+      background: var(--primary);
+      color: #ffffff;
+      padding: 14px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(30, 41, 59, 0.1);
+    }
+
+    .meta-subtext {
+      font-size: 11px;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    /* Panel del árbol y las bolitas */
+    .challenge-playground {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+      background: var(--bg-card);
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid var(--border-color);
+    }
+
+    /* Gráfico del Árbol */
+    .tree-container {
+      flex: 0 0 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-right: 1px dashed var(--border-color);
+      padding-right: 12px;
+    }
+
+    .star-ornament {
+      font-size: 32px;
+      opacity: 0.2;
+      transition: all 0.4s ease;
+      filter: grayscale(100%);
+    }
+
+    .star-ornament.active {
+      opacity: 1;
+      filter: grayscale(0%);
+      transform: scale(1.2);
+      text-shadow: 0 0 12px rgba(234, 179, 8, 0.8);
+    }
+
+    .tree-icon {
+      font-size: 54px;
+      margin-top: -5px;
+    }
+
+    /* Cuadrícula de 22 semanas */
+    .weeks-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .ornament-button {
+      aspect-ratio: 1;
+      background: var(--ornament-off);
+      border: none;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: inset 0 -3px 0 rgba(0,0,0,0.15);
+    }
+
+    .ornament-button .week-num {
+      font-size: 11px;
+      font-weight: 800;
+      color: #64748b;
+    }
+
+    .ornament-button .check-icon {
+      font-size: 9px;
+      display: none;
+      color: #ffffff;
+      margin-top: -2px;
+    }
+
+    /* Comportamiento visual encendido */
+    .ornament-button.active {
+      background: var(--christmas-red);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(220, 38, 38, 0.3), inset 0 -3px 0 rgba(0,0,0,0.2);
+    }
+
+    /* Alternar colores de bolitas encendidas para variedad visual navideña */
+    .ornament-button.active:nth-child(even) {
+      background: var(--christmas-green);
+      box-shadow: 0 4px 8px rgba(22, 163, 74, 0.3), inset 0 -3px 0 rgba(0,0,0,0.2);
+    }
+
+    .ornament-button.active .week-num {
+      color: #ffffff;
+    }
+
+    .ornament-button.active .check-icon {
+      display: block;
+    }
+
+    /* Mensajes motivacionales dinámicos */
+    .motivation-alert {
+      display: none;
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 24px;
+      font-size: 13px;
+      color: #166534;
+      line-height: 1.45;
+      animation: fadeIn 0.4s ease;
+    }
+    
+    .motivation-alert.final-win {
+      background: #fff9db;
+      border: 1px solid #ffe066;
+      color: #856404;
+    }
+
+    /* 🧭 BARRA DE NAVEGACIÓN INFERIOR MÓVIL */
+    .bottom-nav {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 65px;
+      background: var(--nav-bg);
+      border-top: 1px solid var(--border-color);
+      display: none; /* Se activa junto con el Main App */
+      grid-template-columns: 1fr 1fr;
+      z-index: 200;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 700;
+      transition: color 0.2s ease;
+    }
+
+    .nav-item.active {
+      color: var(--accent);
+    }
+
+    .nav-icon {
+      font-size: 18px;
+    }
+
+    /* Quitar flechas por defecto en inputs numéricos */
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type="number"] {
+      -moz-appearance: textfield;
     }
   </style>
 </head>
@@ -337,19 +607,17 @@
         <h2 style="font-size: 16px; font-weight: 800; letter-spacing: -0.3px;">miscuartos</h2>
       </header>
 
-      <main class="app-body">
+      <!-- VIEW 1: PRESUPUESTO -->
+      <main id="viewBudget" class="app-view active">
         
-        <!-- Mensaje de bienvenida -->
         <div class="welcome-card">
           <p>¡Qué bueno tenerte aquí! 👋 Esta app funciona mejor si sabes cómo sacarle el jugo. Antes de empezar, dale un minuto a este video — te va a ahorrar tiempo después.</p>
           <button class="btn-video">▶ Cómo sacarle el jugo a la app · 1 min</button>
         </div>
 
-        <!-- Títulos de sección -->
         <h3 class="section-title">Tus cuartos, bajo tu control</h3>
-        <p class="section-subtitle">Manejar tu dinero no tiene que ser complicado. Pon lo que ganas, anota lo que gastas, y te vamos guiando en el camino.</p>
+        <p class="section-subtitle">Manejar tu dinero no tiene que ser complicado. Pon lo que ganas, anota lo que gastas, y te vamos guíando en el camino.</p>
 
-        <!-- Campo de ingreso -->
         <div class="input-group">
           <label for="incomeInput">Ingreso ganado este mes</label>
           <div class="input-wrapper">
@@ -358,123 +626,129 @@
           </div>
         </div>
 
-        <!-- Título de la lista de gastos -->
         <h4 class="expenses-list-title">Tus gastos este mes</h4>
 
-        <!-- Las 11 Categorías en el orden exacto especificado -->
         <div class="categories-container">
+          <div class="category-item"><span class="category-label">Vivienda</span><div class="category-input-box"><span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span><input type="number" class="budget-input" placeholder="0"></div></div>
+          <div class="category-item"><span class="category-label">Comida</span><div class="category-input-box"><span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span><input type="number" class="budget-input" placeholder="0"></div></div>
+          <div class="category-item"><span class="category-label">Luz, agua y teléfono</span><div class="category-input-box"><span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span><input type="number" class="budget-input" placeholder="0"></div></div>
+          <div class="category-item"><span class="category-label">Escuela</span><div class="category-input-box"><span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span><input type="number" class="budget-input" placeholder="0"></div></div>
+          <div class="category-item"><span class="category-label">Salud</span><div class="category-input-box"><span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span><input type="number" class="budget-input" placeholder="0"></div></div>
+          <div class="category-item"><span class="category-label">Transporte</span><div class="category-input-box"><span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span><input type="number" class="budget-input" placeholder="0"></div></div>
+          <div class="category-item"><span class="category-label">Deudas</span><div class="category-input-box"><span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span><input type="number" class="budget-input" placeholder="0"></div></div>
+          <div class="category-item"><span class="category-label">Ahorro</span><div class="category-input-box"><span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span><input type="number" class="budget-input" placeholder="0"></div></div>
+          <div class="category-item"><span class="category-label">Mascotas</span><div class="category-input-box"><span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span><input type="number" class="budget-input" placeholder="0"></div></div>
+          <div class="category-item"><span class="category-label">Donaciones</span><div class="category-input-box"><span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span><input type="number" class="budget-input" placeholder="0"></div></div>
+          <div class="category-item"><span class="category-label">Diversión</span><div class="category-input-box"><span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span><input type="number" class="budget-input" placeholder="0"></div></div>
+        </div>
+
+        <button id="btnVerResumen" class="btn-submit-budget">Ver mi resumen y consejos →</button>
+      </main>
+
+      <!-- VIEW 2: RETO NAVIDEÑO -->
+      <main id="viewChristmas" class="app-view">
+        
+        <div class="christmas-card">
+          <p>Este reto está inspirado en el método clásico de las 52 semanas — pero lo adaptamos a tu calendario real: 22 semanas, de agosto a diciembre. Elige cuánto vas a sumar cada semana, y nosotros hacemos la cuenta. Al final, tu Navidad la pagas tú, sin tarjetas ni deudas.</p>
+        </div>
+
+        <h3 class="section-title">🎄 Reto Navideño</h3>
+        <p class="section-subtitle">Elige tu nivel de ahorro y completa las 22 semanas antes de que llegue diciembre.</p>
+
+        <!-- Selector de nivel -->
+        <table class="levels-table">
+          <thead>
+            <tr>
+              <th class="radio-cell"></th>
+              <th>Nivel</th>
+              <th>Monto semanal</th>
+              <th>Meta total (22 sem)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="selected">
+              <td class="radio-cell"><input type="radio" name="challengeLevel" value="basico" checked id="lvlBasico"></td>
+              <td><label for="lvlBasico">Básico</label></td>
+              <td>RD$50/sem</td>
+              <td><strong>RD$11,550</strong></td>
+            </tr>
+            <tr>
+              <td class="radio-cell"><input type="radio" name="challengeLevel" value="medio" id="lvlMedio"></td>
+              <td><label for="lvlMedio">Medio</label></td>
+              <td>RD$100/sem</td>
+              <td><strong>RD$23,100</strong></td>
+            </tr>
+            <tr>
+              <td class="radio-cell"><input type="radio" name="challengeLevel" value="alto" id="lvlAlto"></td>
+              <td><label for="lvlAlto">Alto</label></td>
+              <td>RD$200/sem</td>
+              <td><strong>RD$46,200</strong></td>
+            </tr>
+            <tr>
+              <td class="radio-cell"><input type="radio" name="challengeLevel" value="medida" id="lvlMedida"></td>
+              <td><label for="lvlMedida">A tu medida</label></td>
+              <td>Tú eliges</td>
+              <td id="lblMetaMedida">Se calcula</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Copy/Input nivel personalizado -->
+        <div id="customLevelBox" class="custom-level-box">
+          <div class="custom-level-title">¿Cuánto vas a sumar cada semana?</div>
+          <div class="input-wrapper" style="border-bottom: 2px solid var(--border-color); padding-bottom: 6px;">
+            <span class="currency-symbol">RD$</span>
+            <input type="number" id="customWeeklyInput" class="input-field" placeholder="Ej. 150, 300, 500">
+          </div>
+        </div>
+
+        <!-- Resumen de meta activa -->
+        <div class="meta-summary-box">
+          <div>
+            <span id="currentSavedText">RD$0</span> 
+            <span class="meta-subtext">de</span> 
+            <span id="targetGoalText">RD$11,550</span>
+          </div>
+          <div class="meta-subtext" style="color: #ffffff; opacity: 0.9;">Marca las semanas que ya depositaste</div>
+        </div>
+
+        <!-- Mensajes motivadores -->
+        <div id="motivationAlert" class="motivation-alert"></div>
+
+        <!-- Panel Árbol + 22 Semanas -->
+        <div class="challenge-playground">
           
-          <!-- 1. Vivienda -->
-          <div class="category-item">
-            <span class="category-label">Vivienda</span>
-            <div class="category-input-box">
-              <span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span>
-              <input type="number" class="budget-input" data-category="vivienda" placeholder="0">
-            </div>
+          <!-- Árbol con Estrella -->
+          <div class="tree-container">
+            <div id="christmasStar" class="star-ornament">🌟</div>
+            <div class="tree-icon">🎄</div>
           </div>
 
-          <!-- 2. Comida -->
-          <div class="category-item">
-            <span class="category-label">Comida</span>
-            <div class="category-input-box">
-              <span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span>
-              <input type="number" class="budget-input" data-category="comida" placeholder="0">
-            </div>
-          </div>
-
-          <!-- 3. Luz, agua y teléfono -->
-          <div class="category-item">
-            <span class="category-label">Luz, agua y teléfono</span>
-            <div class="category-input-box">
-              <span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span>
-              <input type="number" class="budget-input" data-category="servicios" placeholder="0">
-            </div>
-          </div>
-
-          <!-- 4. Escuela -->
-          <div class="category-item">
-            <span class="category-label">Escuela</span>
-            <div class="category-input-box">
-              <span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span>
-              <input type="number" class="budget-input" data-category="escuela" placeholder="0">
-            </div>
-          </div>
-
-          <!-- 5. Salud -->
-          <div class="category-item">
-            <span class="category-label">Salud</span>
-            <div class="category-input-box">
-              <span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span>
-              <input type="number" class="budget-input" data-category="salud" placeholder="0">
-            </div>
-          </div>
-
-          <!-- 6. Transporte -->
-          <div class="category-item">
-            <span class="category-label">Transporte</span>
-            <div class="category-input-box">
-              <span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span>
-              <input type="number" class="budget-input" data-category="transporte" placeholder="0">
-            </div>
-          </div>
-
-          <!-- 7. Deudas -->
-          <div class="category-item">
-            <span class="category-label">Deudas</span>
-            <div class="category-input-box">
-              <span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span>
-              <input type="number" class="budget-input" data-category="deudas" placeholder="0">
-            </div>
-          </div>
-
-          <!-- 8. Ahorro -->
-          <div class="category-item">
-            <span class="category-label">Ahorro</span>
-            <div class="category-input-box">
-              <span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span>
-              <input type="number" class="budget-input" data-category="ahorro" placeholder="0">
-            </div>
-          </div>
-
-          <!-- 9. Mascotas -->
-          <div class="category-item">
-            <span class="category-label">Mascotas</span>
-            <div class="category-input-box">
-              <span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span>
-              <input type="number" class="budget-input" data-category="mascotas" placeholder="0">
-            </div>
-          </div>
-
-          <!-- 10. Donaciones -->
-          <div class="category-item">
-            <span class="category-label">Donaciones</span>
-            <div class="category-input-box">
-              <span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span>
-              <input type="number" class="budget-input" data-category="donaciones" placeholder="0">
-            </div>
-          </div>
-
-          <!-- 11. Diversión -->
-          <div class="category-item">
-            <span class="category-label">Diversión</span>
-            <div class="category-input-box">
-              <span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span>
-              <input type="number" class="budget-input" data-category="diversion" placeholder="0">
-            </div>
+          <!-- Cuadrícula para las 22 Bolitas -->
+          <div id="weeksGrid" class="weeks-grid">
+            <!-- Las 22 bolitas se generan por JavaScript dinámicamente -->
           </div>
 
         </div>
 
-        <!-- Botón final -->
-        <button id="btnVerResumen" class="btn-submit-budget">Ver mi resumen y consejos →</button>
-
       </main>
+
+      <!-- 🧭 BARRA DE NAVEGACIÓN INFERIOR -->
+      <nav id="bottomNav" class="bottom-nav">
+        <button class="nav-item active" data-target="viewBudget">
+          <span class="nav-icon">💰</span>
+          <span>Presupuesto</span>
+        </button>
+        <button class="nav-item" data-target="viewChristmas">
+          <span class="nav-icon">🎄</span>
+          <span>Reto Navideño</span>
+        </button>
+      </nav>
 
     </div><!-- CIERRE MAIN APP -->
 
   </div><!-- CIERRE PHONE CONTAINER -->
 
-  <!-- Enlace al archivo JavaScript -->
   <script src="app.js"></script>
 </body>
 </html>
