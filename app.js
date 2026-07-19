@@ -1,5 +1,5 @@
 // =========================================================================
-// ARCHIVO: app.js (Código Completo Consolidado)
+// ARCHIVO: app.js (Código Completo Consolidado - Versión Final Integrada)
 // =========================================================================
 
 // --- VARIABLES Y CONSTANTES GLOBALES ---
@@ -8,6 +8,7 @@ const CANASTA_BASICA_RD = 45000;
 // --- INICIALIZADOR PRINCIPAL AL CARGAR EL DOCUMENTO ---
 document.addEventListener("DOMContentLoaded", () => {
   configurarNavegacionPestañas();
+  inicializarBotonGuiame();
   inicializarFormularioIngresos();
   inicializarSimuladorAFP();
   inicializarMetasYEmprendimiento();
@@ -24,25 +25,56 @@ function configurarNavegacionPestañas() {
     enlace.addEventListener("click", (e) => {
       e.preventDefault();
       const destinoId = enlace.getAttribute("data-tab");
-
-      // Cambiar estado activo en botones
-      enlacesPestañas.forEach(btn => btn.classList.remove("active"));
-      enlace.classList.add("active");
-
-      // Cambiar visibilidad de las secciones
-      contenidosPestañas.forEach(seccion => {
-        if (seccion.id === destinoId) {
-          seccion.style.display = "block";
-        } else {
-          seccion.style.display = "none";
-        }
-      });
+      irAPestaña(destinoId);
     });
   });
 }
 
+// Función auxiliar reutilizable para cambiar de pestaña programáticamente
+function irAPestaña(destinoId) {
+  const enlacesPestañas = document.querySelectorAll(".tab-link");
+  const contenidosPestañas = document.querySelectorAll(".tab-content");
+
+  // Cambiar estado activo en los botones de navegación
+  enlacesPestañas.forEach(btn => {
+    if (btn.getAttribute("data-tab") === destinoId) {
+      btn.classList.add("active");
+    } else {
+      btn.classList.remove("active");
+    }
+  });
+
+  // Cambiar visibilidad de las secciones de contenido
+  contenidosPestañas.forEach(seccion => {
+    if (seccion.id === destinoId) {
+      seccion.style.display = "block";
+    } else {
+      seccion.style.display = "none";
+    }
+  });
+
+  // Scroll hacia arriba automático para mejorar la experiencia en móviles
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 // =========================================================================
-// --- 2. GESTIÓN DE INGRESOS Y PRESUPUESTO AUXILIAR ---
+// --- 2. ACCIÓN DEL BOTÓN "GUÍAME" (PANTALLA DE INICIO) ---
+// =========================================================================
+function inicializarBotonGuiame() {
+  // Busca el botón de acción principal en el Home/Inicio
+  const btnGuiame = document.getElementById("btnGuiame") || document.querySelector(".btn-guiame");
+  
+  if (btnGuiame) {
+    btnGuiame.addEventListener("click", (e) => {
+      e.preventDefault();
+      // Te redirige dinámicamente a la pestaña del presupuesto para iniciar el flujo
+      irAPestaña("presupuesto"); 
+    });
+  }
+}
+
+// =========================================================================
+// --- 3. GESTIÓN DE INGRESOS Y PRESUPUESTO AUXILIAR ---
 // =========================================================================
 function inicializarFormularioIngresos() {
   const inputIncome = document.getElementById("income");
@@ -335,7 +367,6 @@ function renderizarIdeasDeEmprendimiento(cuotaNecesaria) {
   const contenedorIdeas = document.getElementById("entrepreneurshipIdeasContainer");
   if (!contenedorIdeas) return;
 
-  // Lista de ideas comunes contextualizadas al mercado dominicano
   const ideas = [
     { titulo: "Venta de ropa o accesorios virtuales", gananciaAprox: 8000 },
     { titulo: "Servicios independientes / Freelance (Diseño, Redacción, Soporte)", gananciaAprox: 12000 },
