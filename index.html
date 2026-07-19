@@ -67,11 +67,6 @@
         <div class="welcome-badge">¡Qué bueno tenerte aquí! 👋</div>
         <h1>Tus cuartos, bajo tu control</h1>
         <p class="sub">Manejar tu dinero no tiene que ser aburrido. Esta app es <strong>educativa, interactiva y retadora</strong>. Pon tus números abajo y mira el cambio. ¡Explora las pestañas inferiores!</p>
-        
-        <!-- 🛠️ BOTÓN DE INICIO "GUÍAME" AGREGADO EN EL DOM DE PRESUPUESTO -->
-        <button class="btn-guiame" style="margin-top: 12px; background: #1F7A5C; color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 13.5px; cursor: pointer; display: flex; align-items: center; gap: 6px;">
-          🚀 Guíame paso a paso
-        </button>
       </div>
 
       <div class="video-native-box">
@@ -91,8 +86,70 @@
 
       <div class="section-title">Tus gastos este mes <span class="count" id="countTag">0 con monto</span></div>
       
-      <!-- Contenedor original donde app.js renderiza las casillas de presupuesto -->
-      <div id="results"></div>
+      <!-- Contenedor con las casillas de presupuesto estables y tooltips interactivos -->
+      <div id="results" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
+        
+        <!-- ITEM 1: CUENTAS Y SERVICIOS -->
+        <div class="budget-item-row" style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-card, #fff); padding: 14px 16px; border-radius: 12px; border: 1px solid var(--line, #eee);">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 18px;">🏠</span>
+            <span style="font-size: 14px; font-weight: 600; color: var(--ink, #111);">Cuentas y Servicios</span>
+            <div class="tooltip-container" style="position: relative; display: inline-block; cursor: pointer; color: var(--muted, #888);" title="Alquiler, luz, agua, internet, mantenimiento y teléfono fijo.">
+              ℹ️
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-input, #f9f9f9); padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line, #ddd);">
+            <span style="font-size: 14px; font-weight: 600; color: var(--muted, #666);">RD$</span>
+            <input type="number" class="budget-input" data-category="servicios" placeholder="0" inputmode="decimal" style="width: 80px; border: none; background: transparent; font-size: 14px; font-weight: 700; text-align: right; outline: none; color: var(--ink, #111);">
+          </div>
+        </div>
+
+        <!-- ITEM 2: SUPERMERCADO Y COMIDA -->
+        <div class="budget-item-row" style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-card, #fff); padding: 14px 16px; border-radius: 12px; border: 1px solid var(--line, #eee);">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 18px;">🛒</span>
+            <span style="font-size: 14px; font-weight: 600; color: var(--ink, #111);">Supermercado y Comida</span>
+            <div class="tooltip-container" style="position: relative; display: inline-block; cursor: pointer; color: var(--muted, #888);" title="Compra mensual del súper, colmado, mercados y comidas del día a día.">
+              ℹ️
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-input, #f9f9f9); padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line, #ddd);">
+            <span style="font-size: 14px; font-weight: 600; color: var(--muted, #666);">RD$</span>
+            <input type="number" class="budget-input" data-category="comida" placeholder="0" inputmode="decimal" style="width: 80px; border: none; background: transparent; font-size: 14px; font-weight: 700; text-align: right; outline: none; color: var(--ink, #111);">
+          </div>
+        </div>
+
+        <!-- ITEM 3: TRANSPORTE Y COMBUSTIBLE -->
+        <div class="budget-item-row" style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-card, #fff); padding: 14px 16px; border-radius: 12px; border: 1px solid var(--line, #eee);">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 18px;">🚗</span>
+            <span style="font-size: 14px; font-weight: 600; color: var(--ink, #111);">Transporte y Gasolina</span>
+            <div class="tooltip-container" style="position: relative; display: inline-block; cursor: pointer; color: var(--muted, #888);" title="Combustible, pasajes, Uber/Indrive, peajes y mantenimiento menor del vehículo.">
+              ℹ️
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-input, #f9f9f9); padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line, #ddd);">
+            <span style="font-size: 14px; font-weight: 600; color: var(--muted, #666);">RD$</span>
+            <input type="number" class="budget-input" data-category="transporte" placeholder="0" inputmode="decimal" style="width: 80px; border: none; background: transparent; font-size: 14px; font-weight: 700; text-align: right; outline: none; color: var(--ink, #111);">
+          </div>
+        </div>
+
+        <!-- ITEM 4: GUSTOS Y SALIDAS -->
+        <div class="budget-item-row" style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-card, #fff); padding: 14px 16px; border-radius: 12px; border: 1px solid var(--line, #eee);">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 18px;">🍹</span>
+            <span style="font-size: 14px; font-weight: 600; color: var(--ink, #111);">Gustos y Salidas</span>
+            <div class="tooltip-container" style="position: relative; display: inline-block; cursor: pointer; color: var(--muted, #888);" title="Restaurantes, cine, conciertos, salidas de fin de semana y desarreglos de ocio.">
+              ℹ️
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-input, #f9f9f9); padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line, #ddd);">
+            <span style="font-size: 14px; font-weight: 600; color: var(--muted, #666);">RD$</span>
+            <input type="number" class="budget-input" data-category="gustos" placeholder="0" inputmode="decimal" style="width: 80px; border: none; background: transparent; font-size: 14px; font-weight: 700; text-align: right; outline: none; color: var(--ink, #111);">
+          </div>
+        </div>
+
+      </div>
     </section>
 
     <!-- PESTAÑA 2: RETO NAVIDEÑO -->
@@ -368,7 +425,6 @@
   </main>
 
   <nav class="bottom-nav">
-    <!-- Unificados los selectores data-tab con la lógica del panel en JS -->
     <button class="nav-item active" data-tab="presupuesto"><span class="nav-icon">💰</span><span class="nav-label">Presupuesto</span></button>
     <button class="nav-item" data-tab="reto"><span class="nav-icon">🎄</span><span class="nav-label">Reto Navidad</span></button>
     <button class="nav-item" data-tab="metas"><span class="nav-icon">🎯</span><span class="nav-label">Metas</span></button>
