@@ -1,5 +1,5 @@
 // =========================================================================
-// ARCHIVO: app.js (Código Completo Consolidado - Fix de Atributos y Clases HTML)
+// ARCHIVO: app.js (Código Completo Consolidado - Ajustado según Arquitectura UI)
 // =========================================================================
 
 // --- VARIABLES Y CONSTANTES GLOBALES ---
@@ -32,7 +32,7 @@ function inicializarSplashAndIntro() {
 }
 
 // =========================================================================
-// --- 1. SISTEMA DE NAVEGACIÓN ENTRE PESTAÑAS (MAPEADO DE CLASES Y ID DEL HTML) ---
+// --- 1. SISTEMA DE NAVEGACIÓN ENTRE PESTAÑAS ---
 // =========================================================================
 function configurarNavegacionPestañas() {
   const enlacesPestañas = document.querySelectorAll(".nav-item");
@@ -46,12 +46,10 @@ function configurarNavegacionPestañas() {
   });
 }
 
-// Función auxiliar unificada para cambiar vistas de paneles sin fallos
 function irAPestaña(destinoId) {
   const enlacesPestañas = document.querySelectorAll(".nav-item");
   const contenidosPestañas = document.querySelectorAll(".tab-pane");
 
-  // El id en el HTML lleva el prefijo "pane-" (Ej: id="pane-presupuesto")
   const idContenedorReal = `pane-${destinoId}`;
   const panelDestino = document.getElementById(idContenedorReal);
 
@@ -60,7 +58,6 @@ function irAPestaña(destinoId) {
     return;
   }
 
-  // Actualizar la clase activa del botón en la barra de navegación inferior
   enlacesPestañas.forEach(btn => {
     if (btn.getAttribute("data-tab") === destinoId) {
       btn.classList.add("active");
@@ -69,7 +66,6 @@ function irAPestaña(destinoId) {
     }
   });
 
-  // Alternar visibilidad de las secciones utilizando block/none
   contenidosPestañas.forEach(seccion => {
     if (seccion.id === idContenedorReal) {
       seccion.style.display = "block";
@@ -78,22 +74,19 @@ function irAPestaña(destinoId) {
     }
   });
 
-  // Scroll suave hacia la parte superior (útil en layouts móviles)
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // =========================================================================
-// --- 2. DELEGACIÓN DE EVENTOS GLOBAL (SOLUCIÓN FIX AL BOTÓN DE INICIO) ---
+// --- 2. DELEGACIÓN DE EVENTOS GLOBAL ---
 // =========================================================================
 function inicializarEscuchadorGlobalClicks() {
   document.addEventListener("click", (e) => {
-    // Intercepta clics de cualquier variante estructural del botón "Guíame" o disparadores de metas
     const targetBoton = e.target.closest("#btnGuiame, .btn-guiame, [data-action='guiame']");
     
     if (targetBoton) {
       e.preventDefault();
       console.log("Botón Guíame interceptado con éxito. Navegando al panel de Metas.");
-      // Redirige dinámicamente al panel "metas" para iniciar el flujo guiado
       irAPestaña("metas");
     }
   });
@@ -113,7 +106,7 @@ function inicializarFormularioIngresos() {
 
 function calcularPresupuestoInstantaneo() {
   const sueldo = parseFloat(document.getElementById("income").value) || 0;
-  return sueldo > 0 ? sueldo * 0.70 : 0; // Asumimos un 70% estimado de costes fijos dominicanos
+  return sueldo > 0 ? sueldo * 0.70 : 0; 
 }
 
 // =========================================================================
@@ -122,6 +115,7 @@ function calcularPresupuestoInstantaneo() {
 function inicializarSimuladorAFP() {
   const academiaIntroBox = document.getElementById("academiaIntroMessage");
   if (academiaIntroBox) {
+    // La sección de Dinero Oculto queda completamente excluida de la academia
     academiaIntroBox.innerHTML = `
       <div style="background: linear-gradient(135deg, #1F7A5C, #143D31); color: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(20,61,49,0.2); margin-bottom: 20px;">
         <h3 style="margin: 0 0 8px 0; font-size: 17px; font-weight: 700; letter-spacing: -0.3px;">🎓 Academia MisCuartos</h3>
@@ -173,6 +167,25 @@ function inicializarMetasYEmprendimiento() {
       if (totalVal) totalVal.textContent = `RD$ ${(gastosFijos * meses).toLocaleString('es-DO')}`;
     });
   }
+  
+  // Renderizado estático inicial del tip fuera del bloque del Coach
+  inyectarTipCompromiso();
+}
+
+function inyectarTipCompromiso() {
+  // Buscamos el contenedor de los planes en el HTML
+  const planSelectionBox = document.getElementById("planSelectionContainer");
+  
+  // Evitamos duplicados si la función se vuelve a ejecutar
+  if (planSelectionBox && !document.getElementById("savings-compromise-tip")) {
+    const tipElement = document.createElement("div");
+    tipElement.id = "savings-compromise-tip";
+    tipElement.style.cssText = "background: #FFF9E6; border: 1px solid #FFEAA7; color: #D6A21E; padding: 10px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; margin: 12px 0 16px 0; text-align: left; line-height: 1.4;";
+    tipElement.innerHTML = `💡 Tip de Compromiso: Abre una cuenta de ahorro aparte. Dinero que entra ahí no se toca hasta cumplir el plazo, salvo una emergencia real.`;
+    
+    // Lo colocamos exactamente debajo del contenedor de planes
+    planSelectionBox.parentNode.insertBefore(tipElement, planSelectionBox.nextSibling);
+  }
 }
 
 function actualizarAnalisisDelCoach() {
@@ -197,22 +210,18 @@ function actualizarAnalisisDelCoach() {
   const estiloContenido = "padding: 0 12px 14px 12px; font-size: 13.5px; line-height: 1.5; color: #444; border-top: 1px dashed #e1e6eb; margin-top: 8px; padding-top: 8px;";
   const estiloDetails = "background: #fff; border: 1px solid #e1e6eb; border-radius: 10px; margin-bottom: 10px; overflow: hidden; transition: all 0.2s ease;";
 
+  // El Tip de Compromiso ha sido removido de esta plantilla ya que ahora vive bajo los planes
   let mensajeHTML = `
     <div style="font-weight: 700; color: #111; margin-bottom: 12px; font-size: 15px; display: flex; align-items: center; gap: 6px;">
       📢 SUGERENCIAS DE TU COACH FINANCIERO
     </div>
     
-    <div style="background: #F4F7f9; padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid #2D8ACE; font-size: 14px;">
+    <div style="background: #F4F7f9; padding: 12px; border-radius: 8px; margin-bottom: 16px; border-left: 4px solid #2D8ACE; font-size: 14px;">
       Para lograr tu meta en el tiempo planeado, necesitas separar unos 
       <strong style="color: #2D8ACE; font-size: 15px;">RD$ ${cuotaMensual.toLocaleString('es-DO', {maximumFractionDigits:2})}</strong> al mes.
     </div>
 
-    <!-- 💡 CAMBIO DE UBICACIÓN REQUERIDO: EL TIP SITUADO DIRECTAMENTE DEBAJO DE LOS PLANES -->
-    <div style="background: #FFF9E6; border: 1px solid #FFEAA7; color: #D6A21E; padding: 10px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 6px; text-align: left; line-height: 1.4;">
-      💡 Tip de Compromiso: Abre una cuenta de ahorro aparte. Dinero que entra ahí no se toca hasta cumplir el plazo, salvo una emergencia real.
-    </div>
-
-    <!-- 🔍 SECCIÓN INTERACTIVA: DINERO OCULTO REDISEÑADO EN LAS METAS FINANCIERAS -->
+    <!-- 🔍 SECCIÓN INTERACTIVA: DINERO OCULTO REDISEÑADO E INTEGRADO EN METAS -->
     <div style="background: #FFFDF0; border: 1px solid #F3E1B6; padding: 16px; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
       <h4 style="margin: 0 0 6px 0; font-size: 14px; color: #8A6D1C; font-weight: 700;">🔍 ¿DE DÓNDE SACAR ESE DINERO? ENCUENTRA TU DINERO OCULTO</h4>
       <p style="margin: 0 0 12px 0; font-size: 12.5px; color: #555; line-height: 1.4;">
