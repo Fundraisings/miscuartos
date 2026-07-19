@@ -84,69 +84,81 @@
         </div>
       </div>
 
-      <div class="section-title">Tus gastos este mes <span class="count" id="countTag">0 con monto</span></div>
-      
-      <!-- Contenedor con las casillas de presupuesto estables y tooltips interactivos -->
-      <div id="results" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
+      <!-- CONTENEDOR NUEVO Y ACTUALIZADO: GASTOS DEL MES (5 ÍTEMS CON IMAGEN A LA DERECHA Y MENSAJE ABAJO) -->
+      <div class="expenses-card" style="background: #ffffff; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 24px;">
         
-        <!-- ITEM 1: CUENTAS Y SERVICIOS -->
-        <div class="budget-item-row" style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-card, #fff); padding: 14px 16px; border-radius: 12px; border: 1px solid var(--line, #eee);">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 18px;">🏠</span>
-            <span style="font-size: 14px; font-weight: 600; color: var(--ink, #111);">Cuentas y Servicios</span>
-            <div class="tooltip-container" style="position: relative; display: inline-block; cursor: pointer; color: var(--muted, #888);" title="Alquiler, luz, agua, internet, mantenimiento y teléfono fijo.">
-              ℹ️
-            </div>
-          </div>
-          <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-input, #f9f9f9); padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line, #ddd);">
-            <span style="font-size: 14px; font-weight: 600; color: var(--muted, #666);">RD$</span>
-            <input type="number" class="budget-input" data-category="servicios" placeholder="0" inputmode="decimal" style="width: 80px; border: none; background: transparent; font-size: 14px; font-weight: 700; text-align: right; outline: none; color: var(--ink, #111);">
-          </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: #111;">📉 Tus gastos este mes</h3>
+          <span id="totalGastosMonto" style="font-size: 16px; font-weight: 800; color: #FD8C45;">RD$ 0</span>
         </div>
 
-        <!-- ITEM 2: SUPERMERCADO Y COMIDA -->
-        <div class="budget-item-row" style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-card, #fff); padding: 14px 16px; border-radius: 12px; border: 1px solid var(--line, #eee);">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 18px;">🛒</span>
-            <span style="font-size: 14px; font-weight: 600; color: var(--ink, #111);">Supermercado y Comida</span>
-            <div class="tooltip-container" style="position: relative; display: inline-block; cursor: pointer; color: var(--muted, #888);" title="Compra mensual del súper, colmado, mercados y comidas del día a día.">
-              ℹ️
+        <div class="categories-list" style="display: flex; flex-direction: column; gap: 14px;">
+          
+          <!-- 1. Cuentas y Servicios -->
+          <div style="display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 10px 14px; border-radius: 12px; border: 1px solid #edf2f7;">
+            <div style="flex: 1;">
+              <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 4px;">🏠 Cuentas y Servicios <span title="Luz, agua, internet, alquiler, etc." style="cursor:pointer; color:#a0aec0;">ℹ️</span></label>
+              <div style="display: flex; align-items: center; gap: 4px;">
+                <span style="font-size: 12px; color: #718096; font-weight: 600;">RD$</span>
+                <input type="number" class="input-gasto-item" data-categoria="servicios" placeholder="0" style="width: 80%; border: none; background: transparent; font-size: 14px; font-weight: 700; color: #1a202c; outline: none;">
+              </div>
             </div>
+            <div style="font-size: 24px; padding-left: 10px; opacity: 0.85;">🏠</div>
           </div>
-          <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-input, #f9f9f9); padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line, #ddd);">
-            <span style="font-size: 14px; font-weight: 600; color: var(--muted, #666);">RD$</span>
-            <input type="number" class="budget-input" data-category="comida" placeholder="0" inputmode="decimal" style="width: 80px; border: none; background: transparent; font-size: 14px; font-weight: 700; text-align: right; outline: none; color: var(--ink, #111);">
+
+          <!-- 2. Supermercado y Comida -->
+          <div style="display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 10px 14px; border-radius: 12px; border: 1px solid #edf2f7;">
+            <div style="flex: 1;">
+              <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 4px;">🛒 Supermercado y Comida <span title="Compra del súper, colmado, mercados" style="cursor:pointer; color:#a0aec0;">ℹ️</span></label>
+              <div style="display: flex; align-items: center; gap: 4px;">
+                <span style="font-size: 12px; color: #718096; font-weight: 600;">RD$</span>
+                <input type="number" class="input-gasto-item" data-categoria="comida" placeholder="0" style="width: 80%; border: none; background: transparent; font-size: 14px; font-weight: 700; color: #1a202c; outline: none;">
+              </div>
+            </div>
+            <div style="font-size: 24px; padding-left: 10px; opacity: 0.85;">🛒</div>
           </div>
+
+          <!-- 3. Transporte y Gasolina -->
+          <div style="display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 10px 14px; border-radius: 12px; border: 1px solid #edf2f7;">
+            <div style="flex: 1;">
+              <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 4px;">🚗 Transporte y Gasolina <span title="Combustible, concho, metro, Uber o mantenimiento" style="cursor:pointer; color:#a0aec0;">ℹ️</span></label>
+              <div style="display: flex; align-items: center; gap: 4px;">
+                <span style="font-size: 12px; color: #718096; font-weight: 600;">RD$</span>
+                <input type="number" class="input-gasto-item" data-categoria="transporte" placeholder="0" style="width: 80%; border: none; background: transparent; font-size: 14px; font-weight: 700; color: #1a202c; outline: none;">
+              </div>
+            </div>
+            <div style="font-size: 24px; padding-left: 10px; opacity: 0.85;">🚗</div>
+          </div>
+
+          <!-- 4. Gustos y Salidas -->
+          <div style="display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 10px 14px; border-radius: 12px; border: 1px solid #edf2f7;">
+            <div style="flex: 1;">
+              <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 4px;">🍹 Gustos y Salidas <span title="Restaurantes, cine, desarreglos, compras de antojos" style="cursor:pointer; color:#a0aec0;">ℹ️</span></label>
+              <div style="display: flex; align-items: center; gap: 4px;">
+                <span style="font-size: 12px; color: #718096; font-weight: 600;">RD$</span>
+                <input type="number" class="input-gasto-item" data-categoria="gustos" placeholder="0" style="width: 80%; border: none; background: transparent; font-size: 14px; font-weight: 700; color: #1a202c; outline: none;">
+              </div>
+            </div>
+            <div style="font-size: 24px; padding-left: 10px; opacity: 0.85;">🍹</div>
+          </div>
+
+          <!-- 5. Imprevistos y Otros -->
+          <div style="display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 10px 14px; border-radius: 12px; border: 1px solid #edf2f7;">
+            <div style="flex: 1;">
+              <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 4px;">🩺 Imprevistos y Otros <span title="Gastos médicos sorpresa, reparaciones u otros renglones" style="cursor:pointer; color:#a0aec0;">ℹ️</span></label>
+              <div style="display: flex; align-items: center; gap: 4px;">
+                <span style="font-size: 12px; color: #718096; font-weight: 600;">RD$</span>
+                <input type="number" class="input-gasto-item" data-categoria="otros" placeholder="0" style="width: 80%; border: none; background: transparent; font-size: 14px; font-weight: 700; color: #1a202c; outline: none;">
+              </div>
+            </div>
+            <div style="font-size: 24px; padding-left: 10px; opacity: 0.85;">🩺</div>
+          </div>
+
         </div>
 
-        <!-- ITEM 3: TRANSPORTE Y COMBUSTIBLE -->
-        <div class="budget-item-row" style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-card, #fff); padding: 14px 16px; border-radius: 12px; border: 1px solid var(--line, #eee);">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 18px;">🚗</span>
-            <span style="font-size: 14px; font-weight: 600; color: var(--ink, #111);">Transporte y Gasolina</span>
-            <div class="tooltip-container" style="position: relative; display: inline-block; cursor: pointer; color: var(--muted, #888);" title="Combustible, pasajes, Uber/Indrive, peajes y mantenimiento menor del vehículo.">
-              ℹ️
-            </div>
-          </div>
-          <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-input, #f9f9f9); padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line, #ddd);">
-            <span style="font-size: 14px; font-weight: 600; color: var(--muted, #666);">RD$</span>
-            <input type="number" class="budget-input" data-category="transporte" placeholder="0" inputmode="decimal" style="width: 80px; border: none; background: transparent; font-size: 14px; font-weight: 700; text-align: right; outline: none; color: var(--ink, #111);">
-          </div>
-        </div>
-
-        <!-- ITEM 4: GUSTOS Y SALIDAS -->
-        <div class="budget-item-row" style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-card, #fff); padding: 14px 16px; border-radius: 12px; border: 1px solid var(--line, #eee);">
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 18px;">🍹</span>
-            <span style="font-size: 14px; font-weight: 600; color: var(--ink, #111);">Gustos y Salidas</span>
-            <div class="tooltip-container" style="position: relative; display: inline-block; cursor: pointer; color: var(--muted, #888);" title="Restaurantes, cine, conciertos, salidas de fin de semana y desarreglos de ocio.">
-              ℹ️
-            </div>
-          </div>
-          <div style="display: flex; align-items: center; gap: 6px; background: var(--bg-input, #f9f9f9); padding: 6px 12px; border-radius: 8px; border: 1px solid var(--line, #ddd);">
-            <span style="font-size: 14px; font-weight: 600; color: var(--muted, #666);">RD$</span>
-            <input type="number" class="budget-input" data-category="gustos" placeholder="0" inputmode="decimal" style="width: 80px; border: none; background: transparent; font-size: 14px; font-weight: 700; text-align: right; outline: none; color: var(--ink, #111);">
-          </div>
+        <!-- ABAJO: MENSAJE EDUCATIVO DINÁMICO DEL COACH SOBRE SU ECONOMÍA -->
+        <div id="coachGastosFeedback" style="margin-top: 16px; padding: 12px 14px; border-radius: 12px; background: #f7fafc; border: 1px solid #e2e8f0; font-size: 12.5px; line-height: 1.45; color: #4a5568;">
+          💡 <strong>Estado del Presupuesto:</strong> Ingresa tus montos para evaluar cómo va la distribución de tus cuartos este mes.
         </div>
 
       </div>
@@ -159,9 +171,6 @@
         <p class="sub">De agosto a diciembre 2026 · 22 semanas</p>
         <p class="sub" style="margin-top: 8px; font-size: 13.5px; line-height: 1.5; color: var(--muted, #666);">
           Inspirado en el famoso reto de las 52 semanas, adaptamos esta versión para comenzar en la primera semana de agosto y acompañarte hasta diciembre 2026. ¡Tus ahorros de Navidad en solo 22 semanas!
-        </p>
-        <p class="sub" style="margin-top: 8px; font-size: 13.5px; line-height: 1.5; color: var(--muted, #666);">
-          Elige tu nivel, aparta el dinero en tu "cuenta candado" y marca cada semana completada. El compromiso es contigo mismo y con tu paz financiera en estas fiestas. ¿Arrancamos?
         </p>
       </div>
 
@@ -197,7 +206,6 @@
           </div>
         </div>
 
-        <!-- INPUT EXTRA PARA EL MODO PERSONALIZADO -->
         <div id="xmasCustomInputRow" style="display: none; margin: 16px 0; padding: 12px; border: 1px dashed #FD8C45; border-radius: 12px; background: rgba(253, 140, 69, 0.05);">
           <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--ink);">¿Cuánto vas a sumar cada semana?</label>
           <div style="display: flex; align-items: center; gap: 6px;">
@@ -214,7 +222,7 @@
         <div id="xmasWeeks"></div>
 
         <div class="xmas-footer-tips" style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--muted); display: flex; flex-direction: column; gap: 8px; line-height: 1.5;">
-          <p>💡 <strong>Tip:</strong> Abre una cuenta de ahorro aparte. Dinero que entra ahí no se toca hasta diciembre, salvo una emergency real de salud.</p>
+          <p>💡 <strong>Tip:</strong> Abre una cuenta de ahorro aparte. Dinero que entra ahí no se toca hasta diciembre, salvo una emergencia real de salud.</p>
         </div>
       </div>
     </section>
@@ -226,8 +234,13 @@
         <p class="sub">Calcula tu fondo de emergencia, planifica tus sueños y descubre cómo cerrar la brecha financiera.</p>
       </div>
 
+      <!-- CONTENEDOR DE SELECCIÓN DE PLANES REQUERIDO POR APP.JS PARA EL TIP -->
+      <div id="planSelectionContainer">
+        <!-- Espacio reservado para la interfaz de los 4 planes de ahorro -->
+      </div>
+
       <!-- BLOQUE A: FONDO DE EMERGENCIA -->
-      <div class="meta-card">
+      <div class="meta-card" style="margin-top: 16px;">
         <div class="premium-badge-title">🛡️ TU ESCUDO FINANCIERO (FONDO DE EMERGENCIA)</div>
         <p class="micro-sub" style="font-size:13px; color:var(--muted); margin-bottom:12px;">El dinero que te dará paz mental ante imprevistos. Se calcula en base a tus gastos fijos mensuales.</p>
         
@@ -246,7 +259,7 @@
           </div>
         </div>
         <div class="credit-trick" style="margin-top: 10px; background: rgba(45, 138, 206, 0.08); color: #2D8ACE;">
-          💡 <strong>Tip Dominicano:</strong> No dejes este dinero bajo el colchón perdiendo valor. Cuando tengas el equivalente a un mes, transpórtalo a un <strong>Certificado Financiero</strong> o cuenta de ahorro programado en la banca nacional para que genere intereses mensuales.
+          💡 <strong>Tip Dominicano:</strong> No dejes este dinero bajo el colchón perdiendo valor. Cuando tengas el equivalente a un mes, transpórtalo a un <strong>Certificado Financiero</strong> en la banca nacional.
         </div>
       </div>
 
@@ -271,7 +284,7 @@
           </div>
         </div>
 
-        <!-- Alerta Dinámica del Coach Financiero -->
+        <!-- Alerta Dinámica del Coach con el módulo de Dinero Oculto integrado -->
         <div id="coachAlertBox" style="margin-top: 16px; padding: 14px; border-radius: 12px; display: none; font-size: 13.5px; line-height: 1.5;"></div>
       </div>
 
@@ -283,7 +296,7 @@
         <div id="entrepreneurshipIdeasContainer" style="display: flex; flex-direction: column; gap: 10px;"></div>
         
         <div style="margin-top: 14px; padding: 10px; background: #FFF9F5; border: 1px dashed rgba(253, 140, 69, 0.4); border-radius: 8px; font-size: 12px; color: var(--muted); line-height: 1.4;">
-          📌 <strong>Nota de escala:</strong> Si tu idea empieza a facturar de forma constante, puedes formalizarte fácilmente en RD vía el registro de nombre comercial en <strong>ONAPI</strong> y optar por el régimen simplificado (RST) en la DGII.
+          📌 <strong>Nota de escala:</strong> Si tu idea empieza a facturar de forma constante, puedes formalizarte fácilmente en RD vía el registro de nombre comercial en <strong>ONAPI</strong>.
         </div>
       </div>
     </section>
@@ -310,7 +323,7 @@
         <div class="cause-box">
           <p>Disfruta de la clase introductoria gratis. Desbloquea las próximas 4 lecciones prácticas con tu upgrade de solo $9.</p>
           <div class="cause-divider"></div>
-          <p>🐾 <strong>Propósito miscuartos:</strong> Por cada persona que hace el upgrade a la version de pago, donamos $3 dólares de nuestras ganancias a fundaciones de rescate animal registradas para asegurar su alimento. Tu educación ayuda a salvar vidas.</p>
+          <p>🐾 <strong>Propósito miscuartos:</strong> Por cada persona que hace el upgrade a la versión de pago, donamos $3 dólares a fundaciones de rescate animal.</p>
         </div>
 
         <div class="course-list-minimal">
@@ -345,11 +358,11 @@
         <p class="micro-sub" style="font-size:12.5px; color:var(--muted); line-height:1.5; margin-bottom:12px;">Dos fechas que casi nadie revisa, y que pueden costarte —o ahorrarte— miles de pesos.</p>
 
         <div class="credit-dates-row">
-          <div class="credit-date-box">
+          <div.credit-date-box">
             <div class="credit-date-num">1</div>
             <div class="credit-date-title">Fecha de Corte</div>
             <div class="credit-date-desc">El día que cierra tu factura. Lo que compres después entra al próximo estado de cuenta.</div>
-          </div>
+          </div.credit-date-box>
           <div class="credit-date-box">
             <div class="credit-date-num">2</div>
             <div class="credit-date-title">Fecha Límite de Pago</div>
@@ -358,12 +371,12 @@
         </div>
 
         <div class="credit-trick">💡 <strong>El truco:</strong> compra los primeros días después de tu corte y ganas hasta 50 días para pagar sin intereses.</div>
-        <div class="credit-warning">⚠️ Solo funciona si pagaste tu balance completo el mes pasado. Con saldo pendiente, los intereses corren desde el día de cada compra nueva. Los adelantos de efectivo nunca tienen gracia.</div>
+        <div class="credit-warning">⚠️ Solo funciona si pagaste tu balance completo el mes pasado.</div>
 
         <div class="cause-divider" style="background: var(--line); margin: 16px 0;"></div>
 
         <div class="premium-badge-title" style="margin-bottom:4px;">SIMULADOR: ¿TOTALERO O MÍNIMO?</div>
-        <p class="micro-sub" style="font-size:12px; color:var(--muted); margin-bottom:10px;">Balance de RD$25,000 al 52% anual (tasa promedio en RD). Arrastra para simular tu pago de este mes.</p>
+        <p class="micro-sub" style="font-size:12px; color:var(--muted); margin-bottom:10px;">Balance de RD$25,000 al 52% anual. Arrastra para simular tu pago de este mes.</p>
 
         <div class="credit-slider-row">
           <span class="credit-slider-pct" id="creditPctLabel">30%</span>
@@ -376,18 +389,9 @@
           <div class="credit-result-box"><div class="lbl">Pendiente</div><div class="val" id="creditRemaining">RD$17,500</div></div>
           <div class="credit-result-box"><div class="lbl">Interés/mes</div><div class="val" id="creditInterest">RD$758</div></div>
         </div>
-
-        <div class="cause-divider" style="background: var(--line); margin: 16px 0;"></div>
-
-        <div class="premium-badge-title" style="margin-bottom:6px;">CUÁNTO DE TU LÍMITE ESTÁS USANDO</div>
-        <div class="credit-util-gauge">
-          <div class="credit-util-seg" style="width:30%; background:#3E9C77;"></div>
-          <div class="credit-util-seg" style="width:20%; background:var(--brand-orange);"></div>
-          <div class="credit-util-seg" style="width:50%; background:#B4432A;"></div>
-        </div>
-        <div class="credit-util-caption"><span>0-30% ideal</span><span>31-50% moderado</span><span>51%+ riesgo</span></div>
       </div>
 
+      <!-- SECCIÓN: NIÑOS -->
       <div class="kids-card">
         <div class="upsell-pricing-tag">OFERTA ADICIONAL · SOLO $5 <span class="old-price">Precio regular $7</span></div>
         <div class="premium-badge-title setup-upsell">🚀 NEGOCIOS PARA NIÑOS</div>
@@ -396,7 +400,6 @@
           <p class="micro-sub" style="font-size: 13.5px; line-height: 1.45; color: var(--ink); margin-bottom: 12px;">
             Desarrollar una mentalidad emprendedora desde la infancia no se trata solo de dinero; es sembrar resiliencia y creatividad para formar a los <strong>futuros empresarios</strong> del mañana.
           </p>
-          <p class="micro-sub" style="font-size: 12.5px; color: var(--muted); margin-bottom: 14px;">Agrega este módulo <strong>ahora mismo por solo $5</strong> junto a tu pago de la app (Ahorras $2. Si lo compras después te costará $7 aparte).</p>
           <button class="kids-unlock-btn" id="kidsUnlockBtn">Agregar al pago por $5 →</button>
         </div>
 
@@ -411,13 +414,7 @@
           <div class="kids-progress" id="kidsProgress">0 de 6 retos completados</div>
           <div class="course-list-minimal" style="margin-top: 12px; margin-bottom: 16px;">
             <div class="course-item unlocked active"><div class="course-num">1</div><div class="course-info-text"><b>Tu primer negocio en casa</b> · 5 min</div></div>
-            <div class="course-item unlocked"><div class="course-num">2</div><div class="course-info-text"><b>El juego del presupuesto infantil</b> · 6 min</div></div>
-            <div class="course-item unlocked"><div class="course-num">3</div><div class="course-info-text"><b>¿De dónde sale el dinero del banco?</b> · 5 min</div></div>
-            <div class="course-item unlocked"><div class="course-num">4</div><div class="course-info-text"><b>Cómo ponerle precio a tus ideas</b> · 7 min</div></div>
-            <div class="course-item unlocked"><div class="course-num">5</div><div class="course-info-text"><b>Socios de juego: Trabajo en equipo</b> · 6 min</div></div>
           </div>
-          <p class="micro-sub" style="font-size: 13px; font-weight: 600; margin-bottom: 8px;">Retos prácticos para hacer en familia:</p>
-          <div id="kidsTasks"></div>
         </div>
       </div>
     </section>
