@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Altrua - Finanzas Dominicanas</title>
+    <title>miscuartos - Tu coach financiero de bolsillo</title>
     <style>
         /* --- ESTILOS GENERALES --- */
         * {
@@ -16,11 +16,24 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
             background-color: #f4f6f9;
             color: #2c3e50;
-            overflow-x: hidden;
-            padding-bottom: 80px; /* Espacio para la navegación inferior */
+            padding-bottom: 80px;
         }
 
-        /* --- INTRODUCCIÓN ANIMADA --- */
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* --- 🧭 SPLASH / INTRO SCREEN --- */
         #intro-pantalla {
             position: fixed;
             top: 0;
@@ -34,73 +47,132 @@
             align-items: center;
             z-index: 9999;
             color: white;
-            animation: desvanecerIntro 0.5s ease forward 2.5s; /* Se desvanece tras 2.5s */
+            padding: 30px;
+            text-align: center;
         }
 
-        .logo-animado {
-            font-size: 42px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            letter-spacing: 1px;
-            animation: rebote 1.5s infinite alternate;
+        .brujula-contenedor {
+            font-size: 60px;
+            margin-bottom: 20px;
+            /* Aquí corre tu animación ya resuelta de la brújula */
         }
 
-        .tagline {
+        .marca-nombre {
+            font-size: 36px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+        }
+
+        .marca-tagline {
             font-size: 16px;
-            opacity: 0.9;
+            font-weight: 500;
+            margin-bottom: 24px;
+            opacity: 0.95;
         }
 
-        @keyframes rebote {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-10px); }
+        .marca-descripcion {
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 40px;
+            opacity: 0.85;
+            max-width: 320px;
         }
 
-        @keyframes desvanecerIntro {
-            to { opacity: 0; visibility: hidden; }
+        .nota-cultural {
+            font-size: 11px;
+            line-height: 1.4;
+            opacity: 0.75;
+            margin-bottom: 30px;
+            max-width: 300px;
         }
 
-        /* --- CONTENEDOR PRINCIPAL Y PESTAÑAS --- */
-        .app-container {
-            max-width: 480px;
-            margin: 0 auto;
-            padding: 15px;
+        .btn-comenzar {
+            background-color: #ffffff;
+            color: #4f46e5;
+            border: none;
+            padding: 14px 32px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            transition: transform 0.2s;
         }
 
-        .tab-content {
-            display: none; /* Ocultas por defecto, manejadas por JS */
+        .btn-comenzar:active {
+            transform: scale(0.98);
         }
 
-        .tab-content.active {
-            display: block;
-        }
-
-        /* --- CONTENEDOR ESPECÍFICO DEL PRESUPUESTO --- */
+        /* --- 💰 SECCIÓN: PRESUPUESTO --- */
         .presupuesto-container {
             background-color: #ffffff;
             border-radius: 16px;
-            padding: 24px;
+            padding: 20px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
 
-        h2 {
-            font-size: 20px;
-            text-align: center;
-            margin-bottom: 20px;
-            color: #1a252f;
+        /* Tarjeta de Bienvenida y Video */
+        .bienvenida-card {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 25px;
         }
 
-        h3 {
+        .bienvenida-texto {
             font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin: 25px 0 12px 0;
-            padding-bottom: 6px;
-            border-bottom: 2px solid #edf2f7;
+            line-height: 1.5;
+            color: #475569;
+            margin-bottom: 12px;
         }
 
-        /* --- ELEMENTOS DE FORMULARIO --- */
+        .btn-video {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1e293b;
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        /* Cabeceras de títulos */
+        .encabezado-seccion {
+            margin-bottom: 20px;
+        }
+
+        .encabezado-seccion h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #0f172a;
+            text-align: left;
+            margin-bottom: 4px;
+        }
+
+        .encabezado-seccion p {
+            font-size: 14px;
+            color: #64748b;
+            line-height: 1.5;
+        }
+
+        .titulo-lista-gastos {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 25px 0 15px 0;
+        }
+
+        /* Elementos del Formulario */
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
 
         label {
@@ -108,7 +180,7 @@
             font-size: 13px;
             font-weight: 600;
             margin-bottom: 6px;
-            color: #5a6a85;
+            color: #475569;
         }
 
         input {
@@ -136,7 +208,7 @@
             background-color: #f5f3ff;
         }
 
-        /* --- MEDIDOR DE PROGRESO DE DEDUCCIÓN --- */
+        /* --- MEDIDOR DE DEDUCCIÓN --- */
         .progress-section {
             margin: 25px 0 15px 0;
         }
@@ -156,7 +228,7 @@
             transition: width 0.3s ease;
         }
 
-        /* --- NOTIFICACIONES Y TIPS --- */
+        /* Box de Consejos */
         .tip-box {
             background-color: #fff9db;
             border-left: 4px solid #fcc419;
@@ -168,7 +240,7 @@
             display: none;
         }
 
-        /* --- RESUMENES --- */
+        /* Resumen de balances */
         .resumen-box {
             background-color: #f8fafc;
             border-radius: 10px;
@@ -195,23 +267,28 @@
             font-weight: 600;
         }
 
-        /* --- BOTONES --- */
-        .btn-whatsapp {
+        /* Botón final */
+        .btn-finalizar {
             display: flex;
             justify-content: center;
             align-items: center;
             width: 100%;
             height: 48px;
-            background-color: #25D366;
+            background-color: #4f46e5;
             color: white;
             border: none;
             border-radius: 8px;
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
+            transition: background-color 0.2s;
         }
 
-        /* --- NAVEGACIÓN INFERIOR FIXA --- */
+        .btn-finalizar:hover {
+            background-color: #4338ca;
+        }
+
+        /* --- NAVEGACIÓN INFERIOR --- */
         .nav-inferior {
             position: fixed;
             bottom: 0;
@@ -248,7 +325,6 @@
             margin-bottom: 4px;
         }
 
-        /* --- ESTILOS DE VISTAS VACÍAS --- */
         .placeholder-vista {
             background: white;
             border-radius: 16px;
@@ -260,53 +336,87 @@
 </head>
 <body>
 
-    <!-- 1. INTRODUCCIÓN ANIMADA -->
+    <!-- 1. 🧭 SPLASH / INTRO -->
     <div id="intro-pantalla">
-        <div class="logo-animado">Altrua</div>
-        <div class="tagline">Tus finanzas claras, versión dominicana 🇩🇴</div>
+        <div class="brujula-contenedor">🧭</div>
+        <div class="marca-nombre">miscuartos</div>
+        <div class="marca-tagline">Tu coach financiero de bolsillo</div>
+        <div class="marca-descripcion">Una app que te guía y te ayuda a manejar tu dinero con inteligencia — sin vueltas, sin culpas.</div>
+        <div class="nota-cultural">* miscuartos: así le decimos los dominicanos al dinero que nos ganamos con esfuerzo. "Dame mis cuartos." "Trabajando duro por mis cuartos."</div>
+        <button class="btn-comenzar" onclick="cerrarSplash()">Comenzar a guiarme →</button>
     </div>
 
-    <!-- CONTENEDOR PRINCIPAL DE LAS SECCIONES -->
+    <!-- CONTENEDOR DE LA APLICACIÓN -->
     <div class="app-container">
 
-        <!-- SECCIÓN A: PRESUPUESTO (ACTIVA POR DEFECTO) -->
+        <!-- 💰 PESTAÑA PRINCIPAL: PRESUPUESTO -->
         <div id="vista-presupuesto" class="tab-content active">
+            
+            <!-- Mensaje de bienvenida inicial -->
+            <div class="bienvenida-card">
+                <p class="bienvenida-texto">¡Qué bueno tenerte aquí! 👋<br><br>Esta app funciona mejor si sabes cómo sacarle el jugo. Antes de empezar, dale un minuto a este video — te va a ahorrar tiempo después.</p>
+                <button class="btn-video">▶ Cómo sacarle el jugo a la app · 1 min</button>
+            </div>
+
             <div class="presupuesto-container">
-                <h2>📊 Mi Presupuesto Real</h2>
+                <!-- Títulos principales -->
+                <div class="encabezado-seccion">
+                    <h2>Tus cuartos, bajo tu control</h2>
+                    <p>Manejar tu dinero no tiene que ser complicado. Pon lo que ganas, anota lo que gastas, y te guiamos en el camino.</p>
+                </div>
                 
+                <!-- Campo de Ingresos -->
                 <div class="form-group ingreso-principal">
-                    <label for="ingresoTotal">💵 Ingreso Neto Mensual (Tus Cuartos):</label>
-                    <input type="number" id="ingresoTotal" placeholder="RD$ Ej. 40000" min="0">
+                    <label for="ingresoTotal">Ingreso ganado este mes</label>
+                    <input type="number" id="ingresoTotal" placeholder="Ej. 50,000" min="0">
                 </div>
 
-                <h3 style="color: #e67e22;">🔒 Compromisos Reales (70% Ideal)</h3>
+                <div class="titulo-lista-gastos">Tus gastos este mes</div>
+
+                <!-- 11 CATEGORÍAS ASIGNADAS CON SUS ATRIBUTOS DE FILTRADO PARA EL 70/20/10 -->
                 <div class="form-group">
-                    <label>🏠 Renta o Hipoteca:</label>
+                    <label>🏠 Vivienda (Renta/Hipoteca):</label>
                     <input type="number" class="input-gasto" data-category="compromisos" placeholder="0">
                 </div>
                 <div class="form-group">
-                    <label>🛒 Supermercado y Colmado:</label>
+                    <label>🛒 Comida (Supermercado/Colmado):</label>
                     <input type="number" class="input-gasto" data-category="compromisos" placeholder="0">
                 </div>
                 <div class="form-group">
-                    <label>⚡ Servicios (Luz, Internet, Agua):</label>
+                    <label>⚡ Luz, agua y teléfono:</label>
                     <input type="number" class="input-gasto" data-category="compromisos" placeholder="0">
                 </div>
-
-                <h3 style="color: #2980b9;">🎉 El Coro y Estilo de Vida (20% Ideal)</h3>
                 <div class="form-group">
-                    <label>🍻 Salidas y Entretenimiento:</label>
-                    <input type="number" class="input-gasto" data-category="coro" placeholder="0">
+                    <label>🎒 Escuela / Educación:</label>
+                    <input type="number" class="input-gasto" data-category="compromisos" placeholder="0">
                 </div>
                 <div class="form-group">
-                    <label>📺 Suscripciones (Netflix, Spotify):</label>
-                    <input type="number" class="input-gasto" data-category="coro" placeholder="0">
+                    <label>🏥 Salud / Seguros:</label>
+                    <input type="number" class="input-gasto" data-category="compromisos" placeholder="0">
                 </div>
-
-                <h3 style="color: #27ae60;">💰 Tus Clavos (Ahorro - 10% Ideal)</h3>
                 <div class="form-group">
-                    <label>🐷 Fondo de Emergencia / Metas:</label>
+                    <label>🚗 Transporte (Gasolina/Público):</label>
+                    <input type="number" class="input-gasto" data-category="compromisos" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>💳 Deudas (Préstamos/Tarjetas):</label>
+                    <input type="number" class="input-gasto" data-category="compromisos" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>🐷 Ahorro (Tus clavos):</label>
                     <input type="number" class="input-gasto" data-category="ahorro" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>🐶 Mascotas:</label>
+                    <input type="number" class="input-gasto" data-category="coro" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>🤲 Donaciones:</label>
+                    <input type="number" class="input-gasto" data-category="coro" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>🎉 Diversión (El coro):</label>
+                    <input type="number" class="input-gasto" data-category="coro" placeholder="0">
                 </div>
 
                 <!-- MEDIDOR DE DEDUCCIÓN -->
@@ -317,44 +427,44 @@
                     </div>
                 </div>
 
-                <!-- TIP DINÁMICO -->
+                <!-- CONSEJOS DINÁMICOS -->
                 <div id="tipDominicano" class="tip-box"></div>
 
-                <!-- BALANCES -->
+                <!-- RESUMEN DE BALANCES -->
                 <div class="resumen-box">
                     <div class="resumen-linea"><strong>Ingresos:</strong> <span id="txtIngreso">RD$ 0.00</span></div>
                     <div class="resumen-linea"><strong>Total Gastado:</strong> <span id="txtGastado">RD$ 0.00</span></div>
                     <div class="resumen-linea"><strong>Disponible:</strong> <span id="txtDisponible">RD$ 0.00</span></div>
                 </div>
 
-                <button id="btnEnviarWhatsapp" class="btn-whatsapp">
-                    💬 Enviar Resumen por WhatsApp
+                <!-- BOTÓN FINAL DE CONSEJOS (Conecta con el WhatsApp o tu lógica interna) -->
+                <button id="btnEnviarWhatsapp" class="btn-finalizar">
+                    Ver mi resumen y consejos →
                 </button>
             </div>
         </div>
 
-        <!-- SECCIÓN B: METAS Y PROGRESO -->
+        <!-- OTRAS VISTAS DE NAVEGACIÓN -->
         <div id="vista-metas" class="tab-content">
             <div class="placeholder-vista">
                 <h2>🎯 Metas & Progreso</h2>
-                <p style="margin-top: 10px; color: #64748b;">Aquí podrás configurar y trackear tus clavos de ahorro a largo plazo.</p>
+                <p style="margin-top:10px; color:#64748b;">Maneja tus ahorros aquí.</p>
             </div>
         </div>
 
-        <!-- SECCIÓN C: ACADEMIA -->
         <div id="vista-academia" class="tab-content">
             <div class="placeholder-vista">
                 <h2>📚 Academia Altrua</h2>
-                <p style="margin-top: 10px; color: #64748b;">Módulos educativos para aprender a manejar tus cuartos de verdad.</p>
+                <p style="margin-top:10px; color:#64748b;">Aprende finanzas aplatana'as.</p>
             </div>
         </div>
 
     </div>
 
-    <!-- MENÚ DE NAVEGACIÓN INFERIOR (Las secciones de abajo) -->
+    <!-- MENÚ DE NAVEGACIÓN INFERIOR -->
     <nav class="nav-inferior">
         <button class="nav-item active" onclick="cambiarPestaña('vista-presupuesto', this)">
-            <span class="nav-icon">📊</span>
+            <span class="nav-icon">💰</span>
             <span>Presupuesto</span>
         </button>
         <button class="nav-item" onclick="cambiarPestaña('vista-metas', this)">
@@ -367,28 +477,23 @@
         </button>
     </nav>
 
-    <!-- CONTROLADOR BÁSICO DE NAVEGACIÓN -->
+    <!-- ACCIONES DE INTERFAZ -->
     <script>
+        function cerrarSplash() {
+            const intro = document.getElementById('intro-pantalla');
+            if (intro) {
+                intro.style.transition = "opacity 0.4s ease";
+                intro.style.opacity = "0";
+                setTimeout(() => { intro.style.display = "none"; }, 400);
+            }
+        }
+
         function cambiarPestaña(idVista, botonActivo) {
-            // Ocultar todas las vistas
-            document.querySelectorAll('.tab-content').forEach(vista => {
-                vista.classList.remove('active');
-            });
-            // Quitar clase activa a todos los botones
-            document.querySelectorAll('.nav-item').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            // Mostrar la seleccionada
+            document.querySelectorAll('.tab-content').forEach(vista => vista.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
             document.getElementById(idVista).classList.add('active');
             botonActivo.classList.add('active');
         }
-
-        // Simulación básica por si acaso para remover la intro del flujo visual tras la animación
-        setTimeout(() => {
-            const intro = document.getElementById('intro-pantalla');
-            if(intro) intro.style.display = 'none';
-        }, 3000);
     </script>
     <script src="app.js"></script>
 </body>
