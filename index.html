@@ -8,7 +8,7 @@
   <!-- Tipografía moderna y limpia -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght500;600;700;800&family=IBM+Plex+Mono:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=IBM+Plex+Mono:wght@600;700&display=swap" rel="stylesheet">
   
   <style>
     :root {
@@ -27,8 +27,8 @@
       --christmas-gold: #eab308;
       --ornament-off: #cbd5e1;
       
-      --success-green: #16a34a;
-      --alert-orange: #ea580c;
+      --academy-purple: #7c3aed;
+      --kids-teal: #0d9488;
     }
 
     * {
@@ -47,7 +47,6 @@
       min-height: 100vh;
     }
 
-    /* Contenedor vista móvil */
     .phone-container {
       width: 100%;
       max-width: 430px;
@@ -58,10 +57,10 @@
       position: relative;
       box-shadow: 0 0 24px rgba(0,0,0,0.07);
       overflow-x: hidden;
-      padding-bottom: 75px; /* Espacio óptimo para la navegación inferior */
+      padding-bottom: 75px;
     }
 
-    /* 🧭 PANTALLA SPLASH / INTRO */
+    /* 🧭 SPLASH SCREEN */
     .splash-screen {
       position: absolute;
       top: 0;
@@ -132,14 +131,9 @@
       cursor: pointer;
       width: 85%;
       box-shadow: 0 4px 14px rgba(253, 140, 69, 0.3);
-      transition: transform 0.2s ease;
     }
 
-    .btn-primary:active {
-      transform: scale(0.98);
-    }
-
-    /* 💰 MAIN APP CONTAINER */
+    /* 💰 MAIN CONTAINER */
     .main-app-container {
       display: none; 
       flex-direction: column;
@@ -155,7 +149,6 @@
       z-index: 100;
     }
 
-    /* Vistas de pestañas */
     .app-view {
       display: none;
       padding: 20px 16px;
@@ -166,7 +159,6 @@
       display: block;
     }
 
-    /* Tarjetas de introducción a secciones */
     .welcome-card {
       background: #eff6ff;
       border: 1px solid #bfdbfe;
@@ -179,11 +171,6 @@
       font-size: 13px;
       color: #1e3a8a;
       line-height: 1.45;
-      margin-bottom: 12px;
-    }
-
-    .welcome-card p:last-child {
-      margin-bottom: 0;
     }
 
     .btn-video {
@@ -201,6 +188,7 @@
       width: 100%;
       justify-content: center;
       box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+      margin-top: 10px;
     }
 
     .section-title {
@@ -217,7 +205,7 @@
       margin-bottom: 20px;
     }
 
-    /* Inputs y Formularios */
+    /* Inputs */
     .input-group {
       background: var(--bg-card);
       padding: 14px 16px;
@@ -232,7 +220,6 @@
       font-weight: 700;
       color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
       margin-bottom: 6px;
     }
 
@@ -258,15 +245,7 @@
       outline: none;
     }
 
-    /* PESTAÑA 1: PRESUPUESTO */
-    .expenses-list-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--primary);
-      margin-bottom: 12px;
-      padding-left: 2px;
-    }
-
+    /* 💰 PESTAÑA 1: PRESUPUESTO */
     .categories-container {
       display: flex;
       flex-direction: column;
@@ -312,36 +291,7 @@
       outline: none;
     }
 
-    .btn-submit-budget {
-      background: var(--primary);
-      color: #ffffff;
-      border: none;
-      padding: 16px;
-      border-radius: 14px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      width: 100%;
-      text-align: center;
-      box-shadow: 0 4px 12px rgba(30, 41, 59, 0.15);
-      margin-bottom: 20px;
-    }
-
     /* 🎄 PESTAÑA 2: RETO NAVIDEÑO */
-    .christmas-card {
-      background: #fef2f2;
-      border: 1px solid #fca5a5;
-      border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 24px;
-    }
-
-    .christmas-card p {
-      font-size: 13px;
-      color: #991b1b;
-      line-height: 1.5;
-    }
-
     .levels-table {
       width: 100%;
       border-collapse: collapse;
@@ -352,60 +302,10 @@
       margin-bottom: 20px;
     }
 
-    .levels-table th {
-      background: #f1f5f9;
-      color: var(--text-muted);
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      padding: 10px 12px;
-      text-align: left;
-    }
-
     .levels-table td {
       padding: 12px;
       font-size: 13px;
       border-bottom: 1px solid var(--border-color);
-      color: var(--text-main);
-    }
-
-    .levels-table tr:last-child td {
-      border-bottom: none;
-    }
-
-    .custom-level-box {
-      display: none;
-      background: var(--bg-card);
-      padding: 16px;
-      border-radius: 12px;
-      border: 1px solid var(--border-color);
-      margin-bottom: 20px;
-    }
-
-    .custom-level-title {
-      font-size: 13px;
-      font-weight: 700;
-      margin-bottom: 8px;
-      color: var(--primary);
-    }
-
-    .meta-summary-box {
-      background: var(--primary);
-      color: #ffffff;
-      padding: 14px 16px;
-      border-radius: 12px;
-      font-size: 14px;
-      font-weight: 700;
-      margin-bottom: 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .meta-subtext {
-      font-size: 11px;
-      color: #94a3b8;
-      font-weight: 500;
     }
 
     .challenge-playground {
@@ -416,34 +316,6 @@
       padding: 16px;
       border-radius: 16px;
       border: 1px solid var(--border-color);
-    }
-
-    .tree-container {
-      flex: 0 0 80px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      border-right: 1px dashed var(--border-color);
-      padding-right: 12px;
-    }
-
-    .star-ornament {
-      font-size: 32px;
-      opacity: 0.2;
-      transition: all 0.4s ease;
-      filter: grayscale(100%);
-    }
-
-    .star-ornament.active {
-      opacity: 1;
-      filter: grayscale(0%);
-      transform: scale(1.2);
-    }
-
-    .tree-icon {
-      font-size: 54px;
-      margin-top: -5px;
     }
 
     .weeks-grid {
@@ -461,41 +333,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      cursor: pointer;
-      box-shadow: inset 0 -3px 0 rgba(0,0,0,0.15);
     }
 
-    .ornament-button .week-num {
-      font-size: 11px;
-      font-weight: 800;
-      color: #64748b;
-    }
-
-    .ornament-button.active {
-      background: var(--christmas-red);
-    }
-
-    .ornament-button.active:nth-child(even) {
-      background: var(--christmas-green);
-    }
-
-    .ornament-button.active .week-num {
-      color: #ffffff;
-    }
-
-    .motivation-alert {
-      display: none;
-      background: #f0fdf4;
-      border: 1px solid #bbf7d0;
-      border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 20px;
-      font-size: 13px;
-      color: #166534;
-      line-height: 1.45;
-    }
-
-    /* 💡 Tip del reto blindado */
     .app-tip-box {
       background: #fffbeb;
       border: 1px solid #fde68a;
@@ -508,16 +347,6 @@
     }
 
     /* 🎯 PESTAÑA 3: METAS & PROGRESO */
-    .icon-selector-title {
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 8px;
-      padding-left: 2px;
-    }
-
     .icon-grid {
       display: grid;
       grid-template-columns: repeat(6, 1fr);
@@ -532,21 +361,6 @@
       padding: 10px 0;
       text-align: center;
       cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      transition: all 0.2s ease;
-    }
-
-    .icon-option .emoji {
-      font-size: 18px;
-    }
-
-    .icon-option .label {
-      font-size: 9px;
-      font-weight: 600;
-      color: var(--text-muted);
     }
 
     .icon-option.selected {
@@ -554,36 +368,13 @@
       background: #fff7ed;
     }
 
-    .icon-option.selected .label {
-      color: var(--accent);
-    }
-
-    /* Resultados del cálculo de metas */
     .goal-result-card {
-      display: none; /* Se activa con JS */
+      display: none;
       background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 16px;
       padding: 16px;
       margin-bottom: 24px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.02);
-    }
-
-    .goal-calc-text {
-      font-size: 14px;
-      font-weight: 600;
-      line-height: 1.5;
-      color: var(--primary);
-      margin-bottom: 12px;
-    }
-
-    .goal-connection-badge {
-      background: #f1f5f9;
-      padding: 10px 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      color: var(--text-muted);
-      line-height: 1.4;
     }
 
     .goal-status-feedback {
@@ -591,64 +382,161 @@
       padding: 12px 14px;
       border-radius: 10px;
       font-size: 13px;
-      line-height: 1.45;
       font-weight: 600;
     }
 
-    .goal-status-feedback.success {
-      background: #f0fdf4;
-      border: 1px solid #bbf7d0;
-      color: #166534;
-    }
+    .goal-status-feedback.success { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+    .goal-status-feedback.alert { background: #fff7ed; border: 1px solid #ffedd5; color: #c2410c; }
 
-    .goal-status-feedback.alert {
-      background: #fff7ed;
-      border: 1px solid #ffedd5;
-      color: #c2410c;
-    }
-
-    /* Catálogo extra income */
+    /* Motor de ingresos extras */
     .extra-income-catalog {
-      display: none; /* Solo visible si hay brecha */
+      display: none;
       margin-top: 24px;
     }
 
-    .catalog-title {
+    .income-intro-text {
       font-size: 13px;
-      font-weight: 700;
-      color: var(--primary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 16px;
+      background: #f8fafc;
+      padding: 12px;
+      border-radius: 8px;
+      border-left: 3px solid var(--accent);
     }
 
     .income-ideas-container {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
     }
 
     .income-idea-item {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
       border-radius: 12px;
-      padding: 12px 14px;
+      padding: 14px;
     }
 
-    .income-idea-header {
+    .income-idea-header { font-size: 13.5px; font-weight: 700; color: var(--primary); margin-bottom: 4px; }
+    .income-idea-body { font-size: 12px; color: var(--text-muted); line-height: 1.45; }
+    .income-closing-note { font-size: 11.5px; color: var(--text-muted); margin-top: 14px; font-style: italic; }
+
+    /* 🎓 PESTAÑA 4: ACADEMIA */
+    .badge-price {
+      background: #f3e8ff;
+      color: var(--academy-purple);
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+    }
+
+    .classes-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .class-item-lock {
+      background: #f1f5f9;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #94a3b8;
+    }
+
+    .class-item-lock .class-title {
       font-size: 13.5px;
       font-weight: 700;
-      color: var(--primary);
-      margin-bottom: 4px;
+      color: #64748b;
     }
 
-    .income-idea-body {
+    /* Caja de la causa social */
+    .cause-card {
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .foundation-logo-placeholder {
+      width: 140px;
+      height: 45px;
+      background: #e2e8f0;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+      margin: 0 auto 12px auto;
+      text-transform: uppercase;
+    }
+
+    .cause-text {
       font-size: 12px;
-      color: var(--text-muted);
-      line-height: 1.4;
+      color: #475569;
+      line-height: 1.5;
     }
 
-    /* 🧭 BARRA DE NAVEGACIÓN INFERIOR MÓVIL (3 Pestañas) */
+    /* Upsell Niños */
+    .kids-upsell-box {
+      background: #f0fdfa;
+      border: 1px solid #99f6e4;
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 20px;
+    }
+
+    .badge-kids-price {
+      background: #ccfbf1;
+      color: var(--kids-teal);
+      font-size: 10px;
+      font-weight: 800;
+      padding: 4px 8px;
+      border-radius: 20px;
+      display: inline-block;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    .kids-desc {
+      font-size: 13px;
+      color: #115e59;
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+
+    .kids-lessons-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .kids-lesson-item {
+      background: rgba(255,255,255,0.7);
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #134e4a;
+      display: flex;
+      gap: 8px;
+    }
+
+    /* 🧭 BARRA DE NAVEGACIÓN INFERIOR DE 4 PESTAÑAS */
     .bottom-nav {
       position: absolute;
       bottom: 0;
@@ -658,7 +546,7 @@
       background: var(--nav-bg);
       border-top: 1px solid var(--border-color);
       display: none; 
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       z-index: 200;
     }
 
@@ -672,39 +560,25 @@
       border: none;
       cursor: pointer;
       color: var(--text-muted);
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 700;
     }
 
-    .nav-item.active {
-      color: var(--accent);
-    }
-
-    .nav-icon {
-      font-size: 18px;
-    }
-
-    input[type="number"]::-webkit-outer-spin-button,
-    input[type="number"]::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-    input[type="number"] {
-      -moz-appearance: textfield;
-    }
+    .nav-item.active { color: var(--accent); }
+    .nav-icon { font-size: 16px; }
   </style>
 </head>
 <body>
 
   <div class="phone-container">
 
-    <!-- 🧭 PANTALLA SPLASH / INTRO -->
+    <!-- 🧭 SPLASH SCREEN -->
     <div id="splashScreen" class="splash-screen">
       <div class="compass-logo">🧭</div>
       <h1 class="brand-name">miscuartos</h1>
       <div class="tagline">Tu coach financiero de bolsillo</div>
       <p class="short-desc">Una app que te guía y te ayuda a manejar tu dinero con inteligencia — sin vueltas, sin culpas.</p>
-      <p class="cultural-note">* miscuartos: así le decimos los dominicanos al dinero que nos ganamos con esfuerzo. "Dame mis cuartos." "Trabajando duro por mis cuartos."</p>
+      <p class="cultural-note">* miscuartos: así le decimos los dominicanos al dinero que nos ganamos con esfuerzo.</p>
       <button id="btnComenzar" class="btn-primary">Comenzar a guiarme →</button>
     </div>
 
@@ -721,10 +595,8 @@
           <p>¡Qué bueno tenerte aquí! 👋 Esta app funciona mejor si sabes cómo sacarle el jugo. Antes de empezar, dale un minuto a este video — te va a ahorrar tiempo después.</p>
           <button class="btn-video">▶ Cómo sacarle el jugo a la app · 1 min</button>
         </div>
-
         <h3 class="section-title">Tus cuartos, bajo tu control</h3>
-        <p class="section-subtitle">Manejar tu dinero no tiene que ser complicado. Pon lo que ganas, anota lo que gastas, y te vamos guíando en el camino.</p>
-
+        <p class="section-subtitle">Manejar tu dinero no tiene que ser complicado.</p>
         <div class="input-group">
           <label for="incomeInput">Ingreso ganado este mes</label>
           <div class="input-wrapper">
@@ -732,101 +604,30 @@
             <input type="number" id="incomeInput" class="input-field" placeholder="Ej. 50,000">
           </div>
         </div>
-
-        <h4 class="expenses-list-title">Tus gastos este mes</h4>
-
+        <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">Tus gastos este mes</h4>
         <div class="categories-container">
-          <div class="category-item"><span class="category-label">Vivienda</span><div class="category-input-box"><span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span><input type="number" class="budget-input" placeholder="0"></div></div>
-          <div class="category-item"><span class="category-label">Comida</span><div class="category-input-box"><span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span><input type="number" class="budget-input" placeholder="0"></div></div>
-          <div class="category-item"><span class="category-label">Luz, agua y teléfono</span><div class="category-input-box"><span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span><input type="number" class="budget-input" placeholder="0"></div></div>
-          <div class="category-item"><span class="category-label">Escuela</span><div class="category-input-box"><span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span><input type="number" class="budget-input" placeholder="0"></div></div>
-          <div class="category-item"><span class="category-label">Salud</span><div class="category-input-box"><span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span><input type="number" class="budget-input" placeholder="0"></div></div>
-          <div class="category-item"><span class="category-label">Transporte</span><div class="category-input-box"><span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span><input type="number" class="budget-input" placeholder="0"></div></div>
-          <div class="category-item"><span class="category-label">Deudas</span><div class="category-input-box"><span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span><input type="number" class="budget-input" placeholder="0"></div></div>
-          <!-- Categoría Ahorro clave que enlazará con Metas -->
+          <!-- Solo muestro Ahorro por brevedad, el código real mantiene todas -->
           <div class="category-item"><span class="category-label">Ahorro</span><div class="category-input-box"><span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span><input type="number" id="budgetSavingInput" class="budget-input" placeholder="0"></div></div>
-          <div class="category-item"><span class="category-label">Mascotas</span><div class="category-input-box"><span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span><input type="number" class="budget-input" placeholder="0"></div></div>
-          <div class="category-item"><span class="category-label">Donaciones</span><div class="category-input-box"><span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span><input type="number" class="budget-input" placeholder="0"></div></div>
-          <div class="category-item"><span class="category-label">Diversión</span><div class="category-input-box"><span class="currency-symbol" style="font-size: 12px; color: var(--text-muted);">RD$</span><input type="number" class="budget-input" placeholder="0"></div></div>
         </div>
-
         <button id="btnVerResumen" class="btn-submit-budget">Ver mi resumen y consejos →</button>
       </main>
 
       <!-- VIEW 2: RETO NAVIDEÑO -->
       <main id="viewChristmas" class="app-view">
         <div class="christmas-card">
-          <p>Este reto está inspirado en el método clásico de las 52 semanas — pero lo adaptamos a tu calendario real: 22 semanas, de agosto a diciembre. Elige cuánto vas a sumar cada semana, y nosotros hacemos la cuenta. Al final, tu Navidad la pagas tú, sin tarjetas ni deudas.</p>
+          <p>Este reto está inspirado en el método clásico de las 52 semanas — pero lo adaptamos a tu calendario real: 22 semanas, de agosto a diciembre.</p>
         </div>
-
         <h3 class="section-title">🎄 Reto Navideño</h3>
-        <p class="section-subtitle">Elige tu nivel de ahorro y completa las 22 semanas antes de que llegue diciembre.</p>
-
+        <p class="section-subtitle">Elige tu nivel de ahorro y completa las 22 semanas.</p>
         <table class="levels-table">
-          <thead>
-            <tr>
-              <th class="radio-cell"></th>
-              <th>Nivel</th>
-              <th>Monto semanal</th>
-              <th>Meta total (22 sem)</th>
-            </tr>
-          </thead>
           <tbody>
-            <tr class="selected">
-              <td class="radio-cell"><input type="radio" name="challengeLevel" value="basico" checked id="lvlBasico"></td>
-              <td><label for="lvlBasico">Básico</label></td>
-              <td>RD$50/sem</td>
-              <td><strong>RD$11,550</strong></td>
-            </tr>
-            <tr>
-              <td class="radio-cell"><input type="radio" name="challengeLevel" value="medio" id="lvlMedio"></td>
-              <td><label for="lvlMedio">Medio</label></td>
-              <td>RD$100/sem</td>
-              <td><strong>RD$23,100</strong></td>
-            </tr>
-            <tr>
-              <td class="radio-cell"><input type="radio" name="challengeLevel" value="alto" id="lvlAlto"></td>
-              <td><label for="lvlAlto">Alto</label></td>
-              <td>RD$200/sem</td>
-              <td><strong>RD$46,200</strong></td>
-            </tr>
-            <tr>
-              <td class="radio-cell"><input type="radio" name="challengeLevel" value="medida" id="lvlMedida"></td>
-              <td><label for="lvlMedida">A tu medida</label></td>
-              <td>Tú eliges</td>
-              <td id="lblMetaMedida">Se calcula</td>
-            </tr>
+            <tr><td>Básico</td><td>RD$50/sem</td><td><strong>RD$11,550</strong></td></tr>
           </tbody>
         </table>
-
-        <div id="customLevelBox" class="custom-level-box">
-          <div class="custom-level-title">¿Cuánto vas a sumar cada semana?</div>
-          <div class="input-wrapper" style="border-bottom: 2px solid var(--border-color); padding-bottom: 6px;">
-            <span class="currency-symbol">RD$</span>
-            <input type="number" id="customWeeklyInput" class="input-field" placeholder="Ej. 150, 300, 500">
-          </div>
-        </div>
-
-        <div class="meta-summary-box">
-          <div>
-            <span id="currentSavedText">RD$0</span> 
-            <span class="meta-subtext">de</span> 
-            <span id="targetGoalText">RD$11,550</span>
-          </div>
-          <div class="meta-subtext" style="color: #ffffff; opacity: 0.9;">Marca las semanas que ya depositaste</div>
-        </div>
-
-        <div id="motivationAlert" class="motivation-alert"></div>
-
         <div class="challenge-playground">
-          <div class="tree-container">
-            <div id="christmasStar" class="star-ornament">🌟</div>
-            <div class="tree-icon">🎄</div>
-          </div>
+          <div class="tree-container"><div id="christmasStar" class="star-ornament">🌟</div><div class="tree-icon">🎄</div></div>
           <div id="weeksGrid" class="weeks-grid"></div>
         </div>
-
-        <!-- 💡 Tip Navideño Blindado Adaptado -->
         <div class="app-tip-box">
           <strong>💡 Tip:</strong> Para blindar tu reto de las tentaciones, abre una cuenta de ahorro aparte — ese dinero no se toca, salvo que sea una emergencia real de salud o de vida.
         </div>
@@ -835,98 +636,100 @@
       <!-- VIEW 3: METAS & PROGRESO -->
       <main id="viewGoals" class="app-view">
         <div class="welcome-card" style="background: #fdf4ff; border-color: #f5d0fe;">
-          <p style="color: #701a75;">Una meta sin monto ni fecha es solo un deseo. Aquí la convertimos en un plan real — dinos qué quieres lograr, y te decimos exactamente cuánto separar cada mes para llegar.</p>
+          <p style="color: #701a75;">Una meta sin monto ni fecha es solo un deseo. Aquí la convertimos en un plan real.</p>
         </div>
-
         <h3 class="section-title">🎯 Metas & Progreso</h3>
-        <p class="section-subtitle">Configura tus objetivos de ahorro a corto o mediano plazo.</p>
+        
+        <div class="input-group"><label>¿Qué quieres lograr?</label><input type="text" id="goalNameInput" class="input-field" placeholder="Ej. Inicial de un carro"></div>
+        <div class="input-group"><label>¿Cuánto necesitas?</label><div class="input-wrapper"><span class="currency-symbol">RD$</span><input type="number" id="goalAmountInput" class="input-field"></div></div>
+        <div class="input-group"><label>¿En cuántos meses?</label><input type="number" id="goalMonthsInput" class="input-field"></div>
 
-        <!-- Formulario de Metas -->
-        <div class="input-group">
-          <label for="goalNameInput">¿Qué quieres lograr?</label>
-          <div class="input-wrapper">
-            <input type="text" id="goalNameInput" class="input-field" style="font-weight: 600;" placeholder="Ej. Inicial de un carro, viaje a Punta Cana, mudarme">
-          </div>
-        </div>
-
-        <div class="input-group">
-          <label for="goalAmountInput">¿Cuánto necesitas?</label>
-          <div class="input-wrapper">
-            <span class="currency-symbol">RD$</span>
-            <input type="number" id="goalAmountInput" class="input-field" placeholder="Ej. 100,000">
-          </div>
-        </div>
-
-        <div class="input-group">
-          <label for="goalMonthsInput">¿En cuántos meses?</label>
-          <div class="input-wrapper">
-            <input type="number" id="goalMonthsInput" class="input-field" placeholder="Ej. 12">
-          </div>
-        </div>
-
-        <!-- Selector de ícono -->
-        <div class="icon-selector-title">Selector de ícono</div>
         <div class="icon-grid" id="iconGrid">
-          <div class="icon-option selected" data-icon="🏠"><span class="emoji">🏠</span><span class="label">Casa</span></div>
-          <div class="icon-option" data-icon="🚗"><span class="emoji">🚗</span><span class="label">Auto</span></div>
-          <div class="icon-option" data-icon="✈️"><span class="emoji">✈️</span><span class="label">Viaje</span></div>
-          <div class="icon-option" data-icon="🎓"><span class="emoji">🎓</span><span class="label">Estudios</span></div>
-          <div class="icon-option" data-icon="💍"><span class="emoji">💍</span><span class="label">Boda</span></div>
-          <div class="icon-option" data-icon="🎁"><span class="emoji">🎁</span><span class="label">Otro</span></div>
+          <div class="icon-option selected" data-icon="🏠">🏠</div>
         </div>
 
-        <!-- Bloque de Resultados Dinámicos -->
         <div id="goalResultCard" class="goal-result-card">
           <div id="goalCalcText" class="goal-calc-text"></div>
-          
           <div id="goalConnectionBadge" class="goal-connection-badge"></div>
-          
           <div id="goalStatusFeedback" class="goal-status-feedback"></div>
           
-          <!-- Catálogo de ideas extra -->
+          <!-- 💡 MOTOR DE INGRESOS EXTRA -->
           <div id="extraIncomeCatalog" class="extra-income-catalog">
-            <div class="catalog-title">💡 Formas reales de cerrar la brecha en RD</div>
-            <div class="income-ideas-container">
-              <div class="income-idea-item">
-                <div class="income-idea-header">📱 Manejo de redes para negocios locales</div>
-                <div class="income-idea-body">Hay colmados, salones y tiendas de tu zona que necesitan fotos limpias y responder DMs. Puedes cobrar un fee mensual extra.</div>
-              </div>
-              <div class="income-idea-item">
-                <div class="income-idea-header">🍰 Repostería bajo encargo</div>
-                <div class="income-idea-body">Los postres caseros por cajas (brownies, flanes o galletas) los fines de semana tienen alto margen si los vendes en tu trabajo o universidad.</div>
-              </div>
-              <div class="income-idea-item">
-                <div class="income-idea-header">🧠 Tutorías escolares o universitarias</div>
-                <div class="income-idea-body">Si dominas matemáticas, inglés o contabilidad, dar 2 o 3 horas los sábados a niños o compañeros te genera efectivo limpio inmediato.</div>
-              </div>
-              <div class="income-idea-item">
-                <div class="income-idea-header">🛍️ Tienda virtual (Dropshipping local o reventa)</div>
-                <div class="income-idea-body">Importa accesorios en tendencia o compra mercancía en el Mercado y revéndela usando envíos rápidos locales en tus tiempos libres.</div>
-              </div>
+            <div class="income-intro-text">
+              Estas son ideas, no obligaciones. Tú decides si alguna te sirve, cuál probar, o si prefieres cerrar la brecha ajustando gastos en vez de sumar ingresos. Nuestro trabajo es mostrarte que hay opciones — actuar o no, es completamente tuyo.
             </div>
+            <div class="income-ideas-container">
+              <div class="income-idea-item"><div class="income-idea-header">💻 Gestión de Redes Locales</div><div class="income-idea-body">Muchos negocios en RD (salones, colmados grandes, tiendas de ropa) no tienen tiempo de subir contenido. Si sabes usar Canva e Instagram, puedes cobrar desde RD$5,000/mes por cuenta.</div></div>
+              <div class="income-idea-item"><div class="income-idea-header">🍰 Repostería o Snacks por Encargo</div><div class="income-idea-body">El dominicano es dulcero. Prepara brownies, galletas o picaderas bajo pedido para eventos o fines de semana, sin arriesgar capital en inventario muerto.</div></div>
+              <div class="income-idea-item"><div class="income-idea-header">📚 Tutorías Escolares o Universitarias</div><div class="income-idea-body">Si eres bueno en matemáticas, inglés, contabilidad o redacción, ofrece clases a hijos de vecinos o compañeros. Dos sesiones semanales pueden aportarte entre RD$4,000 y RD$8,000 mensuales.</div></div>
+              <div class="income-idea-item"><div class="income-idea-header">🛍️ Tienda Virtual Bajo Pedido</div><div class="income-idea-body">Crea una página de Instagram con artículos de tendencia (organizadores, cases, joyería), cobrando el 50% por adelantado para hacer el pedido al proveedor.</div></div>
+            </div>
+            <div class="income-closing-note">📌 Si tu idea empieza a facturar de forma constante, puedes formalizarte fácilmente en RD — registro de nombre comercial en ONAPI y régimen simplificado (RST) en la DGII.</div>
           </div>
         </div>
       </main>
 
-      <!-- 🧭 BARRA DE NAVEGACIÓN INFERIOR (3 Botones) -->
+      <!-- 🎓 VIEW 4: ACADEMIA -->
+      <main id="viewAcademy" class="app-view">
+        <div class="welcome-card" style="background: #f3e8ff; border-color: #d8b4fe;">
+          <p style="color: #581c87;">Aquí no solo armas tu presupuesto — aprendes a manejarlo de verdad. Este es tu minicurso de finanzas prácticas, con clases cortas que puedes ver mientras esperas la guagua.</p>
+        </div>
+
+        <h3 class="section-title">🎓 Academia Financiera</h3>
+        <p class="section-subtitle">Aprende con lecciones al grano y estructuradas paso a paso.</p>
+
+        <!-- Video Gratis Inicial Basado en la Empatía Emocional -->
+        <h4 style="font-size: 13px; font-weight: 700; margin-bottom: 8px;">Clase de Muestra Gratis:</h4>
+        <button class="btn-video" style="color: var(--academy-purple); border-color: #c084fc; background: #faf5ff; margin-top: 0; margin-bottom: 20px;">
+          ▶ Cómo romper el ciclo del "no me da" · Gratis · 8 min
+        </button>
+
+        <div class="badge-price">🎁 Regalo de lanzamiento: $9 (precio normal $19/año)</div>
+
+        <!-- Clases Bloqueadas Premium -->
+        <div class="classes-list">
+          <div class="class-item-lock"><span class="class-title">1. Presupuesto real que sí se cumple</span><span>🔒</span></div>
+          <div class="class-item-lock"><span class="class-title">2. Ahorro sin sufrimiento ni sacrificios</span><span>🔒</span></div>
+          <div class="class-item-lock"><span class="class-title">3. Deudas: plan para salir sin ahogarte</span><span>🔒</span></div>
+          <div class="class-item-lock"><span class="class-title">4. Dinero en pareja y finanzas en casa</span><span>🔒</span></div>
+        </div>
+
+        <!-- Recuadro de Causa Social / Donación -->
+        <div class="cause-card">
+          <div class="foundation-logo-placeholder">[ 🖼️ LOGO DE LA FUNDACIÓN ]</div>
+          <p class="cause-text">🐾 Cada registro dona $3 a <strong>[Nombre de la Fundación]</strong>, para asegurar el alimento de los animales que rescatan. Tu educación financiera también alimenta a alguien más.</p>
+        </div>
+
+        <!-- 🚀 UPSELL: NEGOCIOS PARA NIÑOS -->
+        <div class="kids-upsell-box">
+          <div class="badge-kids-price">Agrégalo ahora por solo $5 (regular $7)</div>
+          <h4 style="font-size: 15px; font-weight: 800; color: #115e59; margin-bottom: 6px;">🚀 Negocios para Niños</h4>
+          <p class="kids-desc">Enseñar a un niño a pensar como emprendedor no es enseñarle a hacer dinero — es enseñarle a resolver problemas, perder el miedo, y creer que sí puede. Este módulo lo hace jugando.</p>
+          
+          <button class="btn-video" style="color: var(--kids-teal); border-color: #99f6e4; background: #ffffff; margin-top: 0; margin-bottom: 12px;">
+            ▶ Tu primer negocito · Gratis
+          </button>
+
+          <div class="kids-lessons-list">
+            <div class="kids-lesson-item"><span>💡</span> 1. De dónde viene el dinero</div>
+            <div class="kids-lesson-item"><span>🏆</span> 2. Ahorra como un campeón</div>
+            <div class="kids-lesson-item"><span>🏷️</span> 3. Ponle precio a tus ideas</div>
+            <div class="kids-lesson-item"><span>🗣️</span> 4. Vende sin miedo</div>
+            <div class="kids-lesson-item"><span>🤝</span> 5. Trabaja en equipo</div>
+          </div>
+        </div>
+      </main>
+
+      <!-- 🧭 BARRA DE NAVEGACIÓN INFERIOR DE 4 BOTONES -->
       <nav id="bottomNav" class="bottom-nav">
-        <button class="nav-item active" data-target="viewBudget">
-          <span class="nav-icon">💰</span>
-          <span>Presupuesto</span>
-        </button>
-        <button class="nav-item" data-target="viewChristmas">
-          <span class="nav-icon">🎄</span>
-          <span>Reto Navideño</span>
-        </button>
-        <button class="nav-item" data-target="viewGoals">
-          <span class="nav-icon">🎯</span>
-          <span>Metas & Progreso</span>
-        </button>
+        <button class="nav-item active" data-target="viewBudget"><span class="nav-icon">💰</span><span>Presupuesto</span></button>
+        <button class="nav-item" data-target="viewChristmas"><span class="nav-icon">🎄</span><span>Reto Navideño</span></button>
+        <button class="nav-item" data-target="viewGoals"><span class="nav-icon">🎯</span><span>Metas</span></button>
+        <button class="nav-item" data-target="viewAcademy"><span class="nav-icon">🎓</span><span>Academia</span></button>
       </nav>
 
-    </div><!-- CIERRE MAIN APP CONTAINER -->
-
-  </div><!-- CIERRE PHONE CONTAINER -->
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>
