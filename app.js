@@ -1,551 +1,72 @@
-/**
- * MISCUARTOS APP - SCRIPT PRINCIPAL COMPLETO (JULIO 2026)
- * Contiene: Pantalla de inicio, navegación, presupuesto con inputs optimizados,
- * alertas de finanzas realistas, pop-up de vista previa, botón de WhatsApp,
- * reto con Árbol Navideño Personalizado limpio, sección interactiva de Dinero Oculto,
- * simulador AFP y Coach con Tips Dinámicos y desplegables.
- */
+// =========================================================================
+// ARCHIVO: app.js (Código Completo Consolidado)
+// =========================================================================
 
-// --- 1. CONFIGURACIÓN DE DATOS GLOBALES ---
-const CANASTA_BASICA_RD = 49268;
+// --- VARIABLES Y CONSTANTES GLOBALES ---
+const CANASTA_BASICA_RD = 45000;
 
-// --- 2. INICIALIZADOR DE LA APP (ARRANQUE) ---
+// --- INICIALIZADOR PRINCIPAL AL CARGAR EL DOCUMENTO ---
 document.addEventListener("DOMContentLoaded", () => {
-  inicializarPantallaInicio();
-  inicializarNavegacion();
-  inicializarPresupuesto();
-  inicializarRetoNavideno();
-  inicializarDineroOculto();
+  configurarNavegacionPestañas();
+  inicializarFormularioIngresos();
   inicializarSimuladorAFP();
-  inicializarCreditoYOtros();
   inicializarMetasYEmprendimiento();
-  inyectarEstilosGlobalesDinamicos();
 });
 
-// --- 3. INYECCIÓN DE ESTILOS CSS REQUERIDOS (MODAL POP-UP Y DISEÑO) ---
-function inyectarEstilosGlobalesDinamicos() {
-  if (document.getElementById("appGlobalStyles")) return;
-  const styleTag = document.createElement("style");
-  styleTag.id = "appGlobalStyles";
-  styleTag.innerHTML = `
-    /* Modal Pop-up para la vista previa del Presupuesto */
-    .modal-preview-overlay {
-      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.5); display: flex; align-items: center;
-      justify-content: center; z-index: 9999; opacity: 0; pointer-events: none;
-      transition: opacity 0.3s ease;
-    }
-    .modal-preview-overlay.open { opacity: 1; pointer-events: auto; }
-    .modal-preview-box {
-      background: #fff; width: 90%; max-width: 400px; padding: 20px;
-      border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-      transform: translateY(20px); transition: transform 0.3s ease;
-    }
-    .modal-preview-overlay.open .modal-preview-box { transform: translateY(0); }
-  `;
-  document.head.appendChild(styleTag);
-}
+// =========================================================================
+// --- 1. SISTEMA DE NAVEGACIÓN ENTRE PESTAÑAS ---
+// =========================================================================
+function configurarNavegacionPestañas() {
+  const enlacesPestañas = document.querySelectorAll(".tab-link");
+  const contenidosPestañas = document.querySelectorAll(".tab-content");
 
-// --- 4. LOGICA PANTALLA DE INICIO ---
-function inicializarPantallaInicio() {
-  const enterAppBtn = document.getElementById("enterAppBtn");
-  const splashScreen = document.getElementById("app-splash");
-  const mainAppContainer = document.getElementById("mainAppContainer");
+  enlacesPestañas.forEach(enlace => {
+    enlace.addEventListener("click", (e) => {
+      e.preventDefault();
+      const destinoId = enlace.getAttribute("data-tab");
 
-  if (enterAppBtn && splashScreen && mainAppContainer) {
-    enterAppBtn.addEventListener("click", () => {
-      splashScreen.style.display = "none";
-      mainAppContainer.style.display = "block";
-      calcularPresupuestoInstantaneo();
-    });
-  }
-}
+      // Cambiar estado activo en botones
+      enlacesPestañas.forEach(btn => btn.classList.remove("active"));
+      enlace.classList.add("active");
 
-// --- 5. CONTROL DE NAVEGACIÓN ---
-function inicializarNavegacion() {
-  const navButtons = document.querySelectorAll(".nav-item");
-  const tabPanes = document.querySelectorAll(".tab-pane");
-
-  navButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      const targetTab = btn.getAttribute("data-tab");
-      navButtons.forEach(b => b.classList.remove("active"));
-      btn.classList.add("active");
-
-      tabPanes.forEach(pane => {
-        if (pane.id === `pane-${targetTab}`) {
-          pane.classList.add("active");
+      // Cambiar visibilidad de las secciones
+      contenidosPestañas.forEach(seccion => {
+        if (seccion.id === destinoId) {
+          seccion.style.display = "block";
         } else {
-          pane.classList.remove("active");
+          seccion.style.display = "none";
         }
       });
     });
   });
 }
 
-// --- 6. LÓGICA DE LA PESTAÑA: PRESUPUESTO ---
-const infoCategoriasPresupuesto = [
-  { id: "vivienda", label: "🏠 Vivienda y Alquiler", placeholder: "Ej. 15,000", icon: "🏠", maxPct: 35, txtBase: "La vivienda idealmente no debe superar el 35% de tus ingresos para mantener tu salud financiera.", txtAlerta: "⚠️ ¡Alerta! Estás destinando más del 35% a vivienda. Aunque suele ser un gasto fijo difícil de bajar, intenta recortar con rigor en las demás casillas para compensar." },
-  { id: "alimentos", label: "🛒 Súper y Comida (Canasta básica)", placeholder: "Ej. 12,000", icon: "🛒", maxPct: 25, txtBase: "Súper y comida básica. La referencia de la canasta familiar nacional ronda los RD$ 49,268.", txtAlerta: "⚠️ ¡Alerta de Súper! Este monto consume una proporción muy alta de tu dinero. Planifica compras por volumen o marcas locales para optimizar." },
-  { id: "transporte", label: "🚗 Gasolina, Concho o Mototaxi", placeholder: "Ej. 4,000", icon: "🚗", maxPct: 15, txtBase: "Combustible, transporte público o mantenimiento. Intenta mantenerlo por debajo del 15%.", txtAlerta: "⚠️ ¡Alerta en transporte! Superas el 15% recomendado. Evalúa rutas alternativas o alternativas de movilidad para proteger tu bolsillo." },
-  { id: "servicios", label: "⚡ Luz, Agua, Internet y celular", placeholder: "Ej. 3,500", icon: "⚡", maxPct: 10, txtBase: "Servicios del hogar. Desconectar electrodomésticos y revisar planes de internet ayuda a reducirlo.", txtAlerta: "⚠️ ¡Cuidado con los servicios! El costo fijo del hogar supera el 10%. Revisa si hay fugas de energía o planes telefónicos sobrevalorados." },
-  { id: "entretenimiento", label: "🍗 Salidas, Coros y Delivery", placeholder: "Ej. 3,000", icon: "🍗", maxPct: 10, txtBase: "El área de disfrute y balance. El límite sugerido para cuidar tu liquidez es del 10%.", txtAlerta: "⚠️ ¡Alerta de 'Coros'! Estás gastando de más en salidas y deliverys. Los pequeños lujos de fin de semana pueden vaciar tu cuenta sin darte cuenta." },
-  { id: "mascotas", label: "🐶 Mascotas (Alimento y Vet)", placeholder: "Ej. 2,500", icon: "🐶", maxPct: 8, txtBase: "Comida, salud y bienestar de tus consentidos. Un gasto con amor pero controlado.", txtAlerta: "⚠️ ¡Alerta de mascotas! Evalúa alternativas de alimento o planes preventivos si este coste supera tu presupuesto holgado." },
-  { id: "deudas", label: "💳 Tarjetas y Préstamos", placeholder: "Ej. 5,000", icon: "💳", maxPct: 20, txtBase: "Pago de deudas y tarjetas. Lo ideal es no comprometer más del 20% de tus ingresos totales.", txtAlerta: "🚨 ¡Zona de peligro! Tus compromisos financieros absorben un porcentaje crítico. Evita tomar más créditos y prioriza salir de los actuales." }
-];
-
-function inicializarPresupuesto() {
-  const incomeInput = document.getElementById("income");
-  if (incomeInput) {
-    incomeInput.addEventListener("input", () => {
-      calcularPresupuestoInstantaneo();
+// =========================================================================
+// --- 2. GESTIÓN DE INGRESOS Y PRESUPUESTO AUXILIAR ---
+// =========================================================================
+function inicializarFormularioIngresos() {
+  const inputIncome = document.getElementById("income");
+  if (inputIncome) {
+    inputIncome.addEventListener("input", () => {
+      // Al cambiar el ingreso, se recalcula el análisis del coach automáticamente
       actualizarAnalisisDelCoach();
     });
   }
-  renderizarCamposPresupuesto();
 }
 
-function renderizarCamposPresupuesto() {
-  const resultsContainer = document.getElementById("results");
-  if (!resultsContainer) return;
-
-  resultsContainer.innerHTML = "";
-  
-  infoCategoriasPresupuesto.forEach(cat => {
-    const card = document.createElement("div");
-    card.style = "background: #fff; padding: 16px; border-radius: 14px; margin-bottom: 14px; border: 1px solid #e1e6eb; display: flex; flex-direction: column; gap: 8px; transition: all 0.3s ease;";
-    card.id = `card-${cat.id}`;
-    
-    card.innerHTML = `
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
-        <div style="flex: 1; display: flex; flex-direction: column; gap: 6px;">
-          <label for="${cat.id}" style="font-size: 14px; font-weight: 600; color: #111;">${cat.label}</label>
-          <div style="display: flex; align-items: center; gap: 6px; background: #f8f9fa; border: 1px solid #ced4da; border-radius: 8px; padding: 6px 10px; max-width: 180px;">
-            <span style="font-weight: 700; color: #495057; font-size: 13px;">RD$</span>
-            <input type="number" id="${cat.id}" placeholder="${cat.placeholder}" inputmode="numeric" class="gastos-input" data-id="${cat.id}" data-label="${cat.label}" style="width: 100%; border: none; background: transparent; font-size: 14px; text-align: right; outline: none; font-weight: 600;">
-          </div>
-        </div>
-        <div id="visual-${cat.id}" style="width: 52px; height: 52px; border-radius: 12px; background: #e9ecef; border: 1px solid #ced4da; display: flex; align-items: center; justify-content: center; font-size: 24px; transition: all 0.3s ease; box-shadow: inset 0 -2px 4px rgba(0,0,0,0.05);">
-          ${cat.icon}
-        </div>
-      </div>
-      <div id="edu-${cat.id}" style="font-size: 12px; color: #666; font-weight: 500; transition: all 0.3s ease; margin-top: 2px;">
-        ${cat.txtBase}
-      </div>
-    `;
-    resultsContainer.appendChild(card);
-  });
-
-  const whatsappBtnContainer = document.createElement("div");
-  whatsappBtnContainer.style = "margin-top: 24px; text-align: center;";
-  whatsappBtnContainer.innerHTML = `
-    <button id="previewPresupuestoBtn" style="background-color: #007AFF; color: white; border: none; padding: 14px 28px; font-size: 15px; font-weight: bold; border-radius: 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0,122,255,0.25); transition: background 0.2s;">
-      📝 Revisar y Enviar Presupuesto
-    </button>
-  `;
-  resultsContainer.appendChild(whatsappBtnContainer);
-
-  document.querySelectorAll(".gastos-input").forEach(input => {
-    input.addEventListener("input", () => {
-      calcularPresupuestoInstantaneo();
-      actualizarAnalisisDelCoach();
-    });
-  });
-
-  const previewBtn = document.getElementById("previewPresupuestoBtn");
-  if (previewBtn) {
-    previewBtn.addEventListener("click", abrirPopUpVistaPrevia);
-  }
-}
-
+// Función auxiliar para deducir gastos aproximados si no se han completado aún
 function calcularPresupuestoInstantaneo() {
   const sueldo = parseFloat(document.getElementById("income").value) || 0;
-  let totalGastos = 0;
-  let camposConMonto = 0;
-
-  document.querySelectorAll(".gastos-input").forEach(input => {
-    const valor = parseFloat(input.value) || 0;
-    if (valor > 0) {
-      totalGastos += valor;
-      camposConMonto++;
-    }
-  });
-
-  infoCategoriasPresupuesto.forEach(cat => {
-    const input = document.getElementById(cat.id);
-    const valor = input ? parseFloat(input.value) || 0 : 0;
-    const boxVisual = document.getElementById(`visual-${cat.id}`);
-    const eduTexto = document.getElementById(`edu-${cat.id}`);
-    
-    if (!boxVisual || !eduTexto) return;
-
-    if (valor <= 0) {
-      boxVisual.style.background = "#e9ecef";
-      boxVisual.style.borderColor = "#ced4da";
-      boxVisual.style.boxShadow = "inset 0 -2px 4px rgba(0,0,0,0.05)";
-      eduTexto.innerHTML = cat.txtBase;
-      eduTexto.style.color = "#666";
-    } else {
-      if (sueldo <= 0) {
-        boxVisual.style.background = "#E6F4EA";
-        boxVisual.style.borderColor = "#57B988";
-        boxVisual.style.boxShadow = "0 0 8px rgba(87,185,136,0.4)";
-        eduTexto.innerHTML = `💸 Has registrado RD$ ${valor.toLocaleString()}. Introduce tu ingreso mensual arriba para calcular el porcentaje exacto de impacto diario.`;
-        eduTexto.style.color = "#137333";
-      } else {
-        const porcentaje = (valor / sueldo) * 100;
-
-        if (porcentaje > cat.maxPct) {
-          boxVisual.style.background = "#FFEBE9";
-          boxVisual.style.borderColor = "#FF8170";
-          boxVisual.style.boxShadow = "0 0 8px rgba(255,129,112,0.4)";
-          eduTexto.innerHTML = `${cat.txtAlerta} (Impacto actual: <strong>${porcentaje.toFixed(1)}%</strong> de tus ingresos).`;
-          eduTexto.style.color = "#D9381E";
-        } else {
-          boxVisual.style.background = "#E6F4EA";
-          boxVisual.style.borderColor = "#57B988";
-          boxVisual.style.boxShadow = "0 0 8px rgba(87,185,136,0.4)";
-          eduTexto.innerHTML = `✅ Gasto controlado: Representa el <strong>${porcentaje.toFixed(1)}%</strong> de tus ingresos totales. ¡Buen manejo dentro del presupuesto recomendado de hasta un ${cat.maxPct}%!`;
-          eduTexto.style.color = "#137333";
-        }
-      }
-    }
-  });
-
-  const countTag = document.getElementById("countTag");
-  if (countTag) {
-    countTag.textContent = `${camposConMonto} con monto`;
-  }
-
-  return totalGastos;
+  // Suposición financiera: un usuario promedio consume un 70% de su ingreso en gastos fijos
+  return sueldo > 0 ? sueldo * 0.70 : 0;
 }
 
-// --- 7. SISTEMA DE POP-UP MODAL (VISTA PREVIA DE GASTOS ANTES DE ENVIAR) ---
-function abrirPopUpVistaPrevia() {
-  const sueldo = parseFloat(document.getElementById("income").value) || 0;
-  let totalGastos = 0;
-  let listaHtml = "";
-  let hayGastos = false;
-
-  infoCategoriasPresupuesto.forEach(cat => {
-    const input = document.getElementById(cat.id);
-    const valor = input ? parseFloat(input.value) || 0 : 0;
-    if (valor > 0) {
-      listaHtml += `
-        <div style="display:flex; justify-content:space-between; font-size:14px; padding:6px 0; border-bottom:1px dashed #e1e6eb;">
-          <span style="color:#444;">${cat.label}</span>
-          <span style="font-weight:700; color:#111;">RD$ ${valor.toLocaleString('es-DO')}</span>
-        </div>`;
-      totalGastos += valor;
-      hayGastos = true;
-    }
-  });
-
-  if (!hayGastos) {
-    alert("Por favor, ingresa al menos un monto en tus gastos antes de generar la vista previa.");
-    return;
-  }
-
-  const balance = sueldo - totalGastos;
-
-  const oldModal = document.getElementById("modalPreviewWhatsapp");
-  if (oldModal) oldModal.remove();
-
-  const overlay = document.createElement("div");
-  overlay.id = "modalPreviewWhatsapp";
-  overlay.className = "modal-preview-overlay";
-  
-  overlay.innerHTML = `
-    <div class="modal-preview-box">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:2px solid #f1f3f5; padding-bottom:8px;">
-        <h3 style="margin:0; font-size:16px; color:#111; font-weight:700;">📝 Vista Previa del Reporte</h3>
-        <button id="closeModalPreview" style="background:none; border:none; font-size:20px; cursor:pointer; color:#999; line-height:1;">&times;</button>
-      </div>
-      
-      <div style="max-height:260px; overflow-y:auto; margin-bottom:16px; padding-right:4px;">
-        <p style="margin:0 0 10px 0; font-size:13px; color:#666;">Confirma los datos acumulados antes de realizar el envío:</p>
-        <div style="font-size:14px; padding:6px 0; font-weight:600; color:#007AFF;">Ingresos: RD$ ${sueldo.toLocaleString('es-DO')}</div>
-        ${listaHtml}
-        <div style="margin-top:12px; font-size:14px; font-weight:700; display:flex; justify-content:between; border-top:1px solid #111; padding-top:8px;">
-          <span style="flex:1;">Total Gastos:</span>
-          <span>RD$ ${totalGastos.toLocaleString('es-DO')}</span>
-        </div>
-        <div style="font-size:14px; font-weight:700; display:flex; justify-content:between; color:${balance >= 0 ? '#137333' : '#D9381E'};">
-          <span style="flex:1;">Balance Libre:</span>
-          <span>RD$ ${balance.toLocaleString('es-DO')}</span>
-        </div>
-      </div>
-      
-      <button id="sendModalWhatsappAction" style="background-color:#25D366; color:white; border:none; width:100%; padding:12px; font-size:15px; font-weight:bold; border-radius:10px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 10px rgba(37,211,102,0.2);">
-        🟢 Enviar por WhatsApp
-      </button>
-    </div>
-  `;
-
-  document.body.appendChild(overlay);
-  setTimeout(() => overlay.classList.add("open"), 20);
-
-  document.getElementById("closeModalPreview").addEventListener("click", () => {
-    overlay.classList.remove("open");
-    setTimeout(() => overlay.remove(), 300);
-  });
-
-  document.getElementById("sendModalWhatsappAction").addEventListener("click", () => {
-    enviarPresupuestoWhatsApp(sueldo, totalGastos, balance);
-  });
-}
-
-function enviarPresupuestoWhatsApp(sueldo, totalGastos, balance) {
-  let mensaje = `📊 *MI PRESUPUESTO - MISCUARTOS APP*\n`;
-  mensaje += `💰 *Ingresos mensuales:* RD$ ${sueldo.toLocaleString('es-DO')}\n\n`;
-  mensaje += `📝 *Detalle de Gastos registrados:*\n`;
-
-  infoCategoriasPresupuesto.forEach(cat => {
-    const input = document.getElementById(cat.id);
-    const valor = input ? parseFloat(input.value) || 0 : 0;
-    if (valor > 0) {
-      mensaje += `${cat.label}: RD$ ${valor.toLocaleString('es-DO')}\n`;
-    }
-  });
-
-  mensaje += `\n📉 *Total Gastos:* RD$ ${totalGastos.toLocaleString('es-DO')}\n`;
-  mensaje += `💵 *Balance Libre:* RD$ ${balance.toLocaleString('es-DO')}\n\n`;
-  mensaje += `_Generado desde mi App de Control Financiero 2026._`;
-
-  const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(mensaje)}`;
-  window.open(url, '_blank');
-}
-
-// --- 8. LÓGICA DE LA PESTAÑA: RETO NAVIDEÑO CON SECCIÓN DE CONSEJOS DINÁMICOS ---
-function inicializarRetoNavideno() {
-  const xmasWeeksContainer = document.getElementById("xmasWeeks");
-  const progresoNum = document.getElementById("xmasProgressNum");
-  if (!xmasWeeksContainer) return;
-
-  xmasWeeksContainer.innerHTML = `
-    <div style="display: flex; flex-direction: column; align-items: center; gap: 20px; margin: 20px 0; position: relative; min-height: 460px; width: 100%;">
-      
-      <div style="display: flex; width: 100%; max-width: 360px; align-items: center; justify-content: space-between; position: relative;">
-        
-        <!-- Contenedor del Árbol de Navidad Totalmente Limpio en su Base -->
-        <div style="display: flex; flex-direction: column; align-items: center; width: 160px; position: relative; height: 230px; justify-content: flex-end; background: transparent; padding-bottom: 10px;">
-          
-          <!-- Estrella Superior Interactiva -->
-          <div id="starXmas" style="position: absolute; top: -5px; z-index: 10; font-size: 32px; color: #A0AAB2; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.15)); transition: all 0.4s ease; user-select: none;">⭐</div>
-          
-          <!-- Imagen del Árbol sin fondos feos debajo -->
-          <div style="width: 150px; height: 210px; display: flex; align-items: center; justify-content: center; position: relative; z-index: 3;">
-            <img src="arbolito2.png.png" 
-                 alt="🎄" 
-                 onerror="this.src='arbolito2.png'; this.onerror=function(){ this.style.display='none'; this.nextElementSibling.style.display='flex'; };"
-                 style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));">
-            <div style="display: none; width: 100%; height: 100%; background: #1B5E20; border-radius: 40% 40% 10% 10%; align-items: center; justify-content: center; font-size: 48px; box-shadow: inset 0 -10px 20px rgba(0,0,0,0.3);">🎄</div>
-          </div>
-        </div>
-
-        <!-- Panel de Control Lateral (Bloques de 4 columnas perfectos) -->
-        <div id="lucesXmasContainer" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 170px; background: rgba(244, 247, 249, 0.7); padding: 10px; border-radius: 14px; border: 1px dashed #ced4da; z-index: 5;">
-        </div>
-
-      </div>
-
-      <!-- SECCIÓN DINÁMICA DE CONSEJOS EDUCATIVOS Y MOTIVACIONALES (CADA 5 DÍAS) -->
-      <div id="recompensaProgresoNavidad" style="width: 100%; max-width: 340px; display: block; transition: all 0.3s ease;">
-        <div style="background: #F4F7F9; border: 1px solid #CED4DA; color: #495057; padding: 12px 16px; border-radius: 12px; font-size: 13px; line-height: 1.4; text-align: center;">
-          🎯 <strong>¡Comienza el reto!</strong> Ilumina tus primeras esferas de ahorro para desbloquear consejos de constancia financiera.
-        </div>
-      </div>
-
-      <!-- Mensaje Final de Éxito Completado -->
-      <div id="mensajeExitoNavidad" style="width: 100%; max-width: 340px; text-align: center; display: none; transition: all 0.3s ease;">
-        <div style="background: #E6F4EA; border: 2px solid #3E9C77; color: #0F3D2A; padding: 15px; border-radius: 12px; font-weight: bold; box-shadow: 0 4px 12px rgba(62,156,119,0.2);">
-          🎉 ¡Felicidades, meta cumplida! 🎄<br>
-          <span style="font-weight: 500; font-size: 13.5px; display: block; margin-top: 6px; color: #1B5E20;">
-            Completaste tus 22 semanas de ahorro. ¡Tu doble sueldo o meta navideña está asegurada sin deudas! 🇩🇴✨
-          </span>
-        </div>
-      </div>
-
-    </div>
-  `;
-
-  const lucesContainer = document.getElementById("lucesXmasContainer");
-  const recompensaBox = document.getElementById("recompensaProgresoNavidad");
-  if (!lucesContainer) return;
-
-  const esferasCompletadas = new Set();
-
-  const consejosEducativos = {
-    5: "💡 <strong>¡Primer logro (Día 5)!</strong> La constancia hace al maestro. Recuerda que ahorrar no es lo que te sobra, es separar tu futuro antes de gastar.",
-    10: "🚀 <strong>¡Día 10 superado!</strong> Mantener el ritmo es el secreto. Evita los 'gastos hormiga' de esta semana para que tu meta no pierda fuerza.",
-    15: "🛡️ <strong>¡Día 15 encendido!</strong> Estás protegiendo tu paz mental. Tener dinero apartado te aleja de los préstamos informales de última hora.",
-    20: "🌟 <strong>¡Día 20 en la bolsa!</strong> Estás a nada de la meta. La disciplina que construyes hoy pagará los mejores intereses en tu diciembre."
-  };
-
-  for (let i = 1; i <= 22; i++) {
-    const esfera = document.createElement("div");
-    esfera.style = "width: 34px; height: 34px; border-radius: 50%; background: #E9ECEF; border: 2px solid #CED4DA; font-weight: bold; font-size: 12px; text-align: center; line-height: 30px; cursor: pointer; user-select: none; transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275); color: #495057; box-shadow: inset 0 -2px 4px rgba(0,0,0,0.1);";
-    esfera.textContent = i;
-
-    esfera.addEventListener("click", () => {
-      if (esferasCompletadas.has(i)) {
-        esferasCompletadas.delete(i);
-        esfera.style.background = "#E9ECEF";
-        esfera.style.borderColor = "#CED4DA";
-        esfera.style.color = "#495057";
-        esfera.style.boxShadow = "inset 0 -2px 4px rgba(0,0,0,0.1)";
-        esfera.style.transform = "scale(1)";
-      } else {
-        esferasCompletadas.add(i);
-        
-        let colorBrillo = "#FF4136";
-        if (i % 3 === 0) colorBrillo = "#FFDC00";
-        else if (i % 2 === 0) colorBrillo = "#2ECC40";
-        
-        esfera.style.background = colorBrillo;
-        esfera.style.borderColor = "#FFF";
-        esfera.style.color = colorBrillo === "#FFDC00" ? "#111" : "#FFF";
-        esfera.style.boxShadow = `0 0 8px ${colorBrillo}, inset 0 -2px 4px rgba(0,0,0,0.2)`;
-        esfera.style.transform = "scale(1.12)";
-      }
-
-      const totalMarcadas = esferasCompletadas.size;
-      const exitoBox = document.getElementById("mensajeExitoNavidad");
-      const estrella = document.getElementById("starXmas");
-      
-      if (totalMarcadas === 0) {
-        recompensaBox.innerHTML = `<div style="background: #F4F7F9; border: 1px solid #CED4DA; color: #495057; padding: 12px 16px; border-radius: 12px; font-size: 13px; text-align: center;">🎯 <strong>¡Comienza el reto!</strong> Ilumina tus primeras esferas de ahorro para desbloquear consejos de constancia financiera.</div>`;
-      } else if (totalMarcadas >= 20) {
-        recompensaBox.innerHTML = `<div style="background: #EBF7FF; border: 1px solid #BCE1FF; color: #005499; padding: 12px 16px; border-radius: 12px; font-size: 13px; text-align: center;">${consejosEducativos[20]}</div>`;
-      } else if (totalMarcadas >= 15) {
-        recompensaBox.innerHTML = `<div style="background: #EBF7FF; border: 1px solid #BCE1FF; color: #005499; padding: 12px 16px; border-radius: 12px; font-size: 13px; text-align: center;">${consejosEducativos[15]}</div>`;
-      } else if (totalMarcadas >= 10) {
-        recompensaBox.innerHTML = `<div style="background: #EBF7FF; border: 1px solid #BCE1FF; color: #005499; padding: 12px 16px; border-radius: 12px; font-size: 13px; text-align: center;">${consejosEducativos[10]}</div>`;
-      } else if (totalMarcadas >= 5) {
-        recompensaBox.innerHTML = `<div style="background: #EBF7FF; border: 1px solid #BCE1FF; color: #005499; padding: 12px 16px; border-radius: 12px; font-size: 13px; text-align: center;">${consejosEducativos[5]}</div>`;
-      } else {
-        recompensaBox.innerHTML = `<div style="background: #FFF9E6; border: 1px solid #FFEAA7; color: #8A6D1C; padding: 12px 16px; border-radius: 12px; font-size: 13px; text-align: center;">⚡ Llevas <strong>${totalMarcadas}</strong> esferas encendidas. ¡Sigue así para activar el próximo consejo de educación financiera!</div>`;
-      }
-
-      if (totalMarcadas === 22) {
-        if (estrella) {
-          estrella.style.color = "#FFD700";
-          estrella.style.filter = "drop-shadow(0 0 12px #FFD700) drop-shadow(0 0 25px #FFDC00)";
-          estrella.style.transform = "scale(1.4)";
-        }
-        if (exitoBox) exitoBox.style.display = "block";
-        if (progresoNum) progresoNum.style.display = "none";
-        recompensaBox.style.display = "none";
-      } else {
-        if (estrella) {
-          estrella.style.color = "#A0AAB2";
-          estrella.style.filter = "drop-shadow(0 1px 2px rgba(0,0,0,0.2))";
-          estrella.style.transform = "scale(1)";
-        }
-        if (exitoBox) exitoBox.style.display = "none";
-        recompensaBox.style.display = "block";
-        if (progresoNum) {
-          progresoNum.style.display = "block";
-          progresoNum.textContent = `Llevas ${totalMarcadas} de 22 semanas iluminadas.`;
-        }
-      }
-    });
-
-    lucesContainer.appendChild(esfera);
-  }
-}
-
+// =========================================================================
 // --- 9. LÓGICA DE LA PESTAÑA: ACADEMIA Y SIMULADORES INTERACTIVOS ---
+// =========================================================================
 function inicializarDineroOculto() {
-  const dineroOcultoContainer = document.getElementById("dineroOcultoContainer");
-  if (!dineroOcultoContainer) return;
-
-  const listaHabitos = [
-    { id: "habito_cafe", label: "☕ Cafecito o empanada en la calle", costo: 150, frecuencia: "veces por semana" },
-    { id: "habito_delivery", label: "🍗 Delivery de cena por antojo", costo: 600, frecuencia: "veces por semana" },
-    { id: "habito_streaming", label: "📺 Suscripción de streaming sin usar", costo: 550, frecuencia: "al mes (fijo)" },
-    { id: "habito_antojos", label: "🍬 Refrescos, picaderas o golosinas", costo: 100, frecuencia: "veces por semana" }
-  ];
-
-  let htmlContenido = `
-    <div style="background: #FFF9E6; border: 1px solid #FFEAA7; padding: 16px; border-radius: 14px; margin-bottom: 16px;">
-      <h4 style="margin: 0 0 6px 0; font-size: 14px; color: #8A6D1C; font-weight: 700;">🔍 DIAGNÓSTICO: DINERO OCULTO</h4>
-      <p style="margin: 0 0 12px 0; font-size: 12.5px; color: #555; line-height: 1.4;">
-        Los pequeños consumos de la semana se vuelven gigantes al mes. Selecciona con qué frecuencia realizas estos hábitos para descubrir tu fuga de dinero:
-      </p>
-      <div style="display: flex; flex-direction: column; gap: 12px;">
-  `;
-
-  listaHabitos.forEach(habito => {
-    if (habito.frecuencia.includes("semana")) {
-      htmlContenido += `
-        <div style="display: flex; flex-direction: column; gap: 4px; background: #fff; padding: 10px; border-radius: 10px; border: 1px solid #e1e6eb;">
-          <label style="font-size: 13px; font-weight: 600; color: #222;">${habito.label}</label>
-          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 2px;">
-            <span style="font-size: 11.5px; color: #666;">Costo apróx: RD$ ${habito.costo}</span>
-            <select class="input-habito-hormiga" data-id="${habito.id}" data-costo="${habito.costo}" data-tipo="semanal" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #ced4da; font-size: 12.5px; background: #f8f9fa; outline: none; font-weight: 600; color: #333;">
-              <option value="0">Nunca</option>
-              <option value="1">1 vez x semana</option>
-              <option value="3">3 veces x semana</option>
-              <option value="5">5 veces x semana</option>
-            </select>
-          </div>
-        </div>
-      `;
-    } else {
-      htmlContenido += `
-        <div style="display: flex; flex-direction: column; gap: 4px; background: #fff; padding: 10px; border-radius: 10px; border: 1px solid #e1e6eb;">
-          <label style="font-size: 13px; font-weight: 600; color: #222;">${habito.label}</label>
-          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 2px;">
-            <span style="font-size: 11.5px; color: #666;">Costo fijo: RD$ ${habito.costo} / mes</span>
-            <select class="input-habito-hormiga" data-id="${habito.id}" data-costo="${habito.costo}" data-tipo="mensual" style="padding: 4px 8px; border-radius: 6px; border: 1px solid #ced4da; font-size: 12.5px; background: #f8f9fa; outline: none; font-weight: 600; color: #333;">
-              <option value="0">No lo tengo</option>
-              <option value="1">Sí, lo pago mensual</option>
-            </select>
-          </div>
-        </div>
-      `;
-    }
-  });
-
-  htmlContenido += `
-      </div>
-      <div style="margin-top: 16px; padding-top: 12px; border-top: 1px dashed #FFEAA7; text-align: center;">
-        <div style="font-size: 13px; font-weight: 600; color: #444;">Fuga mensual estimada:</div>
-        <div id="totalDineroOcultoMensual" style="font-size: 20px; font-weight: 800; color: #D9381E; margin: 2px 0;">RD$ 0</div>
-        <div id="totalDineroOcultoAnual" style="font-size: 11.5px; color: #666; font-weight: 500;">Equivale a RD$ 0 asignados al año</div>
-      </div>
-    </div>
-  `;
-
-  dineroOcultoContainer.innerHTML = htmlContenido;
-
-  document.querySelectorAll(".input-habito-hormiga").forEach(select => {
-    select.addEventListener("change", calcularFugaDineroOculto);
-  });
-}
-
-function calcularFugaDineroOculto() {
-  let totalMensual = 0;
-
-  document.querySelectorAll(".input-habito-hormiga").forEach(select => {
-    const valor = parseFloat(select.value) || 0;
-    const costo = parseFloat(select.getAttribute("data-costo")) || 0;
-    const tipo = select.getAttribute("data-tipo");
-
-    if (tipo === "semanal") {
-      totalMensual += (valor * costo * 4.3333);
-    } else if (tipo === "mensual") {
-      totalMensual += (valor * costo);
-    }
-  });
-
-  const totalAnual = totalMensual * 12;
-  const txtMensual = document.getElementById("totalDineroOcultoMensual");
-  const txtAnual = document.getElementById("totalDineroOcultoAnual");
-
-  if (txtMensual) txtMensual.textContent = `RD$ ${Math.round(totalMensual).toLocaleString('es-DO')}`;
-  if (txtAnual) txtAnual.textContent = `💡 ¡Son RD$ ${Math.round(totalAnual).toLocaleString('es-DO')} al año! Imagina meter eso al Arbolito.`;
+  // Eliminado de la academia para mantenerla limpia y enfocada puramente en enseñar.
+  // La lógica de Dinero Oculto ahora vive de forma estratégica dentro de las Metas Financieras.
 }
 
 function inicializarSimuladorAFP() {
@@ -578,20 +99,9 @@ function inicializarSimuladorAFP() {
   }
 }
 
-function inicializarCreditoYOtros() {
-  const creditSlider = document.getElementById("creditSlider");
-  if (creditSlider) {
-    creditSlider.addEventListener("input", () => {
-      const val = creditSlider.value;
-      const paid = document.getElementById("creditPaid");
-      const label = document.getElementById("creditPctLabel");
-      if (label) label.textContent = `${val}%`;
-      if (paid) paid.textContent = `RD$ ${(25000 * (val/100)).toLocaleString('es-DO')}`;
-    });
-  }
-}
-
-// --- 10. LÓGICA DE LA PESTAÑA: METAS Y ENFOQUE CON DESPLEGABLES ---
+// =========================================================================
+// --- 10. LÓGICA DE LA PESTAÑA: METAS Y ENFOQUE CON DINERO OCULTO INTEGRADO ---
+// =========================================================================
 function inicializarMetasYEmprendimiento() {
   const targetAmount = document.getElementById("targetGoalAmount");
   const targetMonths = document.getElementById("targetGoalMonths");
@@ -616,7 +126,6 @@ function inicializarMetasYEmprendimiento() {
 }
 
 function actualizarAnalisisDelCoach() {
-  const sueldo = parseFloat(document.getElementById("income").value) || 0;
   const metaMonto = parseFloat(document.getElementById("targetGoalAmount").value) || 0;
   const metaMeses = parseFloat(document.getElementById("targetGoalMonths").value) || 0;
   
@@ -635,7 +144,7 @@ function actualizarAnalisisDelCoach() {
   alertBox.style.display = "block";
 
   const estiloSummary = "font-weight: 600; font-size: 14px; color: #111; cursor: pointer; padding: 12px; display: flex; justify-content: space-between; align-items: center; user-select: none; outline: none;";
-  const estiloContenido = "padding: 0 12px 14px 12px; font-size: 13.5px; line-height: 1.5; color: #444; border-top: 1px dashed #e1e6eb; margin-top: 8px; pt: 8px;";
+  const estiloContenido = "padding: 0 12px 14px 12px; font-size: 13.5px; line-height: 1.5; color: #444; border-top: 1px dashed #e1e6eb; margin-top: 8px; padding-top: 8px;";
   const estiloDetails = "background: #fff; border: 1px solid #e1e6eb; border-radius: 10px; margin-bottom: 10px; overflow: hidden; transition: all 0.2s ease;";
 
   let mensajeHTML = `
@@ -644,13 +153,82 @@ function actualizarAnalisisDelCoach() {
     </div>
     
     <div style="background: #F4F7f9; padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid #2D8ACE; font-size: 14px;">
-      Para lograr tu meta en el tiempo planeado, una buena referencia sería intentar separar unos 
+      Para lograr tu meta en el tiempo planeado, necesitas separar unos 
       <strong style="color: #2D8ACE; font-size: 15px;">RD$ ${cuotaMensual.toLocaleString('es-DO', {maximumFractionDigits:2})}</strong> al mes.
     </div>
 
-    <!-- UBICACIÓN OPTIMIZADA DEL TIP PRINCIPAL DE COMPROMISO -->
     <div style="background: #FFF9E6; border: 1px solid #FFEAA7; color: #D6A21E; padding: 10px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 6px; text-align: left; line-height: 1.4;">
-      💡 Tip: Abre una cuenta de ahorro aparte. Dinero que entra ahí no se toca hasta diciembre, salvo una emergencia real de salud.
+      💡 Tip de Compromiso: Abre una cuenta de ahorro aparte. Dinero que entra ahí no se toca hasta cumplir el plazo, salvo una emergencia real.
+    </div>
+
+    <!-- 🔍 INTEGRACIÓN ESTRATÉGICA: DINERO OCULTO EN METAS -->
+    <div style="background: #FFFDF0; border: 1px solid #F3E1B6; padding: 16px; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
+      <h4 style="margin: 0 0 6px 0; font-size: 14px; color: #8A6D1C; font-weight: 700;">🔍 ¿DE DÓNDE SACAR ESE DINERO? ENCUENTRA TU DINERO OCULTO</h4>
+      <p style="margin: 0 0 12px 0; font-size: 12.5px; color: #555; line-height: 1.4;">
+        Antes de pensar que no te alcanza, evalúa tus consumos cotidianos. Al descubrir y ajustar estos gastos ocultos, liberarás el dinero necesario para cubrir tu cuota mensual de ahorro:
+      </p>
+      
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <!-- Hábito 1 -->
+        <div style="display: flex; flex-direction: column; gap: 4px; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #e1e6eb;">
+          <label style="font-size: 12.5px; font-weight: 600; color: #222;">☕ Cafecito o empanada en la calle</label>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+            <span style="font-size: 11px; color: #666;">Costo apróx: RD$ 150</span>
+            <select class="input-habito-meta" data-costo="150" data-tipo="semanal" style="padding: 4px; border-radius: 6px; border: 1px solid #ced4da; font-size: 12px; background: #f8f9fa; font-weight: 600;">
+              <option value="0">Nunca</option>
+              <option value="1">1 vez x semana</option>
+              <option value="3">3 veces x semana</option>
+              <option value="5">5 veces x semana</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Hábito 2 -->
+        <div style="display: flex; flex-direction: column; gap: 4px; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #e1e6eb;">
+          <label style="font-size: 12.5px; font-weight: 600; color: #222;">🍗 Delivery de cena por antojo</label>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+            <span style="font-size: 11px; color: #666;">Costo apróx: RD$ 600</span>
+            <select class="input-habito-meta" data-costo="600" data-tipo="semanal" style="padding: 4px; border-radius: 6px; border: 1px solid #ced4da; font-size: 12px; background: #f8f9fa; font-weight: 600;">
+              <option value="0">Nunca</option>
+              <option value="1">1 vez x semana</option>
+              <option value="3">3 veces x semana</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Hábito 3 -->
+        <div style="display: flex; flex-direction: column; gap: 4px; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #e1e6eb;">
+          <label style="font-size: 12.5px; font-weight: 600; color: #222;">📺 Suscripción de streaming sin usar</label>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+            <span style="font-size: 11px; color: #666;">Costo fijo: RD$ 550 / mes</span>
+            <select class="input-habito-meta" data-costo="550" data-tipo="mensual" style="padding: 4px; border-radius: 6px; border: 1px solid #ced4da; font-size: 12px; background: #f8f9fa; font-weight: 600;">
+              <option value="0">No la tengo</option>
+              <option value="1">Sí, la pago mensual</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Hábito 4 -->
+        <div style="display: flex; flex-direction: column; gap: 4px; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #e1e6eb;">
+          <label style="font-size: 12.5px; font-weight: 600; color: #222;">🍬 Refrescos, picaderas o golosinas</label>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+            <span style="font-size: 11px; color: #666;">Costo apróx: RD$ 100</span>
+            <select class="input-habito-meta" data-costo="100" data-tipo="semanal" style="padding: 4px; border-radius: 6px; border: 1px solid #ced4da; font-size: 12px; background: #f8f9fa; font-weight: 600;">
+              <option value="0">Nunca</option>
+              <option value="1">1 vez x semana</option>
+              <option value="3">3 veces x semana</option>
+              <option value="5">5 veces x semana</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pizarra de Rescate Financiero -->
+      <div style="margin-top: 14px; padding-top: 10px; border-top: 1px dashed #F3E1B6; text-align: center;">
+        <div style="font-size: 12.5px; font-weight: 600; color: #555;">Dinero rescatado para tu meta:</div>
+        <div id="totalRescateMetaMensual" style="font-size: 18px; font-weight: 800; color: #1F7A5C; margin: 2px 0;">RD$ 0 / mes</div>
+        <div id="progresoFugaMetaAnual" style="font-size: 11px; color: #666; font-weight: 500;">¡Equivale a RD$ 0 acumulados al año!</div>
+      </div>
     </div>
 
     <details style="${estiloDetails}">
@@ -663,7 +241,7 @@ function actualizarAnalisisDelCoach() {
           Alcanzar esta cifra puede ser retador, ya que tu ingreso actual se encuentra por debajo de la canasta básica familiar promedio en el país (RD$ ${CANASTA_BASICA_RD.toLocaleString()}).
         </p>
         <p style="margin-top: 6px;">
-          Con el costo de productos esenciales en constante movimiento (como el pollo, el arroz o el aceite), es completamente normal sentir que el dinero rinde menos. ¡La calle tiene sus desafíos y no estás solo en esto!
+          Con el costo de productos esenciales en constante movimiento, es completamente normal sentir que el dinero rinde menos. ¡La calle tiene sus desafíos y no estás solo en esto!
         </p>
       </div>
     </details>
@@ -714,36 +292,76 @@ function actualizarAnalisisDelCoach() {
   alertBox.style.padding = '16px';
   alertBox.style.borderRadius = '14px';
 
+  // Reactividad inmediata en elementos móviles al inyectar el contenido
+  document.querySelectorAll(".input-habito-meta").forEach(select => {
+    select.addEventListener("change", calcularRescateEnMetas);
+  });
+
   entrepreneurshipModule.style.display = "block";
   renderizarIdeasDeEmprendimiento(cuotaMensual);
 }
 
+function calcularRescateEnMetas() {
+  let totalMensual = 0;
+
+  document.querySelectorAll(".input-habito-meta").forEach(select => {
+    const valor = parseFloat(select.value) || 0;
+    const costo = parseFloat(select.getAttribute("data-costo")) || 0;
+    const tipo = select.getAttribute("data-tipo");
+
+    if (tipo === "semanal") {
+      totalMensual += (valor * costo * 4.3333);
+    } else if (tipo === "mensual") {
+      totalMensual += (valor * costo);
+    }
+  });
+
+  const totalAnual = totalMensual * 12;
+  const txtMensual = document.getElementById("totalRescateMetaMensual");
+  const txtAnual = document.getElementById("progresoFugaMetaAnual");
+
+  if (txtMensual) {
+    txtMensual.textContent = `RD$ ${Math.round(totalMensual).toLocaleString('es-DO')} / mes`;
+  }
+  if (txtAnual) {
+    txtAnual.textContent = `¡Equivale a RD$ ${Math.round(totalAnual).toLocaleString('es-DO')} acumulados al año para tus metas!`;
+  }
+}
+
+// =========================================================================
+// --- 11. GENERACIÓN DINÁMICA DE SUGERENCIAS DE EMPRENDIMIENTO ---
+// =========================================================================
 function renderizarIdeasDeEmprendimiento(cuotaNecesaria) {
-  const container = document.getElementById("ideasCatalogContainer");
-  if (!container) return;
-  
+  const contenedorIdeas = document.getElementById("entrepreneurshipIdeasContainer");
+  if (!contenedorIdeas) return;
+
+  // Lista de ideas comunes contextualizadas al mercado dominicano
   const ideas = [
-    { titulo: "📸 Gestión de Redes para Negocios", desc: "Muchos salones o comercios locales necesitan apoyo digital. Manejar un par de cuentas de forma independiente podría aportar un estimado de...", ingreso: 10000 },
-    { titulo: "🧁 Venta de Postres o Snacks", desc: "Preparar opciones bajo pedido para conocidos u oficinas los fines de semana suele generar ingresos extras de aproximadamente...", ingreso: 7500 },
-    { titulo: "🚗 Tutorías o Asesorías", desc: "Compartir tus conocimientos en áreas como inglés, contabilidad o informática en tus tiempos libres puede sumanter un extra estimado de...", ingreso: 8000 }
+    { titulo: "Venta de ropa o accesorios virtuales", gananciaAprox: 8000 },
+    { titulo: "Servicios independientes / Freelance (Diseño, Redacción, Soporte)", gananciaAprox: 12000 },
+    { titulo: "Preparación de postres o picaderas por encargo", gananciaAprox: 6000 },
+    { titulo: "Tutorías escolares o mentorías especializadas", gananciaAprox: 5000 }
   ];
 
-  container.innerHTML = "";
-  ideas.forEach(idea => {
-    const card = document.createElement("div");
-    card.style = "background: #fff; padding: 15px; border: 1px solid #e1e6eb; border-radius: 12px; display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px;";
-    
-    const cubreMeta = idea.ingreso >= cuotaNecesaria;
-    const badge = cubreMeta ? `<span style="background: #3E9C77; color: white; font-size: 10px; padding: 4px 8px; border-radius: 6px; font-weight: bold; width: fit-content; margin-bottom: 2px;">💡 IDEA RECOMENDADA</span>` : '';
+  let htmlContenido = `<div style="display: flex; flex-direction: column; gap: 12px; margin-top: 12px;">`;
 
-    card.innerHTML = `
-      ${badge}
-      <div style="font-weight: 700; font-size: 14.5px; color: #111;">${idea.titulo}</div>
-      <div style="font-size: 13px; color: #666; line-height: 1.4;">${idea.desc}</div>
-      <div style="font-family: system-ui, -apple-system, sans-serif; font-size: 13px; font-weight: 700; color: #1F7A5C; margin-top: 4px; background: #E6F4EA; width: fit-content; padding: 2px 8px; border-radius: 4px;">
-        Ingreso promedio del mercado: ~RD$ ${idea.ingreso.toLocaleString()} / mes
+  ideas.forEach(idea => {
+    const porcentajeCubierto = Math.min(Math.round((idea.gananciaAprox / cuotaNecesaria) * 100), 100);
+    
+    htmlContenido += `
+      <div style="background: #fff; border: 1px solid #e1e6eb; padding: 12px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+        <div style="font-weight: 600; color: #222; font-size: 13.5px; margin-bottom: 4px;">${idea.titulo}</div>
+        <div style="display: flex; justify-content: space-between; font-size: 11.5px; color: #666; margin-bottom: 6px;">
+          <span>Ganancia estimada: <strong>RD$ ${idea.gananciaAprox.toLocaleString('es-DO')} /mes</strong></span>
+          <span style="color: #1F7A5C; font-weight: 600;">Cubre el ${porcentajeCubierto}% de tu cuota</span>
+        </div>
+        <div style="background: #f0f2f5; height: 6px; border-radius: 4px; overflow: hidden;">
+          <div style="background: #1F7A5C; width: ${porcentajeCubierto}%; height: 100%; border-radius: 4px;"></div>
+        </div>
       </div>
     `;
-    container.appendChild(card);
   });
+
+  htmlContenido += `</div>`;
+  contenedorIdeas.innerHTML = htmlContenido;
 }
