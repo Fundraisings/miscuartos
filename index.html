@@ -2,442 +2,522 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Miscuartos — Tu coach financiero de bolsillo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>miscuartos — Tu Coach Financiero</title>
+  <!-- Google Fonts para un look moderno y limpio -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-app: #f4f6f9;
+      --primary: #1a202c;
+      --accent: #FD8C45;
+      --text-main: #1a202c;
+      --text-muted: #718096;
+      --border-color: #edf2f7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-app);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    /* Contenedor tipo Teléfono Móvil */
+    .phone-container {
+      width: 100%;
+      max-width: 430px;
+      background: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 0 20px rgba(0,0,0,0.05);
+    }
+
+    /* --- PANTALLA SPLASH --- */
+    .splash-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #1a202c;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+      padding: 30px;
+      color: #fff;
+      text-align: center;
+    }
+
+    /* --- CONTENIDO PRINCIPAL --- */
+    .main-app-container {
+      display: none; /* Se activa mediante JS */
+      flex-direction: column;
+      flex: 1;
+      padding-bottom: 75px; /* Espacio para el nav inferior */
+    }
+
+    .app-header {
+      background: #ffffff;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .app-content {
+      padding: 16px;
+      flex: 1;
+    }
+
+    .tab-pane {
+      display: none;
+    }
+
+    /* --- NAVEGACIÓN INFERIOR DE PESTAÑAS --- */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      max-width: 430px;
+      background: #ffffff;
+      height: 65px;
+      display: flex;
+      border-top: 1px solid var(--border-color);
+      z-index: 90;
+    }
+
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #a0aec0;
+      cursor: pointer;
+      gap: 4px;
+    }
+
+    .nav-item.active {
+      color: var(--accent);
+    }
+
+    .nav-icon {
+      font-size: 20px;
+    }
+
+    /* --- MODAL FLOTANTE --- */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .modal-box {
+      background: #fff;
+      width: 100%;
+      max-width: 360px;
+      border-radius: 16px;
+      padding: 20px;
+      position: relative;
+    }
+
+    /* Estilos extras reutilizables */
+    .xmas-levels { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 12px; }
+    .xmas-level { padding: 8px; background: #fff; border: 1px solid var(--border-color); border-radius: 8px; font-size: 11.5px; font-weight: 700; text-align: center; cursor: pointer; }
+    .xmas-level.active { background: #319795; color: #fff; border-color: #319795; }
+    
+    input[type="number"], input[type="text"] {
+      -moz-appearance: textfield;
+    }
+    input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+      -webkit-appearance: none; margin: 0;
+    }
+  </style>
 </head>
 <body>
 
-<!-- PANTALLA DE INTRODUCCIÓN ESPECTACULAR (SPLASH SCREEN) -->
-<div id="app-splash" class="splash-screen">
-  <div class="splash-content">
-    <div class="splash-compass-wrap">
-      <svg class="splash-compass" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="50" cy="50" r="45" stroke="currentColor" stroke-width="6" fill="none"/>
-        <line x1="50" y1="5" x2="50" y2="15" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
-        <line x1="50" y1="85" x2="50" y2="95" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
-        <line x1="5" y1="50" x2="15" y2="50" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
-        <line x1="85" y1="50" x2="95" y2="50" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
-        <polygon points="50,15 42,50 50,50" fill="#FD8C45"/>
-        <polygon points="50,15 58,50 50,50" fill="#FD8C45" opacity="0.9"/>
-        <polygon points="50,85 42,50 50,50" fill="currentColor"/>
-        <polygon points="50,85 58,50 50,50" fill="currentColor" opacity="0.95"/>
-      </svg>
+  <div class="phone-container">
+
+    <!-- A. SPLASH SCREEN -->
+    <div id="app-splash" class="splash-screen">
+      <div style="font-size: 42px; margin-bottom: 8px;">📊</div>
+      <h1 style="font-size: 26px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 6px;">miscuartos</h1>
+      <p style="font-size: 13.5px; color: #a0aec0; max-width: 260px; margin-bottom: 30px; line-height: 1.4;">Toma el control de tus ingresos, planifica metas reales y elimina fugas de dinero.</p>
+      <button id="enterAppBtn" style="background: var(--accent); color: #fff; border: none; padding: 14px 32px; border-radius: 25px; font-size: 14px; font-weight: 700; cursor: pointer; width: 80%; box-shadow: 0 4px 12px rgba(253, 140, 69, 0.3);">
+        Entrar al Dashboard
+      </button>
     </div>
 
-    <div class="splash-brand">miscuartos</div>
-    <div class="splash-tagline">Tu coach financiero de bolsillo</div>
-    <div class="splash-desc">Una app diseñada para guiarte y ayudarte a manejar de forma inteligente tu dinero.</div>
-
-    <div class="splash-cultural-note">
-      * <strong>miscuartos:</strong> Expresión dominicana con la que nos referimos a nuestro dinero ganao' con esfuerzo ("dame mis cuartos", "trabajando duro por mis cuartos").
-    </div>
-
-    <button class="splash-btn" id="enterAppBtn">Comenzar a guiarme →</button>
-  </div>
-</div>
-
-<!-- CONTENEDOR PRINCIPAL DE LA APP -->
-<div class="app-container" id="mainAppContainer" style="display: none;">
-
-  <header class="app-header">
-    <div class="wordmark">
-      <svg class="brand-compass-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="50" cy="50" r="45" stroke="currentColor" stroke-width="8" fill="none"/>
-        <line x1="50" y1="5" x2="50" y2="15" stroke="currentColor" stroke-width="8" stroke-linecap="round"/>
-        <line x1="50" y1="85" x2="50" y2="95" stroke="currentColor" stroke-width="8" stroke-linecap="round"/>
-        <line x1="5" y1="50" x2="15" y2="50" stroke="currentColor" stroke-width="8" stroke-linecap="round"/>
-        <line x1="85" y1="50" x2="95" y2="50" stroke="currentColor" stroke-width="8" stroke-linecap="round"/>
-        <polygon points="50,15 42,50 50,50" fill="#FD8C45"/>
-        <polygon points="50,15 58,50 50,50" fill="#FD8C45" opacity="0.9"/>
-        <polygon points="50,85 42,50 50,50" fill="currentColor"/>
-        <polygon points="50,85 58,50 50,50" fill="currentColor" opacity="0.95"/>
-      </svg>
-      miscuartos
-    </div>
-  </header>
-
-  <main class="app-content">
-
-    <!-- PESTAÑA 1: PRESUPUESTO -->
-    <section id="pane-presupuesto" class="tab-pane active">
-      <div class="intro-block">
-        <div class="welcome-badge">¡Qué bueno tenerte aquí! 👋</div>
-        <h1>Tus cuartos, bajo tu control</h1>
-        <p class="sub">Manejar tu dinero no tiene que ser aburrido. Esta app es <strong>educativa, interactiva y retadora</strong>. Pon tus números abajo y mira el cambio. ¡Explora las pestañas inferiores!</p>
-      </div>
-
-      <div class="video-native-box">
-        <div class="video-embed-container" id="embed-tutorial">
-          <div class="video-placeholder-luxury"><span>▶ Reproducir tutorial de la app (2 min)</span></div>
+    <!-- B. CONTENEDOR CENTRAL DE LA APP -->
+    <div id="mainAppContainer" class="main-app-container">
+      
+      <!-- HEADER FIJO -->
+      <header class="app-header">
+        <div>
+          <span style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Mi Billetera</span>
+          <h2 style="font-size: 18px; font-weight: 800; color: #111; margin-top: -2px;">Dashboard</h2>
         </div>
-      </div>
-
-      <!-- CASILLA DE INGRESO UNIFICADA CON BORDE DE MARCA -->
-      <div class="income-card" style="border: 2px solid #FD8C45; border-radius: 16px; padding: 16px; background: var(--bg-card, #fff); margin-bottom: 24px;">
-        <label for="income" style="display: block; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; color: var(--ink, #111);">Ingreso ganado este mes</label>
-        <div class="income-input-row" style="display: flex; align-items: center; gap: 8px;">
-          <span class="currency" style="font-size: 24px; font-weight: 700; color: #FD8C45;">$</span>
-          <input type="number" id="income" placeholder="Ej. 50,000" inputmode="decimal" style="width: 100%; border: none; background: transparent; font-size: 24px; font-weight: 700; color: var(--ink, #111); outline: none;">
+        <!-- Casilla de Ingreso Mensual del Usuario -->
+        <div style="text-align: right; background: #f1f5f9; padding: 6px 12px; border-radius: 10px;">
+          <label style="display: block; font-size: 10px; font-weight: 700; color: #64748b;">INGRESOS MENSUALES</label>
+          <div style="display: flex; align-items: center; gap: 3px;">
+            <span style="font-size: 12px; font-weight: 700; color: #334155;">RD$</span>
+            <input type="number" id="income" placeholder="0" style="width: 80px; border: none; background: transparent; font-size: 13.5px; font-weight: 700; color: #1e293b; text-align: right; outline: none;">
+          </div>
         </div>
-      </div>
+      </header>
 
-      <!-- CONTENEDOR NUEVO Y ACTUALIZADO: GASTOS DEL MES (5 ÍTEMS CON IMAGEN A LA DERECHA Y MENSAJE ABAJO) -->
-      <div class="expenses-card" style="background: #ffffff; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 24px;">
-        
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-          <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: #111;">📉 Tus gastos este mes</h3>
-          <span id="totalGastosMonto" style="font-size: 16px; font-weight: 800; color: #FD8C45;">RD$ 0</span>
-        </div>
+      <!-- SECCIONES / PESTAÑAS (TAB PANES) -->
+      <main class="app-content">
 
-        <div class="categories-list" style="display: flex; flex-direction: column; gap: 14px;">
+        <!-- PESTAÑA 1: PRESUPUESTO (7 CATEGORÍAS ORIGINALES + COACH) -->
+        <div id="pane-presupuesto" class="tab-pane" style="display: block;">
           
-          <!-- 1. Cuentas y Servicios -->
-          <div style="display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 10px 14px; border-radius: 12px; border: 1px solid #edf2f7;">
-            <div style="flex: 1;">
-              <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 4px;">🏠 Cuentas y Servicios <span title="Luz, agua, internet, alquiler, etc." style="cursor:pointer; color:#a0aec0;">ℹ️</span></label>
-              <div style="display: flex; align-items: center; gap: 4px;">
-                <span style="font-size: 12px; color: #718096; font-weight: 600;">RD$</span>
-                <input type="number" class="input-gasto-item" data-categoria="servicios" placeholder="0" style="width: 80%; border: none; background: transparent; font-size: 14px; font-weight: 700; color: #1a202c; outline: none;">
+          <div class="expenses-card" style="background: #ffffff; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 24px;">
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <h3 style="margin: 0; font-size: 16px; font-weight: 700; color: #111;">📉 Tus gastos este mes</h3>
+              <span id="totalGastosMonto" style="font-size: 16px; font-weight: 800; color: var(--accent);">RD$ 0</span>
+            </div>
+
+            <div class="categories-list" style="display: flex; flex-direction: column; gap: 14px;">
+              
+              <!-- 1. Cuentas y Servicios -->
+              <div style="display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 10px 14px; border-radius: 12px; border: 1px solid #edf2f7;">
+                <div style="flex: 1;">
+                  <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 4px;">🏠 Cuentas y Servicios <span title="Luz, agua, internet, alquiler, etc." style="cursor:pointer; color:#a0aec0;">ℹ️</span></label>
+                  <div style="display: flex; align-items: center; gap: 4px;">
+                    <span style="font-size: 12px; color: #718096; font-weight: 600;">RD$</span>
+                    <input type="number" class="input-gasto-item" data-name="Cuentas y Servicios" placeholder="0" style="width: 80%; border: none; background: transparent; font-size: 14px; font-weight: 700; color: #1a202c; outline: none;">
+                  </div>
+                </div>
+                <div style="font-size: 24px; padding-left: 10px; opacity: 0.85;">🏠</div>
+              </div>
+
+              <!-- 2. Supermercado y Comida -->
+              <div style="display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 10px 14px; border-radius: 12px; border: 1px solid #edf2f7;">
+                <div style="flex: 1;">
+                  <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 4px;">🛒 Supermercado y Comida <span title="Compra del súper, colmado, mercados" style="cursor:pointer; color:#a0aec0;">ℹ️</span></label>
+                  <div style="display: flex; align-items: center; gap: 4px;">
+                    <span style="font-size: 12px; color: #718096; font-weight: 600;">RD$</span>
+                    <input type="number" class="input-gasto-item" data-name="Supermercado y Comida" placeholder="0" style="width: 80%; border: none; background: transparent; font-size: 14px; font-weight: 700; color: #1a202c; outline: none;">
+                  </div>
+                </div>
+                <div style="font-size: 24px; padding-left: 10px; opacity: 0.85;">🛒</div>
+              </div>
+
+              <!-- 3. Transporte y Gasolina -->
+              <div style="display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 10px 14px; border-radius: 12px; border: 1px solid #edf2f7;">
+                <div style="flex: 1;">
+                  <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 4px;">🚗 Transporte y Gasolina <span title="Combustible, concho, metro, Uber o mantenimiento" style="cursor:pointer; color:#a0aec0;">ℹ️</span></label>
+                  <div style="display: flex; align-items: center; gap: 4px;">
+                    <span style="font-size: 12px; color: #718096; font-weight: 600;">RD$</span>
+                    <input type="number" class="input-gasto-item" data-name="Transporte y Gasolina" placeholder="0" style="width: 80%; border: none; background: transparent; font-size: 14px; font-weight: 700; color: #1a202c; outline: none;">
+                  </div>
+                </div>
+                <div style="font-size: 24px; padding-left: 10px; opacity: 0.85;">🚗</div>
+              </div>
+
+              <!-- 4. Gustos y Salidas -->
+              <div style="display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 10px 14px; border-radius: 12px; border: 1px solid #edf2f7;">
+                <div style="flex: 1;">
+                  <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 4px;">🍹 Gustos y Salidas <span title="Restaurantes, cine, desarreglos, compras de antojos" style="cursor:pointer; color:#a0aec0;">ℹ️</span></label>
+                  <div style="display: flex; align-items: center; gap: 4px;">
+                    <span style="font-size: 12px; color: #718096; font-weight: 600;">RD$</span>
+                    <input type="number" class="input-gasto-item" data-name="Gustos y Salidas" placeholder="0" style="width: 80%; border: none; background: transparent; font-size: 14px; font-weight: 700; color: #1a202c; outline: none;">
+                  </div>
+                </div>
+                <div style="font-size: 24px; padding-left: 10px; opacity: 0.85;">🍹</div>
+              </div>
+
+              <!-- 5. Mascotas -->
+              <div style="display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 10px 14px; border-radius: 12px; border: 1px solid #edf2f7;">
+                <div style="flex: 1;">
+                  <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 4px;">🐾 Mascotas <span title="Comida, clínica, aseo de tus animalitos" style="cursor:pointer; color:#a0aec0;">ℹ️</span></label>
+                  <div style="display: flex; align-items: center; gap: 4px;">
+                    <span style="font-size: 12px; color: #718096; font-weight: 600;">RD$</span>
+                    <input type="number" class="input-gasto-item" data-name="Mascotas" placeholder="0" style="width: 80%; border: none; background: transparent; font-size: 14px; font-weight: 700; color: #1a202c; outline: none;">
+                  </div>
+                </div>
+                <div style="font-size: 24px; padding-left: 10px; opacity: 0.85;">🐾</div>
+              </div>
+
+              <!-- 6. Tarjetas y Préstamos -->
+              <div style="display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 10px 14px; border-radius: 12px; border: 1px solid #edf2f7;">
+                <div style="flex: 1;">
+                  <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 4px;">💳 Tarjetas y Préstamos <span title="Pagos mensuales de deudas bancarias" style="cursor:pointer; color:#a0aec0;">ℹ️</span></label>
+                  <div style="display: flex; align-items: center; gap: 4px;">
+                    <span style="font-size: 12px; color: #718096; font-weight: 600;">RD$</span>
+                    <input type="number" class="input-gasto-item" data-name="Tarjetas y Préstamos" placeholder="0" style="width: 80%; border: none; background: transparent; font-size: 14px; font-weight: 700; color: #1a202c; outline: none;">
+                  </div>
+                </div>
+                <div style="font-size: 24px; padding-left: 10px; opacity: 0.85;">💳</div>
+              </div>
+
+              <!-- 7. Imprevistos y Otros -->
+              <div style="display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 10px 14px; border-radius: 12px; border: 1px solid #edf2f7;">
+                <div style="flex: 1;">
+                  <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 4px;">🩺 Imprevistos y Otros <span title="Emergencias médicas u otros imprevistos rápidos" style="cursor:pointer; color:#a0aec0;">ℹ️</span></label>
+                  <div style="display: flex; align-items: center; gap: 4px;">
+                    <span style="font-size: 12px; color: #718096; font-weight: 600;">RD$</span>
+                    <input type="number" class="input-gasto-item" data-name="Imprevistos y Otros" placeholder="0" style="width: 80%; border: none; background: transparent; font-size: 14px; font-weight: 700; color: #1a202c; outline: none;">
+                  </div>
+                </div>
+                <div style="font-size: 24px; padding-left: 10px; opacity: 0.85;">🩺</div>
+              </div>
+
+            </div>
+
+            <!-- ACCIÓN INTEGRADA PARA DISPARAR RESUMEN -->
+            <button id="btnVerResumen" style="width: 100%; margin-top: 16px; background: #1a202c; color: #fff; border: none; padding: 12px; border-radius: 12px; font-size: 13.5px; font-weight: 700; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px;">
+              📊 Ver Resumen y Compartir
+            </button>
+
+            <!-- DIAGNÓSTICO DEL COACH ABAJO DE LA CAJA -->
+            <div id="coachGastosFeedback" style="margin-top: 16px; padding: 12px 14px; border-radius: 12px; background: #f7fafc; border: 1px solid #e2e8f0; font-size: 12.5px; line-height: 1.45; color: #4a5568;">
+              💡 <strong>Estado del Presupuesto:</strong> Ingresa tus montos para evaluar cómo va la distribución de tus cuartos este mes.
+            </div>
+
+          </div>
+        </div>
+
+        <!-- PESTAÑA 2: RETOS (RETO NAVIDEÑO DE 22 SEMANAS) -->
+        <div id="pane-retos" class="tab-pane">
+          <div style="background: #ffffff; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+              <span style="font-size: 24px;">🎄</span>
+              <div>
+                <h3 style="font-size: 16px; font-weight: 700; color: #111;">Reto Navideño de Ahorro</h3>
+                <p style="font-size: 11.5px; color: var(--text-muted);">22 semanas con incrementos escalonados</p>
               </div>
             </div>
-            <div style="font-size: 24px; padding-left: 10px; opacity: 0.85;">🏠</div>
-          </div>
 
-          <!-- 2. Supermercado y Comida -->
-          <div style="display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 10px 14px; border-radius: 12px; border: 1px solid #edf2f7;">
-            <div style="flex: 1;">
-              <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 4px;">🛒 Supermercado y Comida <span title="Compra del súper, colmado, mercados" style="cursor:pointer; color:#a0aec0;">ℹ️</span></label>
-              <div style="display: flex; align-items: center; gap: 4px;">
-                <span style="font-size: 12px; color: #718096; font-weight: 600;">RD$</span>
-                <input type="number" class="input-gasto-item" data-categoria="comida" placeholder="0" style="width: 80%; border: none; background: transparent; font-size: 14px; font-weight: 700; color: #1a202c; outline: none;">
+            <!-- Niveles de Reto -->
+            <div class="xmas-levels">
+              <div class="xmas-level" data-level="25">RD$25</div>
+              <div class="xmas-level active" data-level="50">RD$50</div>
+              <div class="xmas-level" data-level="100">RD$100</div>
+              <div class="xmas-level" data-level="custom">Otro</div>
+            </div>
+
+            <!-- Fila dinámica si elige "Otro" monto base -->
+            <div id="xmasCustomInputRow" style="display: none; background: #f8f9fa; padding: 10px; border-radius: 10px; margin-bottom: 12px; border: 1px dashed #cbd5e1;">
+              <label style="display: block; font-size: 11px; font-weight: 700; color: #4a5568; margin-bottom: 4px;">Monto Base Personalizado:</label>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <input type="number" id="xmasCustomAmount" value="150" style="width: 90px; padding: 6px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; font-weight: 700;">
+                <span id="xmasCustomMetaTag" style="font-size: 11.5px; font-weight: 600; color: #319795;"></span>
               </div>
             </div>
-            <div style="font-size: 24px; padding-left: 10px; opacity: 0.85;">🛒</div>
+
+            <div style="background: #EDF2F7; padding: 10px 14px; border-radius: 10px; font-size: 12.5px; font-weight: 700; color: #2d3748; display: flex; justify-content: space-between; margin-bottom: 14px;">
+              <span>Ahorro Acumulado:</span>
+              <span id="xmasProgressNum" style="color: #2b6cb0;">RD$ 0</span>
+            </div>
+
+            <!-- Lista scrolleable de semanas -->
+            <div id="xmasWeeks" style="max-height: 280px; overflow-y: auto; padding-right: 4px;">
+              <!-- Se inyecta dinámicamente -->
+            </div>
+          </div>
+        </div>
+
+        <!-- PESTAÑA 3: RUTA DE METAS (FONDO DE EMERGENCIA, BRECHA E INGRESOS) -->
+        <div id="pane-metas" class="tab-pane">
+          
+          <!-- 1. Calculadora de Fondo de Emergencia -->
+          <div style="background: #ffffff; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px;">
+            <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 4px; color: #111;">🛡️ Tu Fondo de Emergencia</h3>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px;">Calcula tu colchón de protección según tus gastos actuales.</p>
+            
+            <div style="margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; font-size: 12.5px; font-weight: 600; margin-bottom: 6px;">
+                <span>Meses de cobertura:</span>
+                <span id="emergencyMonthsLabel" style="color: #319795; font-weight: 700;">3 meses</span>
+              </div>
+              <input type="range" id="emergencySlider" min="1" max="12" value="3" style="width: 100%; accent-color: #319795;">
+            </div>
+
+            <div style="background: #F7FAFC; border-left: 4px solid #319795; padding: 10px 12px; border-radius: 0 10px 10px 0;">
+              <span style="font-size: 11px; font-weight: 700; color: #718096; display: block;">MONTO TOTAL RECOMENDADO:</span>
+              <span id="emergencyTotalVal" style="font-family: 'IBM Plex Mono', monospace; font-size: 18px; font-weight: 700; color: #234E52;">RD$ 0</span>
+            </div>
           </div>
 
-          <!-- 3. Transporte y Gasolina -->
-          <div style="display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 10px 14px; border-radius: 12px; border: 1px solid #edf2f7;">
-            <div style="flex: 1;">
-              <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 4px;">🚗 Transporte y Gasolina <span title="Combustible, concho, metro, Uber o mantenimiento" style="cursor:pointer; color:#a0aec0;">ℹ️</span></label>
-              <div style="display: flex; align-items: center; gap: 4px;">
-                <span style="font-size: 12px; color: #718096; font-weight: 600;">RD$</span>
-                <input type="number" class="input-gasto-item" data-categoria="transporte" placeholder="0" style="width: 80%; border: none; background: transparent; font-size: 14px; font-weight: 700; color: #1a202c; outline: none;">
+          <!-- 2. Planificador Inteligente de Metas -->
+          <div style="background: #ffffff; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 24px;">
+            <h3 style="font-size: 15px; font-weight: 700; margin-bottom: 12px; color: #111;">🎯 Planificador de Metas</h3>
+            
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px;">
+              <div>
+                <label style="display: block; font-size: 11.5px; font-weight: 600; margin-bottom: 4px; color: #4a5568;">¿Cuál es tu meta?</label>
+                <input type="text" id="targetGoalName" placeholder="Ej: Inicial del carro, Laptop" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px;">
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div>
+                  <label style="display: block; font-size: 11.5px; font-weight: 600; margin-bottom: 4px; color: #4a5568;">Monto total (RD$)</label>
+                  <input type="number" id="targetGoalAmount" placeholder="Monto" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; font-weight: 700;">
+                </div>
+                <div>
+                  <label style="display: block; font-size: 11.5px; font-weight: 600; margin-bottom: 4px; color: #4a5568;">¿En cuántos meses?</label>
+                  <input type="number" id="targetGoalMonths" placeholder="Meses" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; font-weight: 700;">
+                </div>
               </div>
             </div>
-            <div style="font-size: 24px; padding-left: 10px; opacity: 0.85;">🚗</div>
+
+            <!-- Bloque Alerta Brecha & Módulo de Dinero Oculto -->
+            <div id="coachAlertBox" style="display: none; padding: 12px; border-radius: 12px; font-size: 12.5px; line-height: 1.45; margin-bottom: 16px;"></div>
+
+            <!-- Motor de Ingresos Extras (Micro-emprendimientos) -->
+            <div id="entrepreneurshipModule" style="display: none; background: #FFF5F5; border: 1px solid #FED7D7; padding: 14px; border-radius: 14px;">
+              <h4 style="font-size: 13px; font-weight: 700; color: #9b2c2c; margin-bottom: 8px; display: flex; align-items: center; gap: 4px;">🚀 Ideas de Micro-ingresos Rápidos</h4>
+              <p style="font-size: 12px; color: #742A2A; margin-bottom: 12px;">Estrategias locales recomendadas para generar los cuartos que te faltan y cubrir la brecha:</p>
+              <div id="entrepreneurshipIdeasContainer" style="display: flex; flex-direction: column; gap: 10px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PESTAÑA 4: ACADEMIA (SIMULADORES INTERACTIVOS) -->
+        <div id="pane-academia" class="tab-pane">
+          
+          <!-- Bloque 1: Simulador AFP -->
+          <div style="background: #ffffff; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 16px;">
+            <h3 style="font-size: 14.5px; font-weight: 700; color: #111; margin-bottom: 4px;">📈 Ley SIPEN: Impacto Real en tu AFP</h3>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Mira cuánto quita la ley (2.87%) y cuánto pone tu jefe (7.10%).</p>
+            <input type="number" id="afpSalario" placeholder="Digita tu sueldo base (RD$)" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; font-weight: 700; margin-bottom: 10px;">
+            <div id="afpSimResult" style="font-size: 12.5px; line-height: 1.5; color: #2d3748; background: #f8f9fa; padding: 10px; border-radius: 8px;"></div>
           </div>
 
-          <!-- 4. Gustos y Salidas -->
-          <div style="display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 10px 14px; border-radius: 12px; border: 1px solid #edf2f7;">
-            <div style="flex: 1;">
-              <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 4px;">🍹 Gustos y Salidas <span title="Restaurantes, cine, desarreglos, compras de antojos" style="cursor:pointer; color:#a0aec0;">ℹ️</span></label>
-              <div style="display: flex; align-items: center; gap: 4px;">
-                <span style="font-size: 12px; color: #718096; font-weight: 600;">RD$</span>
-                <input type="number" class="input-gasto-item" data-categoria="gustos" placeholder="0" style="width: 80%; border: none; background: transparent; font-size: 14px; font-weight: 700; color: #1a202c; outline: none;">
+          <!-- Bloque 2: Simulador Tarjeta de Crédito -->
+          <div style="background: #ffffff; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 16px;">
+            <h3 style="font-size: 14.5px; font-weight: 700; color: #111; margin-bottom: 4px;">💳 Tarjeta: ¿Totalero o Pago Mínimo?</h3>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Simulación con balance de RD$ 25,000 (Financiamiento ~52% anual).</p>
+            
+            <div style="margin-bottom: 12px;">
+              <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; margin-bottom: 4px;">
+                <span>Tu porcentaje de pago:</span>
+                <span id="creditPctLabel" style="color: #dd6b20;">10%</span>
+              </div>
+              <input type="range" id="creditSlider" min="10" max="100" step="5" value="10" style="width: 100%; accent-color: #dd6b20;">
+              <span id="creditTag" style="display: block; font-size: 11.5px; font-weight: 700; margin-top: 4px; text-align: right;"></span>
+            </div>
+
+            <div style="background: #fffaf0; border: 1px solid #feebc8; padding: 10px; border-radius: 10px; font-size: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; color: #7b341e;">
+              <div>Abonas: <strong id="creditPaid">RD$ 0</strong></div>
+              <div>Pendiente: <strong id="creditRemaining">RD$ 0</strong></div>
+              <div style="grid-column: span 2; border-top: 1px dashed #fbd38d; padding-top: 4px; margin-top: 2px;">
+                💸 Interés generado este mes: <strong id="creditInterest" style="color: #c05621;">RD$ 0</strong>
               </div>
             </div>
-            <div style="font-size: 24px; padding-left: 10px; opacity: 0.85;">🍹</div>
           </div>
 
-          <!-- 5. Imprevistos y Otros -->
-          <div style="display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 10px 14px; border-radius: 12px; border: 1px solid #edf2f7;">
-            <div style="flex: 1;">
-              <label style="display: block; font-size: 13px; font-weight: 600; color: #2d3748; margin-bottom: 4px;">🩺 Imprevistos y Otros <span title="Gastos médicos sorpresa, reparaciones u otros renglones" style="cursor:pointer; color:#a0aec0;">ℹ️</span></label>
-              <div style="display: flex; align-items: center; gap: 4px;">
-                <span style="font-size: 12px; color: #718096; font-weight: 600;">RD$</span>
-                <input type="number" class="input-gasto-item" data-categoria="otros" placeholder="0" style="width: 80%; border: none; background: transparent; font-size: 14px; font-weight: 700; color: #1a202c; outline: none;">
-              </div>
+          <!-- Bloque 3: Módulo de Finanzas para Niños (Upsell) -->
+          <div style="background: #ffffff; border-radius: 16px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 2px dashed #9bc5fe; position: relative;">
+            <h3 style="font-size: 14.5px; font-weight: 700; color: #1e3a8a; margin-bottom: 4px;">🧒 Módulo Finanzas para Niños</h3>
+            
+            <div id="kidsPreview">
+              <p style="font-size: 12px; color: #475569; margin-bottom: 12px;">Enseña el valor del ahorro a tus hijos con dinámicas de alcancía digital.</p>
+              <button id="kidsUnlockBtn" style="width: 100%; background: #3b82f6; color: #fff; border: none; padding: 10px; border-radius: 8px; font-size: 12.5px; font-weight: 700; cursor: pointer;">
+                🔓 Desbloquear Módulo Gratuito
+              </button>
             </div>
-            <div style="font-size: 24px; padding-left: 10px; opacity: 0.85;">🩺</div>
+
+            <div id="kidsFull" style="display: none; animation: fadeIn 0.4s ease;">
+              <p style="font-size: 12px; color: #1e40af; background: #eff6ff; padding: 8px; border-radius: 6px; margin-bottom: 10px; font-weight: 600;">
+                🎉 ¡Activado! Utiliza la regla de los tres envases para tus hijos:
+              </p>
+              <ul style="font-size: 12px; color: #1e3a8a; padding-left: 16px; line-height: 1.5;">
+                <li>🐖 <b>Ahorro (50%):</b> Para juguetes grandes a largo plazo.</li>
+                <li>🛒 <b>Gasto (40%):</b> Para antojos y salidas semanales.</li>
+                <li>🎁 <b>Dar (10%):</b> Para comprar regalos de cumpleaños a amiguitos.</li>
+              </ul>
+            </div>
           </div>
 
         </div>
 
-        <!-- ABAJO: MENSAJE EDUCATIVO DINÁMICO DEL COACH SOBRE SU ECONOMÍA -->
-        <div id="coachGastosFeedback" style="margin-top: 16px; padding: 12px 14px; border-radius: 12px; background: #f7fafc; border: 1px solid #e2e8f0; font-size: 12.5px; line-height: 1.45; color: #4a5568;">
-          💡 <strong>Estado del Presupuesto:</strong> Ingresa tus montos para evaluar cómo va la distribución de tus cuartos este mes.
+      </main>
+
+      <!-- NAVEGACIÓN INFERIOR DE PESTAÑAS (BARRA FIJA) -->
+      <nav class="bottom-nav">
+        <div class="nav-item active" data-tab="presupuesto">
+          <span class="nav-icon">📊</span>
+          <span>Presupuesto</span>
         </div>
-
-      </div>
-    </section>
-
-    <!-- PESTAÑA 2: RETO NAVIDEÑO -->
-    <section id="pane-reto" class="tab-pane" style="display: none;">
-      <div class="intro-block">
-        <h1>Mi Reto Navideño</h1>
-        <p class="sub">De agosto a diciembre 2026 · 22 semanas</p>
-        <p class="sub" style="margin-top: 8px; font-size: 13.5px; line-height: 1.5; color: var(--muted, #666);">
-          Inspirado en el famoso reto de las 52 semanas, adaptamos esta versión para comenzar en la primera semana de agosto y acompañarte hasta diciembre 2026. ¡Tus ahorros de Navidad en solo 22 semanas!
-        </p>
-      </div>
-
-      <div class="video-native-box">
-        <div class="video-embed-container" id="embed-reto-xmas">
-          <div class="video-placeholder-luxury" style="background: #1A0F0A; border: 1px solid rgba(253, 140, 69, 0.2);">
-            <span style="color: var(--brand-orange);">▶ Cómo funciona el Reto Navideño (2 min)</span>
-          </div>
+        <div class="nav-item" data-tab="retos">
+          <span class="nav-icon">🎄</span>
+          <span>Retos</span>
         </div>
-      </div>
-
-      <div class="xmas-card">
-        <div class="xmas-levels" id="xmasLevels">
-          <div class="xmas-level" data-level="25">
-            <div class="xmas-level-name">BÁSICO</div>
-            <div class="xmas-level-amt">+RD$25/sem</div>
-            <div style="font-size: 10px; font-weight: 600; opacity: 0.8; margin-top: 4px;">Meta: RD$6,325</div>
-          </div>
-          <div class="xmas-level active" data-level="50">
-            <div class="xmas-level-name">MEDIO</div>
-            <div class="xmas-level-amt">+RD$50/sem</div>
-            <div style="font-size: 10px; font-weight: 600; opacity: 0.8; margin-top: 4px;">Meta: RD$12,650</div>
-          </div>
-          <div class="xmas-level" data-level="100">
-            <div class="xmas-level-name">PRO</div>
-            <div class="xmas-level-amt">+RD$100/sem</div>
-            <div style="font-size: 10px; font-weight: 600; opacity: 0.8; margin-top: 4px;">Meta: RD$25,300</div>
-          </div>
-          <div class="xmas-level" data-level="custom">
-            <div class="xmas-level-name">A TU MEDIDA</div>
-            <div class="xmas-level-amt">Personalizado</div>
-            <div id="xmasCustomMetaTag" style="font-size: 10px; font-weight: 600; opacity: 0.8; margin-top: 4px;">Meta: Dinámica</div>
-          </div>
+        <div class="nav-item" data-tab="metas">
+          <span class="nav-icon">🎯</span>
+          <span>Metas</span>
         </div>
-
-        <div id="xmasCustomInputRow" style="display: none; margin: 16px 0; padding: 12px; border: 1px dashed #FD8C45; border-radius: 12px; background: rgba(253, 140, 69, 0.05);">
-          <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: var(--ink);">¿Cuánto vas a sumar cada semana?</label>
-          <div style="display: flex; align-items: center; gap: 6px;">
-            <span style="font-weight: 700; color: #FD8C45;">RD$</span>
-            <input type="number" id="xmasCustomAmount" placeholder="Ej. 200, 500, 1000" inputmode="numeric" style="width: 100%; border: none; background: transparent; font-size: 18px; font-weight: 700; outline: none; color: var(--ink);">
-          </div>
+        <div class="nav-item" data-tab="academia">
+          <span class="nav-icon">🎓</span>
+          <span>Academia</span>
         </div>
+      </nav>
 
-        <div class="xmas-goal">
-          <div class="num" id="xmasProgressNum">RD$0 de RD$12,650</div>
-          <div class="lbl" id="xmasProgressLbl">Marca las semanas que ya depositaste</div>
-        </div>
+    </div><!-- CIERRE MAIN APP CONTAINER -->
 
-        <div id="xmasWeeks"></div>
-
-        <div class="xmas-footer-tips" style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--muted); display: flex; flex-direction: column; gap: 8px; line-height: 1.5;">
-          <p>💡 <strong>Tip:</strong> Abre una cuenta de ahorro aparte. Dinero que entra ahí no se toca hasta diciembre, salvo una emergencia real de salud.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- PESTAÑA 3: METAS Y EMPRENDIMIENTO -->
-    <section id="pane-metas" class="tab-pane" style="display: none;">
-      <div class="intro-block">
-        <h1>Ruta de Metas & Progreso</h1>
-        <p class="sub">Calcula tu fondo de emergencia, planifica tus sueños y descubre cómo cerrar la brecha financiera.</p>
-      </div>
-
-      <!-- CONTENEDOR DE SELECCIÓN DE PLANES REQUERIDO POR APP.JS PARA EL TIP -->
-      <div id="planSelectionContainer">
-        <!-- Espacio reservado para la interfaz de los 4 planes de ahorro -->
-      </div>
-
-      <!-- BLOQUE A: FONDO DE EMERGENCIA -->
-      <div class="meta-card" style="margin-top: 16px;">
-        <div class="premium-badge-title">🛡️ TU ESCUDO FINANCIERO (FONDO DE EMERGENCIA)</div>
-        <p class="micro-sub" style="font-size:13px; color:var(--muted); margin-bottom:12px;">El dinero que te dará paz mental ante imprevistos. Se calcula en base a tus gastos fijos mensuales.</p>
+    <!-- C. MODAL INTERACTIVO PARA RESUMEN EN WHATSAPP -->
+    <div id="modalOverlay" class="modal-overlay">
+      <div class="modal-box">
+        <h3 style="font-size: 16px; font-weight: 700; color: #111; margin-bottom: 8px;">📊 Desglose de Gastos</h3>
+        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Aquí tienes la distribución de tus 7 renglones de consumo:</p>
         
-        <div style="margin-bottom: 12px;">
-          <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 4px;">
-            <span>Meses de cobertura:</span>
-            <span id="emergencyMonthsLabel" style="color: #FD8C45; font-weight: 700;">3 meses</span>
-          </div>
-          <input type="range" id="emergencySlider" min="3" max="6" value="3" style="width: 100%; accent-color: #FD8C45;">
+        <!-- Contenedor donde se insertará la lista dinámicamente -->
+        <div id="summaryRows" style="margin-bottom: 14px;"></div>
+
+        <div style="display: flex; justify-content: space-between; font-weight: 800; font-size: 14px; padding-top: 8px; border-top: 2px solid #edf2f7; margin-bottom: 16px;">
+          <span>TOTAL COMPROMETIDO:</span>
+          <span id="summaryTotal" style="color: var(--accent);">RD$ 0</span>
         </div>
 
-        <div class="credit-result-row" style="background: rgba(31, 122, 92, 0.05); border: 1px solid rgba(31, 122, 92, 0.2); border-radius: 12px; padding: 12px;">
-          <div style="text-align: center; width: 100%;">
-            <div style="font-size: 11px; text-transform: uppercase; color: var(--muted); font-weight: 600;">Tu meta de Fondo de Emergencia</div>
-            <div id="emergencyTotalVal" style="font-family: 'IBM Plex Mono', monospace; font-size: 22px; font-weight: 700; color: #1F7A5C; margin-top: 4px;">RD$0</div>
-          </div>
-        </div>
-        <div class="credit-trick" style="margin-top: 10px; background: rgba(45, 138, 206, 0.08); color: #2D8ACE;">
-          💡 <strong>Tip Dominicano:</strong> No dejes este dinero bajo el colchón perdiendo valor. Cuando tengas el equivalente a un mes, transpórtalo a un <strong>Certificado Financiero</strong> en la banca nacional.
-        </div>
-      </div>
-
-      <!-- BLOQUE B: EL LANZADOR DE METAS -->
-      <div class="meta-card" style="margin-top: 16px;">
-        <div class="premium-badge-title">🚀 TU PRÓXIMO PASO (PLANIFICADOR)</div>
-        
-        <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 12px;">
-          <div>
-            <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">¿Qué quieres lograr?</label>
-            <input type="text" id="targetGoalName" placeholder="Ej. Inicial del carro, Viaje, Maestría" style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px; outline: none;">
-          </div>
-          <div style="display: flex; gap: 10px;">
-            <div style="flex: 1;">
-              <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">¿Cuánto necesitas? (RD$)</label>
-              <input type="number" id="targetGoalAmount" placeholder="Ej. 100000" inputmode="numeric" style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px; outline: none;">
-            </div>
-            <div style="flex: 1;">
-              <label style="display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px;">¿En cuántos meses?</label>
-              <input type="number" id="targetGoalMonths" placeholder="Ej. 12" inputmode="numeric" style="width: 100%; padding: 10px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px; outline: none;">
-            </div>
-          </div>
-        </div>
-
-        <!-- Alerta Dinámica del Coach con el módulo de Dinero Oculto integrado -->
-        <div id="coachAlertBox" style="margin-top: 16px; padding: 14px; border-radius: 12px; display: none; font-size: 13.5px; line-height: 1.5;"></div>
-      </div>
-
-      <!-- BLOQUE C: CATÁLOGO DE MICRO-EMPRENDIMIENTOS (DINÁMICO) -->
-      <div id="entrepreneurshipModule" class="meta-card" style="margin-top: 16px; display: none;">
-        <div class="premium-badge-title" style="color: #FD8C45;">💡 MOTOR DE INGRESOS EXTRA</div>
-        <p class="micro-sub" style="font-size: 13px; line-height: 1.4; margin-bottom: 12px;">Para cerrar la brecha de tu meta sin sacrificar tu calidad de vida actual, considera arrancar un micro-proyecto de baja inversión en tus horas libres:</p>
-        
-        <div id="entrepreneurshipIdeasContainer" style="display: flex; flex-direction: column; gap: 10px;"></div>
-        
-        <div style="margin-top: 14px; padding: 10px; background: #FFF9F5; border: 1px dashed rgba(253, 140, 69, 0.4); border-radius: 8px; font-size: 12px; color: var(--muted); line-height: 1.4;">
-          📌 <strong>Nota de escala:</strong> Si tu idea empieza a facturar de forma constante, puedes formalizarte fácilmente en RD vía el registro de nombre comercial en <strong>ONAPI</strong>.
+        <div style="display: flex; gap: 8px;">
+          <button id="closeModal" style="flex: 1; background: #e2e8f0; border: none; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; color: #4a5568;">
+            Cerrar
+          </button>
+          <a id="whatsappBtn" target="_blank" style="flex: 1.4; background: #25D366; text-decoration: none; color: #fff; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 700; text-align: center; display: flex; justify-content: center; align-items: center; gap: 6px; cursor: pointer;">
+            💬 Enviar WhatsApp
+          </a>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- PESTAÑA 4: ACADEMIA -->
-    <section id="pane-academia" class="tab-pane" style="display: none;">
-      <div class="intro-block">
-        <h1>Academia</h1>
-        <p class="sub">Clases cortas y herramientas financieras. El video de introducción es gratis — haz tu upgrade para desbloquear las clases magistrales.</p>
-      </div>
+  </div><!-- CIERRE PHONE CONTAINER -->
 
-      <!-- INTRODUCCIÓN DINÁMICA DE LA ACADEMIA -->
-      <div id="academiaIntroMessage"></div>
-
-      <div class="course-card">
-        <div class="offer-header-badge">OFERTA DE INTRODUCCIÓN · SOLO $9 <span class="old-price">$19</span></div>
-        <div class="premium-badge-title">🎓 MINICURSO: FINANZAS QUE SÍ APLICAN</div>
-        <div class="video-native-box">
-          <div class="video-embed-container" id="embed-curso">
-            <div class="video-placeholder-luxury"><span>▶ Video 1: Cómo romper el ciclo del "no me da" (Gratis · 4 min)</span></div>
-          </div>
-        </div>
-
-        <div class="cause-box">
-          <p>Disfruta de la clase introductoria gratis. Desbloquea las próximas 4 lecciones prácticas con tu upgrade de solo $9.</p>
-          <div class="cause-divider"></div>
-          <p>🐾 <strong>Propósito miscuartos:</strong> Por cada persona que hace el upgrade a la versión de pago, donamos $3 dólares a fundaciones de rescate animal.</p>
-        </div>
-
-        <div class="course-list-minimal">
-          <div class="course-item unlocked active"><div class="course-num">1</div><div class="course-info-text"><b>Clase Intro: Rompiendo el ciclo</b> · Gratis</div></div>
-          <div class="course-item locked"><div class="course-num">2</div><div class="course-info-text"><b>Presupuesto real que sí se cumple</b> · 5 min 🔒</div></div>
-          <div class="course-item locked"><div class="course-num">3</div><div class="course-info-text"><b>Ahorro sin sufrimiento ni sacrificios</b> · 6 min 🔒</div></div>
-          <div class="course-item locked"><div class="course-num">4</div><div class="course-info-text"><b>Deudas: Plan para salir sin ahogarte</b> · 7 min 🔒</div></div>
-          <div class="course-item locked"><div class="course-num">5</div><div class="course-info-text"><b>Dinero en pareja y finanzas en casa</b> · 8 min 🔒</div></div>
-        </div>
-      </div>
-
-      <div class="afp-card">
-        <div class="premium-badge-title">📚 TU AFP EXPLICADA</div>
-        <div class="video-native-box"><div class="video-embed-container" id="embed-afp"><div class="video-placeholder-luxury"><span>▶ Video: Lo que nadie te dice de tu AFP</span></div></div></div>
-        <div class="afp-simulator-box">
-          <label>¿Cuánto es el 2.87% de tu sueldo bruto?</label>
-          <div class="afp-sim-row"><span class="amt-currency">$</span><input type="number" id="afpSalario" placeholder="Ingresa tu sueldo" inputmode="decimal"></div>
-          <div class="afp-sim-result" id="afpSimResult"></div>
-        </div>
-        <details class="luxury-accordion">
-          <summary>Ver verdades legales sobre tu dinero (SIPEN) ▾</summary>
-          <div class="accordion-content">
-            <p><b>¿Se pierde si falleces?</b> No. Es herencia 100% reclamable por tu familia.</p>
-            <p><b>¿Cuándo se saca?</b> A los 60 años con 360 cotizaciones, o por enfermedad terminal.</p>
-          </div>
-        </details>
-      </div>
-
-      <!-- CRÉDITO INTELIGENTE -->
-      <div class="cat-card">
-        <div class="premium-badge-title">💳 CRÉDITO INTELIGENTE</div>
-        <p class="micro-sub" style="font-size:12.5px; color:var(--muted); line-height:1.5; margin-bottom:12px;">Dos fechas que casi nadie revisa, y que pueden costarte —o ahorrarte— miles de pesos.</p>
-
-        <div class="credit-dates-row">
-          <div.credit-date-box">
-            <div class="credit-date-num">1</div>
-            <div class="credit-date-title">Fecha de Corte</div>
-            <div class="credit-date-desc">El día que cierra tu factura. Lo que compres después entra al próximo estado de cuenta.</div>
-          </div.credit-date-box>
-          <div class="credit-date-box">
-            <div class="credit-date-num">2</div>
-            <div class="credit-date-title">Fecha Límite de Pago</div>
-            <div class="credit-date-desc">Tu último día para pagar el total sin intereses — suele ser 20-25 días después del corte.</div>
-          </div>
-        </div>
-
-        <div class="credit-trick">💡 <strong>El truco:</strong> compra los primeros días después de tu corte y ganas hasta 50 días para pagar sin intereses.</div>
-        <div class="credit-warning">⚠️ Solo funciona si pagaste tu balance completo el mes pasado.</div>
-
-        <div class="cause-divider" style="background: var(--line); margin: 16px 0;"></div>
-
-        <div class="premium-badge-title" style="margin-bottom:4px;">SIMULADOR: ¿TOTALERO O MÍNIMO?</div>
-        <p class="micro-sub" style="font-size:12px; color:var(--muted); margin-bottom:10px;">Balance de RD$25,000 al 52% anual. Arrastra para simular tu pago de este mes.</p>
-
-        <div class="credit-slider-row">
-          <span class="credit-slider-pct" id="creditPctLabel">30%</span>
-          <span class="credit-slider-tag" id="creditTag">Riesgo moderado</span>
-        </div>
-        <input type="range" class="credit-range" id="creditSlider" min="5" max="100" value="30">
-
-        <div class="credit-result-row">
-          <div class="credit-result-box"><div class="lbl">Pagas</div><div class="val" id="creditPaid">RD$7,500</div></div>
-          <div class="credit-result-box"><div class="lbl">Pendiente</div><div class="val" id="creditRemaining">RD$17,500</div></div>
-          <div class="credit-result-box"><div class="lbl">Interés/mes</div><div class="val" id="creditInterest">RD$758</div></div>
-        </div>
-      </div>
-
-      <!-- SECCIÓN: NIÑOS -->
-      <div class="kids-card">
-        <div class="upsell-pricing-tag">OFERTA ADICIONAL · SOLO $5 <span class="old-price">Precio regular $7</span></div>
-        <div class="premium-badge-title setup-upsell">🚀 NEGOCIOS PARA NIÑOS</div>
-
-        <div class="kids-preview" id="kidsPreview">
-          <p class="micro-sub" style="font-size: 13.5px; line-height: 1.45; color: var(--ink); margin-bottom: 12px;">
-            Desarrollar una mentalidad emprendedora desde la infancia no se trata solo de dinero; es sembrar resiliencia y creatividad para formar a los <strong>futuros empresarios</strong> del mañana.
-          </p>
-          <button class="kids-unlock-btn" id="kidsUnlockBtn">Agregar al pago por $5 →</button>
-        </div>
-
-        <div class="kids-full" id="kidsFull" style="display: none;">
-          <div class="video-native-box">
-            <div class="video-embed-container" id="embed-kids">
-              <div class="video-placeholder-luxury" style="background: #0F171E; border: 1px solid rgba(253, 140, 69, 0.2);">
-                <span style="color: var(--brand-orange);">▶ Video Intro: El chip del futuro empresario (2 min)</span>
-              </div>
-            </div>
-          </div>
-          <div class="kids-progress" id="kidsProgress">0 de 6 retos completados</div>
-          <div class="course-list-minimal" style="margin-top: 12px; margin-bottom: 16px;">
-            <div class="course-item unlocked active"><div class="course-num">1</div><div class="course-info-text"><b>Tu primer negocio en casa</b> · 5 min</div></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-  </main>
-
-  <nav class="bottom-nav">
-    <button class="nav-item active" data-tab="presupuesto"><span class="nav-icon">💰</span><span class="nav-label">Presupuesto</span></button>
-    <button class="nav-item" data-tab="reto"><span class="nav-icon">🎄</span><span class="nav-label">Reto Navidad</span></button>
-    <button class="nav-item" data-tab="metas"><span class="nav-icon">🎯</span><span class="nav-label">Metas</span></button>
-    <button class="nav-item" data-tab="academia"><span class="nav-icon">🎓</span><span class="nav-label">Academia</span></button>
-  </nav>
-</div>
-
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal-sheet">
-    <div class="modal-top"><div class="modal-eyebrow">Tu resumen</div><button class="close-btn" id="closeModal">✕</button></div>
-    <div class="summary-total"><div class="num" id="summaryTotal">$0</div><div class="lbl">de presupuesto armado</div></div>
-    <div id="summaryRows"></div>
-    <a class="whatsapp-btn" id="whatsappBtn" href="#" target="_blank" rel="noopener">Compartir por WhatsApp</a>
-  </div>
-</div>
-
-<script src="app.js" defer></script>
+  <!-- Enlace al archivo JavaScript externo -->
+  <script src="app.js"></script>
 </body>
 </html>
