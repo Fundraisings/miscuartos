@@ -1,68 +1,264 @@
-<!-- CONTENEDOR PRINCIPAL DEL PRESUPUESTO -->
-<div class="presupuesto-container">
-    <h2>📊 Mi Presupuesto Real (Regla 70/20/10)</h2>
-    
-    <!-- Entrada de Ingresos -->
-    <div class="form-group" style="margin-bottom: 20px;">
-        <label for="ingresoTotal" style="font-weight: bold; display: block; margin-bottom: 5px;">💵 Ingreso Neto Mensual (Tus Cuartos):</label>
-        <input type="number" id="ingresoTotal" placeholder="Ej. 40000" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 16px;">
-    </div>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MisCuartos App - Presupuesto Dominicano</title>
+    <style>
+        /* --- ESTILOS GENERALES Y ESTRUCTURA --- */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    <!-- CATEGORÍA 1: Compromisos (70%) -->
-    <h3>🔒 Compromisos Reales (Necesidades - 70% Ideal)</h3>
-    <div class="form-group" style="margin-bottom: 12px;">
-        <label>🏠 Renta o Hipoteca:</label>
-        <input type="number" class="input-gasto" data-category="compromisos" placeholder="0" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc;">
-    </div>
-    <div class="form-group" style="margin-bottom: 12px;">
-        <label>🛒 Supermercado y Colmado:</label>
-        <input type="number" class="input-gasto" data-category="compromisos" placeholder="0" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc;">
-    </div>
-    <div class="form-group" style="margin-bottom: 12px;">
-        <label>⚡ Servicios (Luz, Agua, Internet, Gas):</label>
-        <input type="number" class="input-gasto" data-category="compromisos" placeholder="0" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc;">
-    </div>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background-color: #f4f6f9;
+            color: #2c3e50;
+            padding: 15px;
+        }
 
-    <!-- CATEGORÍA 2: El Coro (20%) -->
-    <h3>🎉 El Coro y Estilo de Vida (Deseos - 20% Ideal)</h3>
-    <div class="form-group" style="margin-bottom: 12px;">
-        <label>🍻 Salidas, Cenas y Entretenimiento:</label>
-        <input type="number" class="input-gasto" data-category="coro" placeholder="0" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc;">
-    </div>
-    <div class="form-group" style="margin-bottom: 12px;">
-        <label>📺 Suscripciones (Netflix, Spotify, etc.):</label>
-        <input type="number" class="input-gasto" data-category="coro" placeholder="0" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc;">
-    </div>
+        .presupuesto-container {
+            background-color: #ffffff;
+            border-radius: 16px;
+            padding: 24px;
+            max-width: 480px;
+            margin: 0 auto;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
 
-    <!-- CATEGORÍA 3: Ahorros (10%) -->
-    <h3>💰 Tus Clavos (Ahorro / Futuro - 10% Ideal)</h3>
-    <div class="form-group" style="margin-bottom: 12px;">
-        <label>🐷 Fondo de Emergencia / Inversión:</label>
-        <input type="number" class="input-gasto" data-category="ahorro" placeholder="0" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc;">
-    </div>
+        h2 {
+            font-size: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #1a252f;
+        }
 
-    <!-- MEDIDOR DE CUARTOS INTELIGENTE (BARRA DE PROGRESO) -->
-    <div class="progress-container" style="margin: 25px 0 15px 0;">
-        <label style="font-weight: bold; display: block; margin-bottom: 8px;">📊 Medidor de Cuartos Consumidos:</label>
-        <div class="progress-bar-bg" style="background: #e0e0e0; border-radius: 8px; width: 100%; height: 22px; overflow: hidden; position: relative;">
-            <div id="barraProgreso" style="background: #2ecc71; width: 0%; height: 100%; transition: width 0.3s ease, background-color 0.3s;"></div>
+        h3 {
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 25px 0 12px 0;
+            padding-bottom: 6px;
+            border-bottom: 2px solid #edf2f7;
+        }
+
+        /* --- BLOQUES DE FORMULARIO --- */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #5a6a85;
+        }
+
+        input {
+            width: 100%;
+            height: 44px;
+            padding: 0 12px;
+            font-size: 16px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background-color: #f8fafc;
+            color: #334155;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #3498db;
+            background-color: #ffffff;
+        }
+
+        .ingreso-principal label {
+            font-size: 14px;
+            color: #2c3e50;
+        }
+
+        .ingreso-principal input {
+            font-size: 18px;
+            font-weight: bold;
+            border-color: #a5b4fc;
+            background-color: #f5f3ff;
+        }
+
+        /* --- MEDIDOR Y BARRAS --- */
+        .progress-section {
+            margin: 25px 0 15px 0;
+        }
+
+        .progress-bar-bg {
+            background-color: #e2e8f0;
+            border-radius: 10px;
+            width: 100%;
+            height: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            background-color: #2ecc71;
+            width: 0%;
+            height: 100%;
+            transition: width 0.3s ease, background-color 0.3s;
+        }
+
+        /* --- SECCIÓN DE TIP ADAPTADO --- */
+        .tip-box {
+            background-color: #fff9db;
+            border-left: 4px solid #fcc419;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            line-height: 1.5;
+            display: none; /* Se activa dinámicamente con JS */
+        }
+
+        /* --- RESUMEN DE BALANCES --- */
+        .resumen-box {
+            background-color: #f8fafc;
+            border-radius: 10px;
+            padding: 16px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+
+        .resumen-linea {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 14px;
+        }
+
+        .resumen-linea:not(:last-child) {
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .resumen-linea strong {
+            color: #475569;
+        }
+
+        .resumen-linea span {
+            font-family: monospace;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        /* --- ACCIONES --- */
+        .btn-whatsapp {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 48px;
+            background-color: #25D366;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-whatsapp:hover {
+            background-color: #1ea952;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="presupuesto-container">
+        <h2>📊 Mi Presupuesto Real</h2>
+        
+        <!-- Entrada de Ingresos -->
+        <div class="form-group ingreso-principal">
+            <label for="ingresoTotal">💵 Ingreso Neto Mensual (Tus Cuartos):</label>
+            <input type="number" id="ingresoTotal" placeholder="RD$ Ej. 40000" min="0">
         </div>
+
+        <!-- CATEGORÍA 1: Compromisos (70%) -->
+        <h3 style="color: #e67e22;">🔒 Compromisos Reales (70% Ideal)</h3>
+        
+        <div class="form-group">
+            <label>🏠 Renta o Hipoteca:</label>
+            <input type="number" class="input-gasto" data-category="compromisos" placeholder="0">
+        </div>
+        
+        <div class="form-group">
+            <label>🛒 Supermercado y Colmado:</label>
+            <input type="number" class="input-gasto" data-category="compromisos" placeholder="0">
+        </div>
+        
+        <div class="form-group">
+            <label>⚡ Servicios (Luz, Internet, Agua):</label>
+            <input type="number" class="input-gasto" data-category="compromisos" placeholder="0">
+        </div>
+
+        <!-- CATEGORÍA 2: El Coro (20%) -->
+        <h3 style="color: #2980b9;">🎉 El Coro y Estilo de Vida (20% Ideal)</h3>
+        
+        <div class="form-group">
+            <label>🍻 Salidas y Entretenimiento:</label>
+            <input type="number" class="input-gasto" data-category="coro" placeholder="0">
+        </div>
+        
+        <div class="form-group">
+            <label>📺 Suscripciones (Netflix, Spotify):</label>
+            <input type="number" class="input-gasto" data-category="coro" placeholder="0">
+        </div>
+
+        <!-- CATEGORÍA 3: Ahorros (10%) -->
+        <h3 style="color: #27ae60;">💰 Tus Clavos (Ahorro - 10% Ideal)</h3>
+        
+        <div class="form-group">
+            <label>🐷 Fondo de Emergencia / Metas:</label>
+            <input type="number" class="input-gasto" data-category="ahorro" placeholder="0">
+        </div>
+
+        <!-- MEDIDOR DE CONSUMO -->
+        <div class="progress-section">
+            <label>📊 Medidor de Cuartos Consumidos:</label>
+            <div class="progress-bar-bg">
+                <div id="barraProgreso" class="progress-bar-fill"></div>
+            </div>
+        </div>
+
+        <!-- CASILLA DE TIP FINANCIERO (Ubicada exactamente debajo del plan/medidor) -->
+        <div id="tipDominicano" class="tip-box"></div>
+
+        <!-- RESUMEN DE BALANCES -->
+        <div class="resumen-box">
+            <div class="resumen-linea">
+                <strong>Ingresos:</strong>
+                <span id="txtIngreso">RD$ 0.00</span>
+            </div>
+            <div class="resumen-linea">
+                <strong>Total Gastado:</strong>
+                <span id="txtGastado">RD$ 0.00</span>
+            </div>
+            <div class="resumen-linea">
+                <strong>Disponible:</strong>
+                <span id="txtDisponible">RD$ 0.00</span>
+            </div>
+        </div>
+
+        <!-- ACCIÓN DE WHATSAPP -->
+        <button id="btnEnviarWhatsapp" class="btn-whatsapp">
+            💬 Enviar Resumen por WhatsApp
+        </button>
     </div>
 
-    <!-- CASILLA DE TIP FINANCIERO ADAPTADO (Debajo de la barra de progreso) -->
-    <div id="tipDominicano" style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px; border-radius: 6px; margin: 15px 0; font-size: 14px; color: #856404; display: none;">
-        <!-- Se llena dinámicamente con JS -->
-    </div>
-
-    <!-- RESUMEN DE COMPORTAMIENTO -->
-    <div class="resumen-valores" style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 20px; border-left: 4px solid #3498db;">
-        <p style="margin: 6px 0; display: flex; justify-content: space-between;"><strong>Ingresos:</strong> <span id="txtIngreso">RD$ 0.00</span></p>
-        <p style="margin: 6px 0; display: flex; justify-content: space-between;"><strong>Total Gastado:</strong> <span id="txtGastado">RD$ 0.00</span></p>
-        <p style="margin: 6px 0; display: flex; justify-content: space-between;"><strong>Disponible:</strong> <span id="txtDisponible" style="font-weight: bold;">RD$ 0.00</span></p>
-    </div>
-
-    <!-- BOTÓN DE WHATSAPP CON PROTECCIÓN DE PROPAGACIÓN -->
-    <button id="btnEnviarWhatsapp" style="background: #25D366; color: white; border: none; padding: 14px; width: 100%; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 15px; display: block;">
-        💬 Enviar Resumen por WhatsApp
-    </button>
-</div>
+    <script src="app.js"></script>
+</body>
+</html>
