@@ -1,355 +1,412 @@
-// =========================================================================
-// ARCHIVO: app.js (Código Completo Consolidado - Ajustado según Arquitectura UI)
-// =========================================================================
+/**
+ * miscuartos — Core Application Logic
+ * Dashboard interactivo, retos de ahorro y coach financiero dinámico.
+ */
 
-// --- VARIABLES Y CONSTANTES GLOBALES ---
-const CANASTA_BASICA_RD = 45000;
-
-// --- INICIALIZADOR PRINCIPAL AL CARGAR EL DOCUMENTO ---
 document.addEventListener("DOMContentLoaded", () => {
-  inicializarSplashAndIntro();
-  configurarNavegacionPestañas();
-  inicializarEscuchadorGlobalClicks(); // Delegación robusta
-  inicializarFormularioIngresos();
-  inicializarSimuladorAFP();
-  inicializarMetasYEmprendimiento();
-});
-
-// =========================================================================
-// --- CONTROL DE ACCESO (SPLASH SCREEN) ---
-// =========================================================================
-function inicializarSplashAndIntro() {
+  // --- A. INICIALIZACIÓN Y NAVEGACIÓN ---
   const enterAppBtn = document.getElementById("enterAppBtn");
-  const splashElement = document.getElementById("app-splash");
+  const splashScreen = document.getElementById("app-splash");
   const mainAppContainer = document.getElementById("mainAppContainer");
 
-  if (enterAppBtn && splashElement && mainAppContainer) {
+  if (enterAppBtn) {
     enterAppBtn.addEventListener("click", () => {
-      splashElement.style.display = "none";
-      mainAppContainer.style.display = "flex";
+      splashScreen.style.transition = "opacity 0.4s ease";
+      splashScreen.style.opacity = "0";
+      setTimeout(() => {
+        splashScreen.style.display = "none";
+        mainAppContainer.style.display = "flex";
+        // Ejecutar cálculos iniciales para setear la interfaz en 0
+        calcularYAnalizarGastos();
+        actualizarFondoEmergencia();
+      }, 400);
     });
   }
-}
 
-// =========================================================================
-// --- 1. SISTEMA DE NAVEGACIÓN ENTRE PESTAÑAS ---
-// =========================================================================
-function configurarNavegacionPestañas() {
-  const enlacesPestañas = document.querySelectorAll(".nav-item");
-  
-  enlacesPestañas.forEach(enlace => {
-    enlace.addEventListener("click", (e) => {
-      e.preventDefault();
-      const destinoId = enlace.getAttribute("data-tab");
-      irAPestaña(destinoId);
+  // Manejo de tabs inferiores
+  const navItems = document.querySelectorAll(".bottom-nav .nav-item");
+  const tabPanes = document.querySelectorAll(".app-content .tab-pane");
+
+  navItems.forEach(item => {
+    item.addEventListener("click", () => {
+      const targetTab = item.getAttribute("data-tab");
+
+      navItems.forEach(nav => nav.classList.remove("active"));
+      tabPanes.forEach(pane => pane.style.display = "none");
+
+      item.classList.add("active");
+      const targetPane = document.getElementById(`pane-${targetTab}`);
+      if (targetPane) {
+        targetPane.style.display = "block";
+      }
     });
   });
-}
 
-function irAPestaña(destinoId) {
-  const enlacesPestañas = document.querySelectorAll(".nav-item");
-  const contenidosPestañas = document.querySelectorAll(".tab-pane");
+  // --- B. SECCIÓN 1: LÓGICA DE PRESUPUESTO Y GASTOS (5 ITEMS + COACH) ---
+  const incomeInput = document.getElementById("income");
+  const gastoInputs = document.querySelectorAll(".input-gasto-item");
 
-  const idContenedorReal = `pane-${destinoId}`;
-  const panelDestino = document.getElementById(idContenedorReal);
-
-  if (!panelDestino) {
-    console.warn(`Panel no encontrado: "${idContenedorReal}". Revisa la sincronización de IDs.`);
-    return;
+  if (incomeInput) {
+    incomeInput.addEventListener("input", () => {
+      calcularYAnalizarGastos();
+      actualizarFondoEmergencia();
+      calcularBrechaMetas();
+    });
   }
 
-  enlacesPestañas.forEach(btn => {
-    if (btn.getAttribute("data-tab") === destinoId) {
-      btn.classList.add("active");
-    } else {
-      btn.classList.remove("active");
-    }
+  gastoInputs.forEach(input => {
+    input.addEventListener("input", () => {
+      calcularYAnalizarGastos();
+      actualizarFondoEmergencia();
+      calcularBrechaMetas();
+    });
   });
 
-  contenidosPestañas.forEach(seccion => {
-    if (seccion.id === idContenedorReal) {
-      seccion.style.display = "block";
-    } else {
-      seccion.style.display = "none";
-    }
-  });
-
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-// =========================================================================
-// --- 2. DELEGACIÓN DE EVENTOS GLOBAL ---
-// =========================================================================
-function inicializarEscuchadorGlobalClicks() {
-  document.addEventListener("click", (e) => {
-    const targetBoton = e.target.closest("#btnGuiame, .btn-guiame, [data-action='guiame']");
+  function calcularYAnalizarGastos() {
+    let totalGastos = 0;
     
-    if (targetBoton) {
-      e.preventDefault();
-      console.log("Botón Guíame interceptado con éxito. Navegando al panel de Metas.");
-      irAPestaña("metas");
-    }
-  });
-}
+    // Sumar los valores de los 5 ítems de gastos
+    gastoInputs.forEach(input => {
+      totalGastos += parseFloat(input.value) || 0;
+    });
 
-// =========================================================================
-// --- 3. GESTIÓN DE INGRESOS Y PRESUPUESTO AUXILIAR ---
-// =========================================================================
-function inicializarFormularioIngresos() {
-  const inputIncome = document.getElementById("income");
-  if (inputIncome) {
-    inputIncome.addEventListener("input", () => {
-      actualizarAnalisisDelCoach();
+    // Actualizar el monto general en la esquina superior de la tarjeta
+    const txtTotal = document.getElementById("totalGastosMonto");
+    if (txtTotal) {
+      txtTotal.textContent = `RD$ ${totalGastos.toLocaleString('es-DO')}`;
+    }
+
+    const ingresosMensuales = incomeInput ? (parseFloat(incomeInput.value) || 0) : 0;
+    const boxFeedback = document.getElementById("coachGastosFeedback");
+    
+    if (!boxFeedback) return;
+
+    if (ingresosMensuales <= 0) {
+      boxFeedback.innerHTML = `💡 <strong>Coach:</strong> Define tus ingresos en la casilla de arriba para darte un diagnóstico exacto de cómo se distribuyen tus cuartos este mes.`;
+      boxFeedback.style.background = "#edf2f7";
+      boxFeedback.style.borderColor = "#e2e8f0";
+      boxFeedback.style.color = "#4a5568";
+      return;
+    }
+
+    // Lógica educativa proporcional según niveles de alerta
+    const porcentajeConsumido = (totalGastos / ingresosMensuales) * 100;
+    
+    if (porcentajeConsumido === 0) {
+      boxFeedback.innerHTML = `💡 <strong>Coach:</strong> Comienza a registrar tus montos gastados. Evaluaremos tus consumos frente al límite saludable recomendado.`;
+      boxFeedback.style.background = "#f7fafc";
+      boxFeedback.style.borderColor = "#e2e8f0";
+      boxFeedback.style.color = "#4a5568";
+    } else if (porcentajeConsumido <= 50) {
+      boxFeedback.innerHTML = `✅ <strong>¡Vas excelente!</strong> Has consumido el ${porcentajeConsumido.toFixed(1)}% de tus ingresos. Mantienes tus gastos esenciales y fijos dentro de la zona segura. Te queda margen ideal para tus metas y ahorros.`;
+      boxFeedback.style.background = "#EBF8FF";
+      boxFeedback.style.borderColor = "#BEE3F8";
+      boxFeedback.style.color = "#2B6CB0";
+    } else if (porcentajeConsumido <= 80) {
+      boxFeedback.innerHTML = `⚠️ <strong>Zona de Cuidado:</strong> Tus gastos consumen el ${porcentajeConsumido.toFixed(1)}% de tu presupuesto. Ojo con los gustos extras y salidas esta semana para evitar quedar en cero antes del próximo cobro.`;
+      boxFeedback.style.background = "#FFF9E6";
+      boxFeedback.style.borderColor = "#FFEAA7";
+      boxFeedback.style.color = "#B7791F";
+    } else {
+      boxFeedback.innerHTML = `🚨 <strong>Alerta Financiera:</strong> Has comprometido el ${porcentajeConsumido.toFixed(1)}% de tus ingresos. Estás al borde de gastar más de lo que ganas. Frena de golpe las salidas y evalúa qué suscripción puedes suspender hoy mismo.`;
+      boxFeedback.style.background = "#FFF5F5";
+      boxFeedback.style.borderColor = "#FED7D7";
+      boxFeedback.style.color = "#C53030";
+    }
+  }
+
+  // --- C. SECCIÓN 2: RETO NAVIDEÑO DE AHORRO (22 SEMANAS) ---
+  const xmasLevels = document.querySelectorAll(".xmas-levels .xmas-level");
+  const xmasWeeksContainer = document.getElementById("xmasWeeks");
+  const xmasProgressNum = document.getElementById("xmasProgressNum");
+  const xmasCustomInputRow = document.getElementById("xmasCustomInputRow");
+  const xmasCustomAmount = document.getElementById("xmasCustomAmount");
+  
+  let nivelSeleccionado = 50; // Por defecto Medio (RD$50)
+  let depositoSemanas = new Array(22).fill(false);
+
+  xmasLevels.forEach(levelBtn => {
+    levelBtn.addEventListener("click", () => {
+      xmasLevels.forEach(l => l.classList.remove("active"));
+      levelBtn.classList.add("active");
+
+      const levelType = levelBtn.getAttribute("data-level");
+      if (levelType === "custom") {
+        xmasCustomInputRow.style.display = "block";
+        nivelSeleccionado = parseFloat(xmasCustomAmount.value) || 0;
+      } else {
+        xmasCustomInputRow.style.display = "none";
+        nivelSeleccionado = parseFloat(levelType);
+      }
+      
+      generarSemanasReto();
+      actualizarProgresoReto();
+    });
+  });
+
+  if (xmasCustomAmount) {
+    xmasCustomAmount.addEventListener("input", () => {
+      nivelSeleccionado = parseFloat(xmasCustomAmount.value) || 0;
+      const customMetaTag = document.getElementById("xmasCustomMetaTag");
+      if (customMetaTag) {
+        let metaCalculada = 0;
+        for (let i = 1; i <= 22; i++) metaCalculada += (nivelSeleccionado * i);
+        customMetaTag.textContent = `Meta: RD$ ${metaCalculada.toLocaleString('es-DO')}`;
+      }
+      generarSemanasReto();
+      actualizarProgresoReto();
     });
   }
-}
 
-function calcularPresupuestoInstantaneo() {
-  const sueldo = parseFloat(document.getElementById("income").value) || 0;
-  return sueldo > 0 ? sueldo * 0.70 : 0; 
-}
+  function generarSemanasReto() {
+    if (!xmasWeeksContainer) return;
+    xmasWeeksContainer.innerHTML = "";
 
-// =========================================================================
-// --- 9. LÓGICA DE LA PESTAÑA: ACADEMIA Y SIMULADORES INTERACTIVOS ---
-// =========================================================================
-function inicializarSimuladorAFP() {
-  const academiaIntroBox = document.getElementById("academiaIntroMessage");
-  if (academiaIntroBox) {
-    // La sección de Dinero Oculto queda completamente excluida de la academia
-    academiaIntroBox.innerHTML = `
-      <div style="background: linear-gradient(135deg, #1F7A5C, #143D31); color: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 15px rgba(20,61,49,0.2); margin-bottom: 20px;">
-        <h3 style="margin: 0 0 8px 0; font-size: 17px; font-weight: 700; letter-spacing: -0.3px;">🎓 Academia MisCuartos</h3>
-        <p style="margin: 0 0 14px 0; font-size: 13.5px; line-height: 1.45; opacity: 0.95;">
-          Domina el uso de herramientas financieras interactivas y acelera el control de tu dinero. Comienza viendo nuestra clase introductoria para organizar tus cuentas desde hoy; las pautas clave para registrarte y expandir tus conocimientos hacia los siguientes niveles están detalladas directamente en el contenido del video.
-        </p>
-        <div style="display: flex; gap: 10px; align-items: center;">
-          <span style="font-size: 12px; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 20px; font-weight: 600;">⏱️ Clases Cortas</span>
-          <span style="font-size: 12px; background: rgba(255,255,255,0.2); padding: 4px 10px; border-radius: 20px; font-weight: 600;">🛠️ Enfoque Práctico</span>
+    for (let i = 0; i < 22; i++) {
+      const numSemana = i + 1;
+      const montoSemana = nivelSeleccionado * numSemana;
+      
+      const weekCard = document.createElement("div");
+      weekCard.className = `xmas-week-item ${depositoSemanas[i] ? 'completed' : ''}`;
+      weekCard.style = `display: flex; justify-content: space-between; align-items: center; background: ${depositoSemanas[i] ? '#E6FFFA' : '#f8f9fa'}; border: 1px solid ${depositoSemanas[i] ? '#319795' : '#edf2f7'}; padding: 10px 14px; border-radius: 10px; margin-bottom: 8px; cursor: pointer; user-select: none;`;
+      
+      weekCard.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <input type="checkbox" ${depositoSemanas[i] ? 'checked' : ''} style="accent-color: #319795; transform: scale(1.1);">
+          <span style="font-size: 13px; font-weight: 600; color: #2d3748;">Semana ${numSemana}</span>
         </div>
-      </div>
-    `;
+        <span style="font-family: 'IBM Plex Mono', monospace; font-size: 13.5px; font-weight: 700; color: ${depositoSemanas[i] ? '#234E52' : '#4a5568'};">RD$ ${montoSemana.toLocaleString('es-DO')}</span>
+      `;
+
+      weekCard.addEventListener("click", (e) => {
+        // Prevenir doble ejecución si hacen click directo en el checkbox
+        if (e.target.tagName !== "INPUT") {
+          depositoSemanas[i] = !depositoSemanas[i];
+        } else {
+          depositoSemanas[i] = e.target.checked;
+        }
+        generarSemanasReto();
+        actualizarProgresoReto();
+      });
+
+      xmasWeeksContainer.appendChild(weekCard);
+    }
   }
 
+  function actualizarProgresoReto() {
+    let acumuladoAhorrado = 0;
+    let metaTotalReto = 0;
+
+    for (let i = 0; i < 22; i++) {
+      const montoSemana = nivelSeleccionado * (i + 1);
+      metaTotalReto += montoSemana;
+      if (depositoSemanas[i]) {
+        acumuladoAhorrado += montoSemana;
+      }
+    }
+
+    if (xmasProgressNum) {
+      xmasProgressNum.textContent = `RD$ ${acumuladoAhorrado.toLocaleString('es-DO')} de RD$ ${metaTotalReto.toLocaleString('es-DO')}`;
+    }
+  }
+
+  // Inicializar las semanas del reto por primera vez
+  generarSemanasReto();
+
+  // --- D. SECCIÓN 3: RUTA DE METAS (FONDO DE EMERGENCIA, BRECHA E INGRESOS) ---
+  const emergencySlider = document.getElementById("emergencySlider");
+  const emergencyMonthsLabel = document.getElementById("emergencyMonthsLabel");
+  const emergencyTotalVal = document.getElementById("emergencyTotalVal");
+
+  if (emergencySlider) {
+    emergencySlider.addEventListener("input", actualizarFondoEmergencia);
+  }
+
+  function actualizarFondoEmergencia() {
+    if (!emergencySlider || !emergencyTotalVal) return;
+    
+    const meses = parseInt(emergencySlider.value);
+    if (emergencyMonthsLabel) emergencyMonthsLabel.textContent = `${meses} meses`;
+
+    // Calcular en base a los gastos declarados del mes
+    let totalGastosFijos = 0;
+    gastoInputs.forEach(input => {
+      totalGastosFijos += parseFloat(input.value) || 0;
+    });
+
+    const fondoCalculado = totalGastosFijos * meses;
+    emergencyTotalVal.textContent = `RD$ ${fondoCalculado.toLocaleString('es-DO')}`;
+  }
+
+  // Lógica del planificador de metas (Cálculo de Brecha + Módulo Dinero Oculto)
+  const targetGoalName = document.getElementById("targetGoalName");
+  const targetGoalAmount = document.getElementById("targetGoalAmount");
+  const targetGoalMonths = document.getElementById("targetGoalMonths");
+  const coachAlertBox = document.getElementById("coachAlertBox");
+  const entrepreneurshipModule = document.getElementById("entrepreneurshipModule");
+  const ideasContainer = document.getElementById("entrepreneurshipIdeasContainer");
+
+  if (targetGoalName) targetGoalName.addEventListener("input", calcularBrechaMetas);
+  if (targetGoalAmount) targetGoalAmount.addEventListener("input", calcularBrechaMetas);
+  if (targetGoalMonths) targetGoalMonths.addEventListener("input", calcularBrechaMetas);
+
+  function calcularBrechaMetas() {
+    if (!targetGoalAmount || !targetGoalMonths || !coachAlertBox) return;
+
+    const montoMeta = parseFloat(targetGoalAmount.value) || 0;
+    const mesesMeta = parseInt(targetGoalMonths.value) || 0;
+    const nombreMeta = targetGoalName ? targetGoalName.value.trim() : "tu meta";
+
+    if (montoMeta <= 0 || mesesMeta <= 0) {
+      coachAlertBox.style.display = "none";
+      if (entrepreneurshipModule) entrepreneurshipModule.style.display = "none";
+      return;
+    }
+
+    const ahorroMensualRequerido = montoMeta / mesesMeta;
+
+    // Calcular capacidad actual de ahorro (Ingresos - Gastos)
+    const ingresos = incomeInput ? (parseFloat(incomeInput.value) || 0) : 0;
+    let gastos = 0;
+    gastoInputs.forEach(input => gastos += parseFloat(input.value) || 0);
+    const capacidadAhorroActual = Math.max(0, ingresos - gastos);
+
+    coachAlertBox.style.display = "block";
+
+    if (capacidadAhorroActual >= ahorroMensualRequerido) {
+      // Tiene suficiente capacidad con sus finanzas actuales
+      coachAlertBox.style.background = "#E6FFFA";
+      coachAlertBox.style.border = "1px solid #319795";
+      coachAlertBox.style.color = "#234E52";
+      coachAlertBox.innerHTML = `🌟 <strong>¡Felicidades!</strong> Tu capacidad de ahorro actual (RD$ ${capacidadAhorroActual.toLocaleString('es-DO')}/mes) cubre perfectamente los RD$ ${ahorroMensualRequerido.toLocaleString('es-DO')}/mes necesarios para alcanzar la meta de <strong>${nombreMeta}</strong> en ${mesesMeta} meses. ¡Mantén la disciplina!`;
+      if (entrepreneurshipModule) entrepreneurshipModule.style.display = "none";
+    } else {
+      // Existe una brecha financiera: desplegar Dinero Oculto y sugerir Micro-emprendimientos
+      const brecha = ahorroMensualRequerido - capacidadAhorroActual;
+      
+      coachAlertBox.style.background = "#FFF5F5";
+      coachAlertBox.style.border = "1px solid #FED7D7";
+      coachAlertBox.style.color = "#742A2A";
+      
+      coachAlertBox.innerHTML = `
+        💥 <strong>Tenemos una brecha:</strong> Para lograr <strong>${nombreMeta}</strong> necesitas ahorrar <strong>RD$ ${ahorroMensualRequerido.toLocaleString('es-DO')}/mes</strong>, pero tu saldo actual solo te permite guardar RD$ ${capacidadAhorroActual.toLocaleString('es-DO')}/mes. 
+        <br><br>
+        ⚠️ Te faltan <strong>RD$ ${brecha.toLocaleString('es-DO')} cada mes</strong>. 
+        <hr style="margin: 10px 0; border: 0; border-top: 1px solid #FED7D7;">
+        🔍 <strong>Módulo de Dinero Oculto:</strong> Antes de estresarte, ¿has revisado tus <i>gastos hormiga</i> en "Gustos y Salidas"? Si recortas un 15% de ahí o cancelas esa suscripción que no usas, puedes recuperar parte del dinero oculto para tu meta. Mira las sugerencias de abajo para generar el resto.
+      `;
+
+      // Activar catálogo dinámico de Micro-emprendimientos dominicanos para cubrir la brecha
+      if (entrepreneurshipModule) {
+        entrepreneurshipModule.style.display = "block";
+        desplegarIdeasEmprendimiento(brecha);
+      }
+    }
+  }
+
+  function desplegarIdeasEmprendimiento(brechaMensual) {
+    if (!ideasContainer) return;
+    ideasContainer.innerHTML = "";
+
+    // Ideas adaptadas localmente al mercado dominicano
+    const catalogo = [
+      { titulo: "📸 Gestión de Redes Sociales (Freelance)", retorno: 6000, desc: "Maneja el Instagram o TikTok de 1 o 2 negocios locales de tu sector los fines de semana." },
+      { titulo: "🍪 Repostería o Snacks por encargo", retorno: 4500, desc: "Hornea galletas, brownies o bizcochos los viernes y véndelos entre tus compañeros de trabajo o vecinos." },
+      { titulo: "🇬🇧 Tutorías de Inglés o Clases Particulares", retorno: 5000, desc: "Si dominas un segundo idioma o materia, ofrece 4 horas de asesoría semanales vía Zoom a estudiantes escolares." },
+      { titulo: "🧼 Car Wash premium a domicilio", retorno: 7000, desc: "Lava y detalla vehículos en los parqueos de tu mismo residencial los sábados por la mañana." }
+    ];
+
+    catalogo.forEach(idea => {
+      const mesesParaBrecha = Math.ceil(brechaMensual / idea.retorno);
+      
+      const itemIdea = document.createElement("div");
+      itemIdea.style = "background: #fff; border: 1px solid #e2e8f0; padding: 12px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);";
+      itemIdea.innerHTML = `
+        <div style="font-weight: 700; color: #1a202c; font-size: 13.5px;">${idea.titulo}</div>
+        <div style="font-size: 12.5px; color: #4a5568; margin-top: 4px; line-height: 1.4;">${idea.desc}</div>
+        <div style="margin-top: 6px; font-size: 11.5px; font-weight: 600; color: #FD8C45; background: #FFF5F5; display: inline-block; padding: 2px 8px; border-radius: 4px;">
+          💰 Aporta ~RD$ ${idea.retorno.toLocaleString('es-DO')}/mes (Cubre tu brecha en unas ${mesesParaBrecha} línea(s) de esfuerzo)
+        </div>
+      `;
+      ideasContainer.appendChild(itemIdea);
+    });
+  }
+
+  // --- E. SECCIÓN 4: INTERACTIVIDAD DE LA ACADEMIA (AFP Y TARJETA) ---
+  
+  // 1. Simulador AFP (SIPEN 2.87%)
   const afpSalario = document.getElementById("afpSalario");
-  if (afpSalario) {
+  const afpSimResult = document.getElementById("afpSimResult");
+
+  if (afpSalario && afpSimResult) {
     afpSalario.addEventListener("input", () => {
       const sueldo = parseFloat(afpSalario.value) || 0;
-      const tuAporte = sueldo * 0.0287;
-      const resultado = document.getElementById("afpSimResult");
-      if (resultado) {
-        resultado.innerHTML = `Tu aporte mensual obligado (2.87%): <strong style="color: #FD8C45;">RD$ ${tuAporte.toLocaleString('es-DO', {maximumFractionDigits:2})}</strong><br><span style="font-size:11px; color:#666;">Tu empleador aporta otro 7.10% en segundo plano.</span>`;
+      if (sueldo <= 0) {
+        afpSimResult.textContent = "";
+        return;
+      }
+      const aporteTrabajador = sueldo * 0.0287;
+      const aporteEmpleador = sueldo * 0.0710;
+      const totalMes = aporteTrabajador + aporteEmpleador;
+
+      afpSimResult.innerHTML = `
+        📌 <b>Tu descuento (2.87%):</b> RD$ ${aporteTrabajador.toLocaleString('es-DO', {maximumFractionDigits:2})}<br>
+        🏢 <b>Tu empresa aporta (7.10%):</b> RD$ ${aporteEmpleador.toLocaleString('es-DO', {maximumFractionDigits:2})}<br>
+        📉 <b>Total invertido en tu CCI al mes:</b> RD$ ${totalMes.toLocaleString('es-DO', {maximumFractionDigits:2})}
+      `;
+    });
+  }
+
+  // 2. Simulador Tarjeta de Crédito (Totalero vs Mínimo)
+  const creditSlider = document.getElementById("creditSlider");
+  const creditPctLabel = document.getElementById("creditPctLabel");
+  const creditTag = document.getElementById("creditTag");
+  const creditPaid = document.getElementById("creditPaid");
+  const creditRemaining = document.getElementById("creditRemaining");
+  const creditInterest = document.getElementById("creditInterest");
+
+  if (creditSlider) {
+    creditSlider.addEventListener("input", () => {
+      const balanceTotal = 25000;
+      const tasaAnual = 0.52; // 52% de interés anual tradicional
+      const tasaMensual = tasaAnual / 12;
+
+      const pctPago = parseInt(creditSlider.value);
+      if (creditPctLabel) creditPctLabel.textContent = `${pctPago}%`;
+
+      const montoPagado = balanceTotal * (pctPago / 100);
+      const montoPendiente = balanceTotal - montoPagado;
+      const interesGenerado = montoPendiente * tasaMensual;
+
+      if (creditPaid) creditPaid.textContent = `RD$ ${Math.round(montoPagado).toLocaleString('es-DO')}`;
+      if (creditRemaining) creditRemaining.textContent = `RD$ ${Math.round(montoPendiente).toLocaleString('es-DO')}`;
+      if (creditInterest) creditInterest.textContent = `RD$ ${Math.round(interesGenerado).toLocaleString('es-DO')}`;
+
+      // Actualizar tags de alerta visuales
+      if (creditTag) {
+        if (pctPago === 100) {
+          creditTag.textContent = "🔥 ¡Cliente Totalero! Cero interés";
+          creditTag.style.color = "#319795";
+        } else if (pctPago >= 50) {
+          creditTag.textContent = "Riesgo moderado";
+          creditTag.style.color = "#D69E2E";
+        } else {
+          creditTag.textContent = "🚨 Trampa de deuda (Pago mínimo)";
+          creditTag.style.color = "#E53E3E";
+        }
       }
     });
   }
-}
 
-// =========================================================================
-// --- 10. LÓGICA DE LA PESTAÑA: METAS Y ENFOQUE CON DINERO OCULTO INTEGRADO ---
-// =========================================================================
-function inicializarMetasYEmprendimiento() {
-  const targetAmount = document.getElementById("targetGoalAmount");
-  const targetMonths = document.getElementById("targetGoalMonths");
-  const emergencySlider = document.getElementById("emergencySlider");
+  // 3. Activación del Upsell de Niños
+  const kidsUnlockBtn = document.getElementById("kidsUnlockBtn");
+  const kidsPreview = document.getElementById("kidsPreview");
+  const kidsFull = document.getElementById("kidsFull");
 
-  if (targetAmount) targetAmount.addEventListener("input", actualizarAnalisisDelCoach);
-  if (targetMonths) targetMonths.addEventListener("input", actualizarAnalisisDelCoach);
-  
-  if (emergencySlider) {
-    emergencySlider.addEventListener("input", () => {
-      const meses = emergencySlider.value;
-      const label = document.getElementById("emergencyMonthsLabel");
-      const totalVal = document.getElementById("emergencyTotalVal");
-      
-      let gastosFijos = calcularPresupuestoInstantaneo();
-      if (gastosFijos <= 0) gastosFijos = 25000;
-
-      if (label) label.textContent = `${meses} meses`;
-      if (totalVal) totalVal.textContent = `RD$ ${(gastosFijos * meses).toLocaleString('es-DO')}`;
+  if (kidsUnlockBtn && kidsPreview && kidsFull) {
+    kidsUnlockBtn.addEventListener("click", () => {
+      kidsPreview.style.display = "none";
+      kidsFull.style.display = "block";
     });
   }
-  
-  // Renderizado estático inicial del tip fuera del bloque del Coach
-  inyectarTipCompromiso();
-}
-
-function inyectarTipCompromiso() {
-  // Buscamos el contenedor de los planes en el HTML
-  const planSelectionBox = document.getElementById("planSelectionContainer");
-  
-  // Evitamos duplicados si la función se vuelve a ejecutar
-  if (planSelectionBox && !document.getElementById("savings-compromise-tip")) {
-    const tipElement = document.createElement("div");
-    tipElement.id = "savings-compromise-tip";
-    tipElement.style.cssText = "background: #FFF9E6; border: 1px solid #FFEAA7; color: #D6A21E; padding: 10px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; margin: 12px 0 16px 0; text-align: left; line-height: 1.4;";
-    tipElement.innerHTML = `💡 Tip de Compromiso: Abre una cuenta de ahorro aparte. Dinero que entra ahí no se toca hasta cumplir el plazo, salvo una emergencia real.`;
-    
-    // Lo colocamos exactamente debajo del contenedor de planes
-    planSelectionBox.parentNode.insertBefore(tipElement, planSelectionBox.nextSibling);
-  }
-}
-
-function actualizarAnalisisDelCoach() {
-  const metaMonto = parseFloat(document.getElementById("targetGoalAmount").value) || 0;
-  const metaMeses = parseFloat(document.getElementById("targetGoalMonths").value) || 0;
-  
-  const alertBox = document.getElementById("coachAlertBox");
-  const entrepreneurshipModule = document.getElementById("entrepreneurshipModule");
-
-  if (!alertBox || !entrepreneurshipModule) return;
-
-  if (metaMonto <= 0 || metaMeses <= 0) {
-    alertBox.style.display = "none";
-    entrepreneurshipModule.style.display = "none";
-    return;
-  }
-
-  const cuotaMensual = metaMonto / metaMeses;
-  alertBox.style.display = "block";
-
-  const estiloSummary = "font-weight: 600; font-size: 14px; color: #111; cursor: pointer; padding: 12px; display: flex; justify-content: space-between; align-items: center; user-select: none; outline: none;";
-  const estiloContenido = "padding: 0 12px 14px 12px; font-size: 13.5px; line-height: 1.5; color: #444; border-top: 1px dashed #e1e6eb; margin-top: 8px; padding-top: 8px;";
-  const estiloDetails = "background: #fff; border: 1px solid #e1e6eb; border-radius: 10px; margin-bottom: 10px; overflow: hidden; transition: all 0.2s ease;";
-
-  // El Tip de Compromiso ha sido removido de esta plantilla ya que ahora vive bajo los planes
-  let mensajeHTML = `
-    <div style="font-weight: 700; color: #111; margin-bottom: 12px; font-size: 15px; display: flex; align-items: center; gap: 6px;">
-      📢 SUGERENCIAS DE TU COACH FINANCIERO
-    </div>
-    
-    <div style="background: #F4F7f9; padding: 12px; border-radius: 8px; margin-bottom: 16px; border-left: 4px solid #2D8ACE; font-size: 14px;">
-      Para lograr tu meta en el tiempo planeado, necesitas separar unos 
-      <strong style="color: #2D8ACE; font-size: 15px;">RD$ ${cuotaMensual.toLocaleString('es-DO', {maximumFractionDigits:2})}</strong> al mes.
-    </div>
-
-    <!-- 🔍 SECCIÓN INTERACTIVA: DINERO OCULTO REDISEÑADO E INTEGRADO EN METAS -->
-    <div style="background: #FFFDF0; border: 1px solid #F3E1B6; padding: 16px; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
-      <h4 style="margin: 0 0 6px 0; font-size: 14px; color: #8A6D1C; font-weight: 700;">🔍 ¿DE DÓNDE SACAR ESE DINERO? ENCUENTRA TU DINERO OCULTO</h4>
-      <p style="margin: 0 0 12px 0; font-size: 12.5px; color: #555; line-height: 1.4;">
-        Antes de pensar que no te alcanza, evalúa tus consumos cotidianos. Al descubrir y ajustar estos gastos ocultos, liberarás el dinero necesario para cubrir tu cuota mensual de ahorro:
-      </p>
-      
-      <div style="display: flex; flex-direction: column; gap: 10px;">
-        <div style="display: flex; flex-direction: column; gap: 4px; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #e1e6eb;">
-          <label style="font-size: 12.5px; font-weight: 600; color: #222;">☕ Cafecito o empanada en la calle</label>
-          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-            <span style="font-size: 11px; color: #666;">Costo apróx: RD$ 150</span>
-            <select class="input-habito-meta" data-costo="150" data-tipo="semanal" style="padding: 4px; border-radius: 6px; border: 1px solid #ced4da; font-size: 12px; background: #f8f9fa; font-weight: 600;">
-              <option value="0">Nunca</option>
-              <option value="1">1 vez x semana</option>
-              <option value="3">3 veces x semana</option>
-              <option value="5">5 veces x semana</option>
-            </select>
-          </div>
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 4px; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #e1e6eb;">
-          <label style="font-size: 12.5px; font-weight: 600; color: #222;">🍗 Delivery de cena por antojo</label>
-          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-            <span style="font-size: 11px; color: #666;">Costo apróx: RD$ 600</span>
-            <select class="input-habito-meta" data-costo="600" data-tipo="semanal" style="padding: 4px; border-radius: 6px; border: 1px solid #ced4da; font-size: 12px; background: #f8f9fa; font-weight: 600;">
-              <option value="0">Nunca</option>
-              <option value="1">1 vez x semana</option>
-              <option value="3">3 veces x semana</option>
-            </select>
-          </div>
-        </div>
-
-        <div style="display: flex; flex-direction: column; gap: 4px; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #e1e6eb;">
-          <label style="font-size: 12.5px; font-weight: 600; color: #222;">📺 Suscripción de streaming sin usar</label>
-          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-            <span style="font-size: 11px; color: #666;">Costo fijo: RD$ 550 / mes</span>
-            <select class="input-habito-meta" data-costo="550" data-tipo="mensual" style="padding: 4px; border-radius: 6px; border: 1px solid #ced4da; font-size: 12px; background: #f8f9fa; font-weight: 600;">
-              <option value="0">No la tengo</option>
-              <option value="1">Sí, la pago mensual</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <div style="margin-top: 14px; padding-top: 10px; border-top: 1px dashed #F3E1B6; text-align: center;">
-        <div style="font-size: 12.5px; font-weight: 600; color: #555;">Dinero rescatado para tu meta:</div>
-        <div id="totalRescateMetaMensual" style="font-size: 18px; font-weight: 800; color: #1F7A5C; margin: 2px 0;">RD$ 0 / mes</div>
-        <div id="progresoFugaMetaAnual" style="font-size: 11px; color: #666; font-weight: 500;">¡Equivale a RD$ 0 acumulados al año!</div>
-      </div>
-    </div>
-
-    <details style="${estiloDetails}">
-      <summary style="${estiloSummary}"><span>⚠️ Un vistazo a la realidad (Punto A)</span><span>▼</span></summary>
-      <div style="${estiloContenido}">
-        <p>Alcanzar esta cifra puede ser retador, ya que tu ingreso actual se encuentra por debajo de la canasta básica familiar promedio en el país (RD$ ${CANASTA_BASICA_RD.toLocaleString()}).</p>
-      </div>
-    </details>
-
-    <details style="${estiloDetails}">
-      <summary style="${estiloSummary}"><span>🧠 Equilibrio de gastos (Punto B)</span><span>▼</span></summary>
-      <div style="${estiloContenido}">
-        <p>Una recomendación práctica para liberar algo de espacio en tus ingresos es cuidar los consumos impulsivos de tarjetas de crédito.</p>
-      </div>
-    </details>
-  `;
-
-  alertBox.innerHTML = mensajeHTML;
-  alertBox.style.backgroundColor = '#FFFDF9';
-  alertBox.style.border = '1px solid #E6D0B3';
-  alertBox.style.padding = '16px';
-  alertBox.style.borderRadius = '14px';
-
-  document.querySelectorAll(".input-habito-meta").forEach(select => {
-    select.addEventListener("change", calcularRescateEnMetas);
-  });
-
-  entrepreneurshipModule.style.display = "block";
-  renderizarIdeasDeEmprendimiento(cuotaMensual);
-}
-
-function calcularRescateEnMetas() {
-  let totalMensual = 0;
-  document.querySelectorAll(".input-habito-meta").forEach(select => {
-    const valor = parseFloat(select.value) || 0;
-    const costo = parseFloat(select.getAttribute("data-costo")) || 0;
-    const tipo = select.getAttribute("data-tipo");
-
-    if (tipo === "semanal") {
-      totalMensual += (valor * costo * 4.3333);
-    } else if (tipo === "mensual") {
-      totalMensual += (valor * costo);
-    }
-  });
-
-  const totalAnual = totalMensual * 12;
-  const txtMensual = document.getElementById("totalRescateMetaMensual");
-  const txtAnual = document.getElementById("progresoFugaMetaAnual");
-
-  if (txtMensual) txtMensual.textContent = `RD$ ${Math.round(totalMensual).toLocaleString('es-DO')} / mes`;
-  if (txtAnual) txtAnual.textContent = `¡Equivale a RD$ ${Math.round(totalAnual).toLocaleString('es-DO')} al año!`;
-}
-
-// =========================================================================
-// --- 11. SUGERENCIAS DE EMPRENDIMIENTO ---
-// =========================================================================
-function renderizarIdeasDeEmprendimiento(cuotaNecesaria) {
-  const contenedorIdeas = document.getElementById("entrepreneurshipIdeasContainer");
-  if (!contenedorIdeas) return;
-
-  const ideas = [
-    { titulo: "Venta de ropa o accesorios virtuales", gananciaAprox: 8000 },
-    { titulo: "Servicios independientes / Freelance", gananciaAprox: 12000 },
-    { titulo: "Preparación de postres por encargo", gananciaAprox: 6000 }
-  ];
-
-  let htmlContenido = `<div style="display: flex; flex-direction: column; gap: 12px; margin-top: 12px;">`;
-  ideas.forEach(idea => {
-    const porcentajeCubierto = Math.min(Math.round((idea.gananciaAprox / cuotaNecesaria) * 100), 100);
-    htmlContenido += `
-      <div style="background: #fff; border: 1px solid #e1e6eb; padding: 12px; border-radius: 10px;">
-        <div style="font-weight: 600; font-size: 13.5px; margin-bottom: 4px;">${idea.titulo}</div>
-        <div style="display: flex; justify-content: space-between; font-size: 11.5px; color: #666;">
-          <span>Ganancia: <strong>RD$ ${idea.gananciaAprox.toLocaleString('es-DO')}</strong></span>
-          <span style="color: #1F7A5C; font-weight: 600;">Cubre el ${porcentajeCubierto}%</span>
-        </div>
-      </div>
-    `;
-  });
-  htmlContenido += `</div>`;
-  contenedorIdeas.innerHTML = htmlContenido;
-}
+});
