@@ -1,5 +1,5 @@
 // =========================================================================
-// ARCHIVO: app.js (Código Completo Consolidado - Versión Final Integrada)
+// ARCHIVO: app.js (Código Completo Consolidado - Fix de Navegación Global)
 // =========================================================================
 
 // --- VARIABLES Y CONSTANTES GLOBALES ---
@@ -8,7 +8,7 @@ const CANASTA_BASICA_RD = 45000;
 // --- INICIALIZADOR PRINCIPAL AL CARGAR EL DOCUMENTO ---
 document.addEventListener("DOMContentLoaded", () => {
   configurarNavegacionPestañas();
-  inicializarBotonGuiame();
+  inicializarEscuchadorGlobalClicks(); // Delegación de eventos robusta
   inicializarFormularioIngresos();
   inicializarSimuladorAFP();
   inicializarMetasYEmprendimiento();
@@ -19,8 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
 // =========================================================================
 function configurarNavegacionPestañas() {
   const enlacesPestañas = document.querySelectorAll(".tab-link");
-  const contenidosPestañas = document.querySelectorAll(".tab-content");
-
+  
   enlacesPestañas.forEach(enlace => {
     enlace.addEventListener("click", (e) => {
       e.preventDefault();
@@ -34,6 +33,13 @@ function configurarNavegacionPestañas() {
 function irAPestaña(destinoId) {
   const enlacesPestañas = document.querySelectorAll(".tab-link");
   const contenidosPestañas = document.querySelectorAll(".tab-content");
+
+  // Verificar que la pestaña de destino exista antes de proceder
+  const pestañaDestino = document.getElementById(destinoId);
+  if (!pestañaDestino) {
+    console.warn(`La pestaña con id "${destinoId}" no fue encontrada en el DOM.`);
+    return;
+  }
 
   // Cambiar estado activo en los botones de navegación
   enlacesPestañas.forEach(btn => {
@@ -58,19 +64,21 @@ function irAPestaña(destinoId) {
 }
 
 // =========================================================================
-// --- 2. ACCIÓN DEL BOTÓN "GUÍAME" (PANTALLA DE INICIO) ---
+// --- 2. DELEGACIÓN DE EVENTOS GLOBAL (SOLUCIÓN AL BOTÓN DE INICIO) ---
 // =========================================================================
-function inicializarBotonGuiame() {
-  // Busca el botón de acción principal en el Home/Inicio
-  const btnGuiame = document.getElementById("btnGuiame") || document.querySelector(".btn-guiame");
-  
-  if (btnGuiame) {
-    btnGuiame.addEventListener("click", (e) => {
+function inicializarEscuchadorGlobalClicks() {
+  // Captura los clics a nivel de documento para evitar problemas de carga a destiempo
+  document.addEventListener("click", (e) => {
+    // Buscamos si el elemento clickeado o uno de sus ancestros es el botón "Guíame"
+    const targetBoton = e.target.closest("#btnGuiame, .btn-guiame, [data-action='guiame']");
+    
+    if (targetBoton) {
       e.preventDefault();
-      // Te redirige dinámicamente a la pestaña del presupuesto para iniciar el flujo
-      irAPestaña("presupuesto"); 
-    });
-  }
+      console.log("Botón Guíame detectado globalmente. Redirigiendo...");
+      // Forzar redirección directa a la pestaña de presupuesto
+      irAPestaña("presupuesto");
+    }
+  });
 }
 
 // =========================================================================
@@ -255,7 +263,7 @@ function actualizarAnalisisDelCoach() {
         </div>
       </div>
 
-      <!-- Pizarra de Rescate Financiero -->
+      <!-- Pizarra de Reskate Financiero -->
       <div style="margin-top: 14px; padding-top: 10px; border-top: 1px dashed #F3E1B6; text-align: center;">
         <div style="font-size: 12.5px; font-weight: 600; color: #555;">Dinero rescatado para tu meta:</div>
         <div id="totalRescateMetaMensual" style="font-size: 18px; font-weight: 800; color: #1F7A5C; margin: 2px 0;">RD$ 0 / mes</div>
