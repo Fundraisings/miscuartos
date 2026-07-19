@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MisCuartos App - Presupuesto Dominicano</title>
+    <title>Altrua - Finanzas Dominicanas</title>
     <style>
-        /* --- ESTILOS GENERALES Y ESTRUCTURA --- */
+        /* --- ESTILOS GENERALES --- */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -16,15 +16,69 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
             background-color: #f4f6f9;
             color: #2c3e50;
+            overflow-x: hidden;
+            padding-bottom: 80px; /* Espacio para la navegación inferior */
+        }
+
+        /* --- INTRODUCCIÓN ANIMADA --- */
+        #intro-pantalla {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #4f46e5, #06b6d4);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+            animation: desvanecerIntro 0.5s ease forward 2.5s; /* Se desvanece tras 2.5s */
+        }
+
+        .logo-animado {
+            font-size: 42px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+            animation: rebote 1.5s infinite alternate;
+        }
+
+        .tagline {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        @keyframes rebote {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-10px); }
+        }
+
+        @keyframes desvanecerIntro {
+            to { opacity: 0; visibility: hidden; }
+        }
+
+        /* --- CONTENEDOR PRINCIPAL Y PESTAÑAS --- */
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
             padding: 15px;
         }
 
+        .tab-content {
+            display: none; /* Ocultas por defecto, manejadas por JS */
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* --- CONTENEDOR ESPECÍFICO DEL PRESUPUESTO --- */
         .presupuesto-container {
             background-color: #ffffff;
             border-radius: 16px;
             padding: 24px;
-            max-width: 480px;
-            margin: 0 auto;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
 
@@ -36,7 +90,7 @@
         }
 
         h3 {
-            font-size: 15px;
+            font-size: 14px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin: 25px 0 12px 0;
@@ -44,13 +98,9 @@
             border-bottom: 2px solid #edf2f7;
         }
 
-        /* --- BLOQUES DE FORMULARIO --- */
+        /* --- ELEMENTOS DE FORMULARIO --- */
         .form-group {
             margin-bottom: 16px;
-        }
-
-        .form-group:last-child {
-            margin-bottom: 0;
         }
 
         label {
@@ -70,18 +120,13 @@
             border-radius: 8px;
             background-color: #f8fafc;
             color: #334155;
-            transition: border-color 0.2s, background-color 0.2s;
+            transition: border-color 0.2s;
         }
 
         input:focus {
             outline: none;
-            border-color: #3498db;
+            border-color: #4f46e5;
             background-color: #ffffff;
-        }
-
-        .ingreso-principal label {
-            font-size: 14px;
-            color: #2c3e50;
         }
 
         .ingreso-principal input {
@@ -91,7 +136,7 @@
             background-color: #f5f3ff;
         }
 
-        /* --- MEDIDOR Y BARRAS --- */
+        /* --- MEDIDOR DE PROGRESO DE DEDUCCIÓN --- */
         .progress-section {
             margin: 25px 0 15px 0;
         }
@@ -108,10 +153,10 @@
             background-color: #2ecc71;
             width: 0%;
             height: 100%;
-            transition: width 0.3s ease, background-color 0.3s;
+            transition: width 0.3s ease;
         }
 
-        /* --- SECCIÓN DE TIP ADAPTADO --- */
+        /* --- NOTIFICACIONES Y TIPS --- */
         .tip-box {
             background-color: #fff9db;
             border-left: 4px solid #fcc419;
@@ -120,10 +165,10 @@
             margin-bottom: 20px;
             font-size: 13px;
             line-height: 1.5;
-            display: none; /* Se activa dinámicamente con JS */
+            display: none;
         }
 
-        /* --- RESUMEN DE BALANCES --- */
+        /* --- RESUMENES --- */
         .resumen-box {
             background-color: #f8fafc;
             border-radius: 10px;
@@ -144,17 +189,13 @@
             border-bottom: 1px solid #f1f5f9;
         }
 
-        .resumen-linea strong {
-            color: #475569;
-        }
-
         .resumen-linea span {
             font-family: monospace;
             font-size: 15px;
             font-weight: 600;
         }
 
-        /* --- ACCIONES --- */
+        /* --- BOTONES --- */
         .btn-whatsapp {
             display: flex;
             justify-content: center;
@@ -162,103 +203,193 @@
             width: 100%;
             height: 48px;
             background-color: #25D366;
-            color: #ffffff;
+            color: white;
             border: none;
             border-radius: 8px;
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.2s;
         }
 
-        .btn-whatsapp:hover {
-            background-color: #1ea952;
+        /* --- NAVEGACIÓN INFERIOR FIXA --- */
+        .nav-inferior {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 65px;
+            background-color: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+            width: 33.33%;
+        }
+
+        .nav-item.active {
+            color: #4f46e5;
+        }
+
+        .nav-icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+
+        /* --- ESTILOS DE VISTAS VACÍAS --- */
+        .placeholder-vista {
+            background: white;
+            border-radius: 16px;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
     </style>
 </head>
 <body>
 
-    <div class="presupuesto-container">
-        <h2>📊 Mi Presupuesto Real</h2>
-        
-        <!-- Entrada de Ingresos -->
-        <div class="form-group ingreso-principal">
-            <label for="ingresoTotal">💵 Ingreso Neto Mensual (Tus Cuartos):</label>
-            <input type="number" id="ingresoTotal" placeholder="RD$ Ej. 40000" min="0">
-        </div>
-
-        <!-- CATEGORÍA 1: Compromisos (70%) -->
-        <h3 style="color: #e67e22;">🔒 Compromisos Reales (70% Ideal)</h3>
-        
-        <div class="form-group">
-            <label>🏠 Renta o Hipoteca:</label>
-            <input type="number" class="input-gasto" data-category="compromisos" placeholder="0">
-        </div>
-        
-        <div class="form-group">
-            <label>🛒 Supermercado y Colmado:</label>
-            <input type="number" class="input-gasto" data-category="compromisos" placeholder="0">
-        </div>
-        
-        <div class="form-group">
-            <label>⚡ Servicios (Luz, Internet, Agua):</label>
-            <input type="number" class="input-gasto" data-category="compromisos" placeholder="0">
-        </div>
-
-        <!-- CATEGORÍA 2: El Coro (20%) -->
-        <h3 style="color: #2980b9;">🎉 El Coro y Estilo de Vida (20% Ideal)</h3>
-        
-        <div class="form-group">
-            <label>🍻 Salidas y Entretenimiento:</label>
-            <input type="number" class="input-gasto" data-category="coro" placeholder="0">
-        </div>
-        
-        <div class="form-group">
-            <label>📺 Suscripciones (Netflix, Spotify):</label>
-            <input type="number" class="input-gasto" data-category="coro" placeholder="0">
-        </div>
-
-        <!-- CATEGORÍA 3: Ahorros (10%) -->
-        <h3 style="color: #27ae60;">💰 Tus Clavos (Ahorro - 10% Ideal)</h3>
-        
-        <div class="form-group">
-            <label>🐷 Fondo de Emergencia / Metas:</label>
-            <input type="number" class="input-gasto" data-category="ahorro" placeholder="0">
-        </div>
-
-        <!-- MEDIDOR DE CONSUMO -->
-        <div class="progress-section">
-            <label>📊 Medidor de Cuartos Consumidos:</label>
-            <div class="progress-bar-bg">
-                <div id="barraProgreso" class="progress-bar-fill"></div>
-            </div>
-        </div>
-
-        <!-- CASILLA DE TIP FINANCIERO (Ubicada exactamente debajo del plan/medidor) -->
-        <div id="tipDominicano" class="tip-box"></div>
-
-        <!-- RESUMEN DE BALANCES -->
-        <div class="resumen-box">
-            <div class="resumen-linea">
-                <strong>Ingresos:</strong>
-                <span id="txtIngreso">RD$ 0.00</span>
-            </div>
-            <div class="resumen-linea">
-                <strong>Total Gastado:</strong>
-                <span id="txtGastado">RD$ 0.00</span>
-            </div>
-            <div class="resumen-linea">
-                <strong>Disponible:</strong>
-                <span id="txtDisponible">RD$ 0.00</span>
-            </div>
-        </div>
-
-        <!-- ACCIÓN DE WHATSAPP -->
-        <button id="btnEnviarWhatsapp" class="btn-whatsapp">
-            💬 Enviar Resumen por WhatsApp
-        </button>
+    <!-- 1. INTRODUCCIÓN ANIMADA -->
+    <div id="intro-pantalla">
+        <div class="logo-animado">Altrua</div>
+        <div class="tagline">Tus finanzas claras, versión dominicana 🇩🇴</div>
     </div>
 
+    <!-- CONTENEDOR PRINCIPAL DE LAS SECCIONES -->
+    <div class="app-container">
+
+        <!-- SECCIÓN A: PRESUPUESTO (ACTIVA POR DEFECTO) -->
+        <div id="vista-presupuesto" class="tab-content active">
+            <div class="presupuesto-container">
+                <h2>📊 Mi Presupuesto Real</h2>
+                
+                <div class="form-group ingreso-principal">
+                    <label for="ingresoTotal">💵 Ingreso Neto Mensual (Tus Cuartos):</label>
+                    <input type="number" id="ingresoTotal" placeholder="RD$ Ej. 40000" min="0">
+                </div>
+
+                <h3 style="color: #e67e22;">🔒 Compromisos Reales (70% Ideal)</h3>
+                <div class="form-group">
+                    <label>🏠 Renta o Hipoteca:</label>
+                    <input type="number" class="input-gasto" data-category="compromisos" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>🛒 Supermercado y Colmado:</label>
+                    <input type="number" class="input-gasto" data-category="compromisos" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>⚡ Servicios (Luz, Internet, Agua):</label>
+                    <input type="number" class="input-gasto" data-category="compromisos" placeholder="0">
+                </div>
+
+                <h3 style="color: #2980b9;">🎉 El Coro y Estilo de Vida (20% Ideal)</h3>
+                <div class="form-group">
+                    <label>🍻 Salidas y Entretenimiento:</label>
+                    <input type="number" class="input-gasto" data-category="coro" placeholder="0">
+                </div>
+                <div class="form-group">
+                    <label>📺 Suscripciones (Netflix, Spotify):</label>
+                    <input type="number" class="input-gasto" data-category="coro" placeholder="0">
+                </div>
+
+                <h3 style="color: #27ae60;">💰 Tus Clavos (Ahorro - 10% Ideal)</h3>
+                <div class="form-group">
+                    <label>🐷 Fondo de Emergencia / Metas:</label>
+                    <input type="number" class="input-gasto" data-category="ahorro" placeholder="0">
+                </div>
+
+                <!-- MEDIDOR DE DEDUCCIÓN -->
+                <div class="progress-section">
+                    <label>📊 Medidor de Cuartos Consumidos:</label>
+                    <div class="progress-bar-bg">
+                        <div id="barraProgreso" class="progress-bar-fill"></div>
+                    </div>
+                </div>
+
+                <!-- TIP DINÁMICO -->
+                <div id="tipDominicano" class="tip-box"></div>
+
+                <!-- BALANCES -->
+                <div class="resumen-box">
+                    <div class="resumen-linea"><strong>Ingresos:</strong> <span id="txtIngreso">RD$ 0.00</span></div>
+                    <div class="resumen-linea"><strong>Total Gastado:</strong> <span id="txtGastado">RD$ 0.00</span></div>
+                    <div class="resumen-linea"><strong>Disponible:</strong> <span id="txtDisponible">RD$ 0.00</span></div>
+                </div>
+
+                <button id="btnEnviarWhatsapp" class="btn-whatsapp">
+                    💬 Enviar Resumen por WhatsApp
+                </button>
+            </div>
+        </div>
+
+        <!-- SECCIÓN B: METAS Y PROGRESO -->
+        <div id="vista-metas" class="tab-content">
+            <div class="placeholder-vista">
+                <h2>🎯 Metas & Progreso</h2>
+                <p style="margin-top: 10px; color: #64748b;">Aquí podrás configurar y trackear tus clavos de ahorro a largo plazo.</p>
+            </div>
+        </div>
+
+        <!-- SECCIÓN C: ACADEMIA -->
+        <div id="vista-academia" class="tab-content">
+            <div class="placeholder-vista">
+                <h2>📚 Academia Altrua</h2>
+                <p style="margin-top: 10px; color: #64748b;">Módulos educativos para aprender a manejar tus cuartos de verdad.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MENÚ DE NAVEGACIÓN INFERIOR (Las secciones de abajo) -->
+    <nav class="nav-inferior">
+        <button class="nav-item active" onclick="cambiarPestaña('vista-presupuesto', this)">
+            <span class="nav-icon">📊</span>
+            <span>Presupuesto</span>
+        </button>
+        <button class="nav-item" onclick="cambiarPestaña('vista-metas', this)">
+            <span class="nav-icon">🎯</span>
+            <span>Metas</span>
+        </button>
+        <button class="nav-item" onclick="cambiarPestaña('vista-academia', this)">
+            <span class="nav-icon">📚</span>
+            <span>Academia</span>
+        </button>
+    </nav>
+
+    <!-- CONTROLADOR BÁSICO DE NAVEGACIÓN -->
+    <script>
+        function cambiarPestaña(idVista, botonActivo) {
+            // Ocultar todas las vistas
+            document.querySelectorAll('.tab-content').forEach(vista => {
+                vista.classList.remove('active');
+            });
+            // Quitar clase activa a todos los botones
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Mostrar la seleccionada
+            document.getElementById(idVista).classList.add('active');
+            botonActivo.classList.add('active');
+        }
+
+        // Simulación básica por si acaso para remover la intro del flujo visual tras la animación
+        setTimeout(() => {
+            const intro = document.getElementById('intro-pantalla');
+            if(intro) intro.style.display = 'none';
+        }, 3000);
+    </script>
     <script src="app.js"></script>
 </body>
 </html>
