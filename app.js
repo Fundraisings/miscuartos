@@ -1,5 +1,5 @@
 // =========================================================================
-// ARCHIVO: app.js (Código Completo Consolidado - Fix de Navegación Global)
+// ARCHIVO: app.js (Código Completo Consolidado - Fix de Atributos y Clases HTML)
 // =========================================================================
 
 // --- VARIABLES Y CONSTANTES GLOBALES ---
@@ -7,18 +7,35 @@ const CANASTA_BASICA_RD = 45000;
 
 // --- INICIALIZADOR PRINCIPAL AL CARGAR EL DOCUMENTO ---
 document.addEventListener("DOMContentLoaded", () => {
+  inicializarSplashAndIntro();
   configurarNavegacionPestañas();
-  inicializarEscuchadorGlobalClicks(); // Delegación de eventos robusta
+  inicializarEscuchadorGlobalClicks(); // Delegación robusta
   inicializarFormularioIngresos();
   inicializarSimuladorAFP();
   inicializarMetasYEmprendimiento();
 });
 
 // =========================================================================
-// --- 1. SISTEMA DE NAVEGACIÓN ENTRE PESTAÑAS ---
+// --- CONTROL DE ACCESO (SPLASH SCREEN) ---
+// =========================================================================
+function inicializarSplashAndIntro() {
+  const enterAppBtn = document.getElementById("enterAppBtn");
+  const splashElement = document.getElementById("app-splash");
+  const mainAppContainer = document.getElementById("mainAppContainer");
+
+  if (enterAppBtn && splashElement && mainAppContainer) {
+    enterAppBtn.addEventListener("click", () => {
+      splashElement.style.display = "none";
+      mainAppContainer.style.display = "flex";
+    });
+  }
+}
+
+// =========================================================================
+// --- 1. SISTEMA DE NAVEGACIÓN ENTRE PESTAÑAS (MAPEADO DE CLASES Y ID DEL HTML) ---
 // =========================================================================
 function configurarNavegacionPestañas() {
-  const enlacesPestañas = document.querySelectorAll(".tab-link");
+  const enlacesPestañas = document.querySelectorAll(".nav-item");
   
   enlacesPestañas.forEach(enlace => {
     enlace.addEventListener("click", (e) => {
@@ -29,19 +46,21 @@ function configurarNavegacionPestañas() {
   });
 }
 
-// Función auxiliar reutilizable para cambiar de pestaña programáticamente
+// Función auxiliar unificada para cambiar vistas de paneles sin fallos
 function irAPestaña(destinoId) {
-  const enlacesPestañas = document.querySelectorAll(".tab-link");
-  const contenidosPestañas = document.querySelectorAll(".tab-content");
+  const enlacesPestañas = document.querySelectorAll(".nav-item");
+  const contenidosPestañas = document.querySelectorAll(".tab-pane");
 
-  // Verificar que la pestaña de destino exista antes de proceder
-  const pestañaDestino = document.getElementById(destinoId);
-  if (!pestañaDestino) {
-    console.warn(`La pestaña con id "${destinoId}" no fue encontrada en el DOM.`);
+  // El id en el HTML lleva el prefijo "pane-" (Ej: id="pane-presupuesto")
+  const idContenedorReal = `pane-${destinoId}`;
+  const panelDestino = document.getElementById(idContenedorReal);
+
+  if (!panelDestino) {
+    console.warn(`Panel no encontrado: "${idContenedorReal}". Revisa la sincronización de IDs.`);
     return;
   }
 
-  // Cambiar estado activo en los botones de navegación
+  // Actualizar la clase activa del botón en la barra de navegación inferior
   enlacesPestañas.forEach(btn => {
     if (btn.getAttribute("data-tab") === destinoId) {
       btn.classList.add("active");
@@ -50,33 +69,32 @@ function irAPestaña(destinoId) {
     }
   });
 
-  // Cambiar visibilidad de las secciones de contenido
+  // Alternar visibilidad de las secciones utilizando block/none
   contenidosPestañas.forEach(seccion => {
-    if (seccion.id === destinoId) {
+    if (seccion.id === idContenedorReal) {
       seccion.style.display = "block";
     } else {
       seccion.style.display = "none";
     }
   });
 
-  // Scroll hacia arriba automático para mejorar la experiencia en móviles
+  // Scroll suave hacia la parte superior (útil en layouts móviles)
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // =========================================================================
-// --- 2. DELEGACIÓN DE EVENTOS GLOBAL (SOLUCIÓN AL BOTÓN DE INICIO) ---
+// --- 2. DELEGACIÓN DE EVENTOS GLOBAL (SOLUCIÓN FIX AL BOTÓN DE INICIO) ---
 // =========================================================================
 function inicializarEscuchadorGlobalClicks() {
-  // Captura los clics a nivel de documento para evitar problemas de carga a destiempo
   document.addEventListener("click", (e) => {
-    // Buscamos si el elemento clickeado o uno de sus ancestros es el botón "Guíame"
+    // Intercepta clics de cualquier variante estructural del botón "Guíame" o disparadores de metas
     const targetBoton = e.target.closest("#btnGuiame, .btn-guiame, [data-action='guiame']");
     
     if (targetBoton) {
       e.preventDefault();
-      console.log("Botón Guíame detectado globalmente. Redirigiendo...");
-      // Forzar redirección directa a la pestaña de presupuesto
-      irAPestaña("presupuesto");
+      console.log("Botón Guíame interceptado con éxito. Navegando al panel de Metas.");
+      // Redirige dinámicamente al panel "metas" para iniciar el flujo guiado
+      irAPestaña("metas");
     }
   });
 }
@@ -88,27 +106,19 @@ function inicializarFormularioIngresos() {
   const inputIncome = document.getElementById("income");
   if (inputIncome) {
     inputIncome.addEventListener("input", () => {
-      // Al cambiar el ingreso, se recalcula el análisis del coach automáticamente
       actualizarAnalisisDelCoach();
     });
   }
 }
 
-// Función auxiliar para deducir gastos aproximados si no se han completado aún
 function calcularPresupuestoInstantaneo() {
   const sueldo = parseFloat(document.getElementById("income").value) || 0;
-  // Suposición financiera: un usuario promedio consume un 70% de su ingreso en gastos fijos
-  return sueldo > 0 ? sueldo * 0.70 : 0;
+  return sueldo > 0 ? sueldo * 0.70 : 0; // Asumimos un 70% estimado de costes fijos dominicanos
 }
 
 // =========================================================================
 // --- 9. LÓGICA DE LA PESTAÑA: ACADEMIA Y SIMULADORES INTERACTIVOS ---
 // =========================================================================
-function inicializarDineroOculto() {
-  // Eliminado de la academia para mantenerla limpia y enfocada puramente en enseñar.
-  // La lógica de Dinero Oculto ahora vive de forma estratégica dentro de las Metas Financieras.
-}
-
 function inicializarSimuladorAFP() {
   const academiaIntroBox = document.getElementById("academiaIntroMessage");
   if (academiaIntroBox) {
@@ -197,11 +207,12 @@ function actualizarAnalisisDelCoach() {
       <strong style="color: #2D8ACE; font-size: 15px;">RD$ ${cuotaMensual.toLocaleString('es-DO', {maximumFractionDigits:2})}</strong> al mes.
     </div>
 
+    <!-- 💡 CAMBIO DE UBICACIÓN REQUERIDO: EL TIP SITUADO DIRECTAMENTE DEBAJO DE LOS PLANES -->
     <div style="background: #FFF9E6; border: 1px solid #FFEAA7; color: #D6A21E; padding: 10px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 6px; text-align: left; line-height: 1.4;">
       💡 Tip de Compromiso: Abre una cuenta de ahorro aparte. Dinero que entra ahí no se toca hasta cumplir el plazo, salvo una emergencia real.
     </div>
 
-    <!-- 🔍 INTEGRACIÓN ESTRATÉGICA: DINERO OCULTO EN METAS -->
+    <!-- 🔍 SECCIÓN INTERACTIVA: DINERO OCULTO REDISEÑADO EN LAS METAS FINANCIERAS -->
     <div style="background: #FFFDF0; border: 1px solid #F3E1B6; padding: 16px; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 2px 6px rgba(0,0,0,0.02);">
       <h4 style="margin: 0 0 6px 0; font-size: 14px; color: #8A6D1C; font-weight: 700;">🔍 ¿DE DÓNDE SACAR ESE DINERO? ENCUENTRA TU DINERO OCULTO</h4>
       <p style="margin: 0 0 12px 0; font-size: 12.5px; color: #555; line-height: 1.4;">
@@ -209,7 +220,6 @@ function actualizarAnalisisDelCoach() {
       </p>
       
       <div style="display: flex; flex-direction: column; gap: 10px;">
-        <!-- Hábito 1 -->
         <div style="display: flex; flex-direction: column; gap: 4px; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #e1e6eb;">
           <label style="font-size: 12.5px; font-weight: 600; color: #222;">☕ Cafecito o empanada en la calle</label>
           <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
@@ -223,7 +233,6 @@ function actualizarAnalisisDelCoach() {
           </div>
         </div>
 
-        <!-- Hábito 2 -->
         <div style="display: flex; flex-direction: column; gap: 4px; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #e1e6eb;">
           <label style="font-size: 12.5px; font-weight: 600; color: #222;">🍗 Delivery de cena por antojo</label>
           <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
@@ -236,7 +245,6 @@ function actualizarAnalisisDelCoach() {
           </div>
         </div>
 
-        <!-- Hábito 3 -->
         <div style="display: flex; flex-direction: column; gap: 4px; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #e1e6eb;">
           <label style="font-size: 12.5px; font-weight: 600; color: #222;">📺 Suscripción de streaming sin usar</label>
           <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
@@ -247,23 +255,8 @@ function actualizarAnalisisDelCoach() {
             </select>
           </div>
         </div>
-
-        <!-- Hábito 4 -->
-        <div style="display: flex; flex-direction: column; gap: 4px; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #e1e6eb;">
-          <label style="font-size: 12.5px; font-weight: 600; color: #222;">🍬 Refrescos, picaderas o golosinas</label>
-          <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
-            <span style="font-size: 11px; color: #666;">Costo apróx: RD$ 100</span>
-            <select class="input-habito-meta" data-costo="100" data-tipo="semanal" style="padding: 4px; border-radius: 6px; border: 1px solid #ced4da; font-size: 12px; background: #f8f9fa; font-weight: 600;">
-              <option value="0">Nunca</option>
-              <option value="1">1 vez x semana</option>
-              <option value="3">3 veces x semana</option>
-              <option value="5">5 veces x semana</option>
-            </select>
-          </div>
-        </div>
       </div>
 
-      <!-- Pizarra de Reskate Financiero -->
       <div style="margin-top: 14px; padding-top: 10px; border-top: 1px dashed #F3E1B6; text-align: center;">
         <div style="font-size: 12.5px; font-weight: 600; color: #555;">Dinero rescatado para tu meta:</div>
         <div id="totalRescateMetaMensual" style="font-size: 18px; font-weight: 800; color: #1F7A5C; margin: 2px 0;">RD$ 0 / mes</div>
@@ -272,58 +265,18 @@ function actualizarAnalisisDelCoach() {
     </div>
 
     <details style="${estiloDetails}">
-      <summary style="${estiloSummary}">
-        <span>⚠️ Un vistazo a la realidad (Punto A)</span>
-        <span style="color: #999; font-size: 11px;">▼</span>
-      </summary>
+      <summary style="${estiloSummary}"><span>⚠️ Un vistazo a la realidad (Punto A)</span><span>▼</span></summary>
       <div style="${estiloContenido}">
-        <p style="margin-top: 8px;">
-          Alcanzar esta cifra puede ser retador, ya que tu ingreso actual se encuentra por debajo de la canasta básica familiar promedio en el país (RD$ ${CANASTA_BASICA_RD.toLocaleString()}).
-        </p>
-        <p style="margin-top: 6px;">
-          Con el costo de productos esenciales en constante movimiento, es completamente normal sentir que el dinero rinde menos. ¡La calle tiene sus desafíos y no estás solo en esto!
-        </p>
+        <p>Alcanzar esta cifra puede ser retador, ya que tu ingreso actual se encuentra por debajo de la canasta básica familiar promedio en el país (RD$ ${CANASTA_BASICA_RD.toLocaleString()}).</p>
       </div>
     </details>
 
     <details style="${estiloDetails}">
-      <summary style="${estiloSummary}">
-        <span>🧠 Equilibrio de gastos (Punto B)</span>
-        <span style="color: #999; font-size: 11px;">▼</span>
-      </summary>
+      <summary style="${estiloSummary}"><span>🧠 Equilibrio de gastos (Punto B)</span><span>▼</span></summary>
       <div style="${estiloContenido}">
-        <p style="margin-top: 8px;">
-          Una recomendación práctica para liberar algo de espacio en tus ingresos es cuidar los consumos impulsivos. 
-        </p>
-        <p style="margin-top: 6px;">
-          A veces, el uso frecuente de tarjetas de crédito en salidas, "coros" o gastos del momento puede comprometer tu presupuesto sin que te des cuenta. Encontrar un balance te ayudará a avanzar más rápido hacia tus propósitos reales.
-        </p>
+        <p>Una recomendación práctica para liberar algo de espacio en tus ingresos es cuidar los consumos impulsivos de tarjetas de crédito.</p>
       </div>
     </details>
-
-    <details style="${estiloDetails}">
-      <summary style="${estiloSummary}">
-        <span>🛡️ Alternativas de ahorro (Punto C)</span>
-        <span style="color: #999; font-size: 11px;">▼</span>
-      </summary>
-      <div style="${estiloContenido}">
-        <p style="margin-top: 8px;">
-          Aunque los métodos informales como los "sanes" o guardar efectivo en casa son herramientas muy comunes y tradicionales en nuestra cultura, considera que la inflación reduce el valor de ese dinero guardado día a día.
-        </p>
-        <p style="margin-top: 6px;">
-          Evaluar opciones en instituciones bancarias reguladas puede ser una alternativa útil para proteger tus recursos de las alzas de precios y mantenerlos seguros.
-        </p>
-      </div>
-    </details>
-
-    <div style="margin-top: 18px; padding-top: 14px; border-top: 1px solid #e1e6eb;">
-      <p style="font-weight: 600; color: #111; line-height: 1.4; font-size: 14px; margin-bottom: 4px;">
-        🚀 ¿Has pensado en generar un extra?
-      </p>
-      <p style="font-size: 13px; color: #666; line-height: 1.4; margin-bottom: 0;">
-        Como recortar gastos a veces tiene un límite, explorar alternativas de micro-emprendimiento independiente es una excelente opción. Aquí abajo te compartimos algunas ideas comunes del mercado que podrían inspirarte:
-      </p>
-    </div>
   `;
 
   alertBox.innerHTML = mensajeHTML;
@@ -332,7 +285,6 @@ function actualizarAnalisisDelCoach() {
   alertBox.style.padding = '16px';
   alertBox.style.borderRadius = '14px';
 
-  // Reactividad inmediata en elementos móviles al inyectar el contenido
   document.querySelectorAll(".input-habito-meta").forEach(select => {
     select.addEventListener("change", calcularRescateEnMetas);
   });
@@ -343,7 +295,6 @@ function actualizarAnalisisDelCoach() {
 
 function calcularRescateEnMetas() {
   let totalMensual = 0;
-
   document.querySelectorAll(".input-habito-meta").forEach(select => {
     const valor = parseFloat(select.value) || 0;
     const costo = parseFloat(select.getAttribute("data-costo")) || 0;
@@ -360,16 +311,12 @@ function calcularRescateEnMetas() {
   const txtMensual = document.getElementById("totalRescateMetaMensual");
   const txtAnual = document.getElementById("progresoFugaMetaAnual");
 
-  if (txtMensual) {
-    txtMensual.textContent = `RD$ ${Math.round(totalMensual).toLocaleString('es-DO')} / mes`;
-  }
-  if (txtAnual) {
-    txtAnual.textContent = `¡Equivale a RD$ ${Math.round(totalAnual).toLocaleString('es-DO')} acumulados al año para tus metas!`;
-  }
+  if (txtMensual) txtMensual.textContent = `RD$ ${Math.round(totalMensual).toLocaleString('es-DO')} / mes`;
+  if (txtAnual) txtAnual.textContent = `¡Equivale a RD$ ${Math.round(totalAnual).toLocaleString('es-DO')} al año!`;
 }
 
 // =========================================================================
-// --- 11. GENERACIÓN DINÁMICA DE SUGERENCIAS DE EMPRENDIMIENTO ---
+// --- 11. SUGERENCIAS DE EMPRENDIMIENTO ---
 // =========================================================================
 function renderizarIdeasDeEmprendimiento(cuotaNecesaria) {
   const contenedorIdeas = document.getElementById("entrepreneurshipIdeasContainer");
@@ -377,30 +324,23 @@ function renderizarIdeasDeEmprendimiento(cuotaNecesaria) {
 
   const ideas = [
     { titulo: "Venta de ropa o accesorios virtuales", gananciaAprox: 8000 },
-    { titulo: "Servicios independientes / Freelance (Diseño, Redacción, Soporte)", gananciaAprox: 12000 },
-    { titulo: "Preparación de postres o picaderas por encargo", gananciaAprox: 6000 },
-    { titulo: "Tutorías escolares o mentorías especializadas", gananciaAprox: 5000 }
+    { titulo: "Servicios independientes / Freelance", gananciaAprox: 12000 },
+    { titulo: "Preparación de postres por encargo", gananciaAprox: 6000 }
   ];
 
   let htmlContenido = `<div style="display: flex; flex-direction: column; gap: 12px; margin-top: 12px;">`;
-
   ideas.forEach(idea => {
     const porcentajeCubierto = Math.min(Math.round((idea.gananciaAprox / cuotaNecesaria) * 100), 100);
-    
     htmlContenido += `
-      <div style="background: #fff; border: 1px solid #e1e6eb; padding: 12px; border-radius: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
-        <div style="font-weight: 600; color: #222; font-size: 13.5px; margin-bottom: 4px;">${idea.titulo}</div>
-        <div style="display: flex; justify-content: space-between; font-size: 11.5px; color: #666; margin-bottom: 6px;">
-          <span>Ganancia estimada: <strong>RD$ ${idea.gananciaAprox.toLocaleString('es-DO')} /mes</strong></span>
-          <span style="color: #1F7A5C; font-weight: 600;">Cubre el ${porcentajeCubierto}% de tu cuota</span>
-        </div>
-        <div style="background: #f0f2f5; height: 6px; border-radius: 4px; overflow: hidden;">
-          <div style="background: #1F7A5C; width: ${porcentajeCubierto}%; height: 100%; border-radius: 4px;"></div>
+      <div style="background: #fff; border: 1px solid #e1e6eb; padding: 12px; border-radius: 10px;">
+        <div style="font-weight: 600; font-size: 13.5px; margin-bottom: 4px;">${idea.titulo}</div>
+        <div style="display: flex; justify-content: space-between; font-size: 11.5px; color: #666;">
+          <span>Ganancia: <strong>RD$ ${idea.gananciaAprox.toLocaleString('es-DO')}</strong></span>
+          <span style="color: #1F7A5C; font-weight: 600;">Cubre el ${porcentajeCubierto}%</span>
         </div>
       </div>
     `;
   });
-
   htmlContenido += `</div>`;
   contenedorIdeas.innerHTML = htmlContenido;
 }
