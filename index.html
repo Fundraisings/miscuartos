@@ -1,500 +1,380 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>miscuartos - Tu coach financiero de bolsillo</title>
-    <style>
-        /* --- ESTILOS GENERALES --- */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-            background-color: #f4f6f9;
-            color: #2c3e50;
-            padding-bottom: 80px;
-        }
-
-        .app-container {
-            max-width: 480px;
-            margin: 0 auto;
-            padding: 15px;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* --- 🧭 SPLASH / INTRO SCREEN --- */
-        #intro-pantalla {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: linear-gradient(135deg, #4f46e5, #06b6d4);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            color: white;
-            padding: 30px;
-            text-align: center;
-        }
-
-        .brujula-contenedor {
-            font-size: 60px;
-            margin-bottom: 20px;
-            /* Aquí corre tu animación ya resuelta de la brújula */
-        }
-
-        .marca-nombre {
-            font-size: 36px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            margin-bottom: 4px;
-        }
-
-        .marca-tagline {
-            font-size: 16px;
-            font-weight: 500;
-            margin-bottom: 24px;
-            opacity: 0.95;
-        }
-
-        .marca-descripcion {
-            font-size: 14px;
-            line-height: 1.6;
-            margin-bottom: 40px;
-            opacity: 0.85;
-            max-width: 320px;
-        }
-
-        .nota-cultural {
-            font-size: 11px;
-            line-height: 1.4;
-            opacity: 0.75;
-            margin-bottom: 30px;
-            max-width: 300px;
-        }
-
-        .btn-comenzar {
-            background-color: #ffffff;
-            color: #4f46e5;
-            border: none;
-            padding: 14px 32px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 25px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            transition: transform 0.2s;
-        }
-
-        .btn-comenzar:active {
-            transform: scale(0.98);
-        }
-
-        /* --- 💰 SECCIÓN: PRESUPUESTO --- */
-        .presupuesto-container {
-            background-color: #ffffff;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-
-        /* Tarjeta de Bienvenida y Video */
-        .bienvenida-card {
-            background-color: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 25px;
-        }
-
-        .bienvenida-texto {
-            font-size: 14px;
-            line-height: 1.5;
-            color: #475569;
-            margin-bottom: 12px;
-        }
-
-        .btn-video {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            background-color: #ffffff;
-            border: 1px solid #cbd5e1;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            color: #1e293b;
-            cursor: pointer;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-        }
-
-        /* Cabeceras de títulos */
-        .encabezado-seccion {
-            margin-bottom: 20px;
-        }
-
-        .encabezado-seccion h2 {
-            font-size: 22px;
-            font-weight: 700;
-            color: #0f172a;
-            text-align: left;
-            margin-bottom: 4px;
-        }
-
-        .encabezado-seccion p {
-            font-size: 14px;
-            color: #64748b;
-            line-height: 1.5;
-        }
-
-        .titulo-lista-gastos {
-            font-size: 16px;
-            font-weight: 700;
-            color: #1e293b;
-            margin: 25px 0 15px 0;
-        }
-
-        /* Elementos del Formulario */
-        .form-group {
-            margin-bottom: 14px;
-        }
-
-        label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: #475569;
-        }
-
-        input {
-            width: 100%;
-            height: 44px;
-            padding: 0 12px;
-            font-size: 16px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            background-color: #f8fafc;
-            color: #334155;
-            transition: border-color 0.2s;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: #4f46e5;
-            background-color: #ffffff;
-        }
-
-        .ingreso-principal input {
-            font-size: 18px;
-            font-weight: bold;
-            border-color: #a5b4fc;
-            background-color: #f5f3ff;
-        }
-
-        /* --- MEDIDOR DE DEDUCCIÓN --- */
-        .progress-section {
-            margin: 25px 0 15px 0;
-        }
-
-        .progress-bar-bg {
-            background-color: #e2e8f0;
-            border-radius: 10px;
-            width: 100%;
-            height: 20px;
-            overflow: hidden;
-        }
-
-        .progress-bar-fill {
-            background-color: #2ecc71;
-            width: 0%;
-            height: 100%;
-            transition: width 0.3s ease;
-        }
-
-        /* Box de Consejos */
-        .tip-box {
-            background-color: #fff9db;
-            border-left: 4px solid #fcc419;
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 13px;
-            line-height: 1.5;
-            display: none;
-        }
-
-        /* Resumen de balances */
-        .resumen-box {
-            background-color: #f8fafc;
-            border-radius: 10px;
-            padding: 16px;
-            border: 1px solid #e2e8f0;
-            margin-bottom: 20px;
-        }
-
-        .resumen-linea {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            font-size: 14px;
-        }
-
-        .resumen-linea:not(:last-child) {
-            border-bottom: 1px solid #f1f5f9;
-        }
-
-        .resumen-linea span {
-            font-family: monospace;
-            font-size: 15px;
-            font-weight: 600;
-        }
-
-        /* Botón final */
-        .btn-finalizar {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: 48px;
-            background-color: #4f46e5;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .btn-finalizar:hover {
-            background-color: #4338ca;
-        }
-
-        /* --- NAVEGACIÓN INFERIOR --- */
-        .nav-inferior {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 65px;
-            background-color: #ffffff;
-            border-top: 1px solid #e2e8f0;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: none;
-            border: none;
-            color: #94a3b8;
-            font-size: 11px;
-            font-weight: 500;
-            cursor: pointer;
-            width: 33.33%;
-        }
-
-        .nav-item.active {
-            color: #4f46e5;
-        }
-
-        .nav-icon {
-            font-size: 22px;
-            margin-bottom: 4px;
-        }
-
-        .placeholder-vista {
-            background: white;
-            border-radius: 16px;
-            padding: 40px 20px;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Miscuartos — Tu coach financiero de bolsillo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- 1. 🧭 SPLASH / INTRO -->
-    <div id="intro-pantalla">
-        <div class="brujula-contenedor">🧭</div>
-        <div class="marca-nombre">miscuartos</div>
-        <div class="marca-tagline">Tu coach financiero de bolsillo</div>
-        <div class="marca-descripcion">Una app que te guía y te ayuda a manejar tu dinero con inteligencia — sin vueltas, sin culpas.</div>
-        <div class="nota-cultural">* miscuartos: así le decimos los dominicanos al dinero que nos ganamos con esfuerzo. "Dame mis cuartos." "Trabajando duro por mis cuartos."</div>
-        <button class="btn-comenzar" onclick="cerrarSplash()">Comenzar a guiarme →</button>
+<div id="app-splash" class="splash-screen">
+  <div class="splash-content">
+    <div class="splash-compass-wrap">
+      <svg class="splash-compass" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="45" stroke="currentColor" stroke-width="6" fill="none"/>
+        <line x1="50" y1="5" x2="50" y2="15" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+        <line x1="50" y1="85" x2="50" y2="95" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+        <line x1="5" y1="50" x2="15" y2="50" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+        <line x1="85" y1="50" x2="95" y2="50" stroke="currentColor" stroke-width="6" stroke-linecap="round"/>
+        <polygon points="50,15 42,50 50,50" fill="#FD8C45"/>
+        <polygon points="50,15 58,50 50,50" fill="#FD8C45" opacity="0.9"/>
+        <polygon points="50,85 42,50 50,50" fill="currentColor"/>
+        <polygon points="50,85 58,50 50,50" fill="currentColor" opacity="0.95"/>
+      </svg>
     </div>
-
-    <!-- CONTENEDOR DE LA APLICACIÓN -->
-    <div class="app-container">
-
-        <!-- 💰 PESTAÑA PRINCIPAL: PRESUPUESTO -->
-        <div id="vista-presupuesto" class="tab-content active">
-            
-            <!-- Mensaje de bienvenida inicial -->
-            <div class="bienvenida-card">
-                <p class="bienvenida-texto">¡Qué bueno tenerte aquí! 👋<br><br>Esta app funciona mejor si sabes cómo sacarle el jugo. Antes de empezar, dale un minuto a este video — te va a ahorrar tiempo después.</p>
-                <button class="btn-video">▶ Cómo sacarle el jugo a la app · 1 min</button>
-            </div>
-
-            <div class="presupuesto-container">
-                <!-- Títulos principales -->
-                <div class="encabezado-seccion">
-                    <h2>Tus cuartos, bajo tu control</h2>
-                    <p>Manejar tu dinero no tiene que ser complicado. Pon lo que ganas, anota lo que gastas, y te guiamos en el camino.</p>
-                </div>
-                
-                <!-- Campo de Ingresos -->
-                <div class="form-group ingreso-principal">
-                    <label for="ingresoTotal">Ingreso ganado este mes</label>
-                    <input type="number" id="ingresoTotal" placeholder="Ej. 50,000" min="0">
-                </div>
-
-                <div class="titulo-lista-gastos">Tus gastos este mes</div>
-
-                <!-- 11 CATEGORÍAS ASIGNADAS CON SUS ATRIBUTOS DE FILTRADO PARA EL 70/20/10 -->
-                <div class="form-group">
-                    <label>🏠 Vivienda (Renta/Hipoteca):</label>
-                    <input type="number" class="input-gasto" data-category="compromisos" placeholder="0">
-                </div>
-                <div class="form-group">
-                    <label>🛒 Comida (Supermercado/Colmado):</label>
-                    <input type="number" class="input-gasto" data-category="compromisos" placeholder="0">
-                </div>
-                <div class="form-group">
-                    <label>⚡ Luz, agua y teléfono:</label>
-                    <input type="number" class="input-gasto" data-category="compromisos" placeholder="0">
-                </div>
-                <div class="form-group">
-                    <label>🎒 Escuela / Educación:</label>
-                    <input type="number" class="input-gasto" data-category="compromisos" placeholder="0">
-                </div>
-                <div class="form-group">
-                    <label>🏥 Salud / Seguros:</label>
-                    <input type="number" class="input-gasto" data-category="compromisos" placeholder="0">
-                </div>
-                <div class="form-group">
-                    <label>🚗 Transporte (Gasolina/Público):</label>
-                    <input type="number" class="input-gasto" data-category="compromisos" placeholder="0">
-                </div>
-                <div class="form-group">
-                    <label>💳 Deudas (Préstamos/Tarjetas):</label>
-                    <input type="number" class="input-gasto" data-category="compromisos" placeholder="0">
-                </div>
-                <div class="form-group">
-                    <label>🐷 Ahorro (Tus clavos):</label>
-                    <input type="number" class="input-gasto" data-category="ahorro" placeholder="0">
-                </div>
-                <div class="form-group">
-                    <label>🐶 Mascotas:</label>
-                    <input type="number" class="input-gasto" data-category="coro" placeholder="0">
-                </div>
-                <div class="form-group">
-                    <label>🤲 Donaciones:</label>
-                    <input type="number" class="input-gasto" data-category="coro" placeholder="0">
-                </div>
-                <div class="form-group">
-                    <label>🎉 Diversión (El coro):</label>
-                    <input type="number" class="input-gasto" data-category="coro" placeholder="0">
-                </div>
-
-                <!-- MEDIDOR DE DEDUCCIÓN -->
-                <div class="progress-section">
-                    <label>📊 Medidor de Cuartos Consumidos:</label>
-                    <div class="progress-bar-bg">
-                        <div id="barraProgreso" class="progress-bar-fill"></div>
-                    </div>
-                </div>
-
-                <!-- CONSEJOS DINÁMICOS -->
-                <div id="tipDominicano" class="tip-box"></div>
-
-                <!-- RESUMEN DE BALANCES -->
-                <div class="resumen-box">
-                    <div class="resumen-linea"><strong>Ingresos:</strong> <span id="txtIngreso">RD$ 0.00</span></div>
-                    <div class="resumen-linea"><strong>Total Gastado:</strong> <span id="txtGastado">RD$ 0.00</span></div>
-                    <div class="resumen-linea"><strong>Disponible:</strong> <span id="txtDisponible">RD$ 0.00</span></div>
-                </div>
-
-                <!-- BOTÓN FINAL DE CONSEJOS (Conecta con el WhatsApp o tu lógica interna) -->
-                <button id="btnEnviarWhatsapp" class="btn-finalizar">
-                    Ver mi resumen y consejos →
-                </button>
-            </div>
-        </div>
-
-        <!-- OTRAS VISTAS DE NAVEGACIÓN -->
-        <div id="vista-metas" class="tab-content">
-            <div class="placeholder-vista">
-                <h2>🎯 Metas & Progreso</h2>
-                <p style="margin-top:10px; color:#64748b;">Maneja tus ahorros aquí.</p>
-            </div>
-        </div>
-
-        <div id="vista-academia" class="tab-content">
-            <div class="placeholder-vista">
-                <h2>📚 Academia Altrua</h2>
-                <p style="margin-top:10px; color:#64748b;">Aprende finanzas aplatana'as.</p>
-            </div>
-        </div>
-
+    <div class="splash-brand">miscuartos</div>
+    <div class="splash-tagline">Tu coach financiero de bolsillo</div>
+    <div class="splash-desc">Una app que te guía y te ayuda a manejar tu dinero con inteligencia — sin vueltas, sin culpas.</div>
+    <div class="splash-cultural-note">
+      * <strong>miscuartos:</strong> así le decimos los dominicanos al dinero que nos ganamos con esfuerzo. "Dame mis cuartos." "Trabajando duro por mis cuartos."
     </div>
+    <button class="splash-btn" id="enterAppBtn">Comenzar a guiarme →</button>
+  </div>
+</div>
 
-    <!-- MENÚ DE NAVEGACIÓN INFERIOR -->
-    <nav class="nav-inferior">
-        <button class="nav-item active" onclick="cambiarPestaña('vista-presupuesto', this)">
-            <span class="nav-icon">💰</span>
-            <span>Presupuesto</span>
-        </button>
-        <button class="nav-item" onclick="cambiarPestaña('vista-metas', this)">
-            <span class="nav-icon">🎯</span>
-            <span>Metas</span>
-        </button>
-        <button class="nav-item" onclick="cambiarPestaña('vista-academia', this)">
-            <span class="nav-icon">📚</span>
-            <span>Academia</span>
-        </button>
-    </nav>
+<div class="app-container" id="mainAppContainer" style="display: none;">
 
-    <!-- ACCIONES DE INTERFAZ -->
-    <script>
-        function cerrarSplash() {
-            const intro = document.getElementById('intro-pantalla');
-            if (intro) {
-                intro.style.transition = "opacity 0.4s ease";
-                intro.style.opacity = "0";
-                setTimeout(() => { intro.style.display = "none"; }, 400);
-            }
-        }
+  <header class="app-header">
+    <div class="wordmark">
+      <svg class="brand-compass-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="45" stroke="currentColor" stroke-width="8" fill="none"/>
+        <line x1="50" y1="5" x2="50" y2="15" stroke="currentColor" stroke-width="8" stroke-linecap="round"/>
+        <line x1="50" y1="85" x2="50" y2="95" stroke="currentColor" stroke-width="8" stroke-linecap="round"/>
+        <line x1="5" y1="50" x2="15" y2="50" stroke="currentColor" stroke-width="8" stroke-linecap="round"/>
+        <line x1="85" y1="50" x2="95" y2="50" stroke="currentColor" stroke-width="8" stroke-linecap="round"/>
+        <polygon points="50,15 42,50 50,50" fill="#FD8C45"/>
+        <polygon points="50,15 58,50 50,50" fill="#FD8C45" opacity="0.9"/>
+        <polygon points="50,85 42,50 50,50" fill="currentColor"/>
+        <polygon points="50,85 58,50 50,50" fill="currentColor" opacity="0.95"/>
+      </svg>
+      miscuartos
+    </div>
+  </header>
 
-        function cambiarPestaña(idVista, botonActivo) {
-            document.querySelectorAll('.tab-content').forEach(vista => vista.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(idVista).classList.add('active');
-            botonActivo.classList.add('active');
-        }
-    </script>
-    <script src="app.js"></script>
+  <main class="app-content">
+
+    <section id="pane-presupuesto" class="tab-pane active">
+      <div class="intro-block">
+        <div class="welcome-badge">¡Qué bueno tenerte aquí! 👋</div>
+        <h1>Tus cuartos, bajo tu control</h1>
+        <p class="sub">Esta app funciona mejor si sabes cómo sacarle el jugo. Antes de empezar, dale un minuto a este video — te va a ahorrar tiempo después.</p>
+      </div>
+
+      <div class="video-native-box">
+        <div class="video-embed-container" id="embed-tutorial">
+          <div class="video-placeholder-luxury"><span>▶ Cómo sacarle el jugo a la app · 1 min</span></div>
+        </div>
+      </div>
+
+      <div class="intro-block" style="margin-top: 4px;">
+        <p class="sub" style="font-size: 13px;">Manejar tu dinero no tiene que ser complicado. Pon lo que ganas, anota lo que gastas, y te vamos guiando en el camino.</p>
+      </div>
+
+      <div class="income-card" style="border: 2px solid #FD8C45;">
+        <label for="income" style="display: block; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Ingreso ganado este mes</label>
+        <div class="income-input-row">
+          <span class="currency" style="color: #FD8C45;">$</span>
+          <input type="number" id="income" placeholder="Ej. 50,000" inputmode="decimal">
+        </div>
+      </div>
+
+      <div class="section-title">Tus gastos este mes <span class="count" id="countTag">0 con monto</span></div>
+      <div id="results"></div>
+    </section>
+
+    <section id="pane-reto" class="tab-pane">
+      <div class="intro-block">
+        <h1>Mi Reto Navideño</h1>
+        <p class="sub">Este reto está inspirado en el método clásico de las 52 semanas — pero lo adaptamos a tu calendario real: <strong>22 semanas, de agosto a diciembre</strong>. Elige cuánto vas a sumar cada semana, y nosotros hacemos la cuenta. Al final, tu Navidad la pagas tú, sin tarjetas ni deudas.</p>
+      </div>
+
+      <div class="video-native-box">
+        <div class="video-embed-container" id="embed-reto-xmas">
+          <div class="video-placeholder-luxury" style="background: #1A0F0A;">
+            <span style="color: var(--brand-orange);">▶ Cómo funciona el Reto Navideño (2 min)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="xmas-card">
+        <div class="xmas-levels" id="xmasLevels">
+          <div class="xmas-level" data-level="50">
+            <div class="xmas-level-name">BÁSICO</div>
+            <div class="xmas-level-amt">+RD$50/sem</div>
+            <div class="xmas-level-meta">Meta: RD$12,650</div>
+          </div>
+          <div class="xmas-level active" data-level="100">
+            <div class="xmas-level-name">MEDIO</div>
+            <div class="xmas-level-amt">+RD$100/sem</div>
+            <div class="xmas-level-meta">Meta: RD$25,300</div>
+          </div>
+          <div class="xmas-level" data-level="200">
+            <div class="xmas-level-name">ALTO</div>
+            <div class="xmas-level-amt">+RD$200/sem</div>
+            <div class="xmas-level-meta">Meta: RD$50,600</div>
+          </div>
+          <div class="xmas-level" data-level="custom">
+            <div class="xmas-level-name">A TU MEDIDA</div>
+            <div class="xmas-level-amt">Tú eliges</div>
+            <div class="xmas-level-meta" id="xmasCustomMetaTag">Meta: dinámica</div>
+          </div>
+        </div>
+
+        <div id="xmasCustomInputRow" style="display: none;">
+          <label>¿Cuánto vas a sumar cada semana?</label>
+          <div class="xmas-custom-row">
+            <span>RD$</span>
+            <input type="number" id="xmasCustomAmount" placeholder="Ej. 150, 300, 500" inputmode="numeric">
+          </div>
+        </div>
+
+        <div class="xmas-goal">
+          <div class="num" id="xmasProgressNum">RD$0 de RD$25,300</div>
+          <div class="lbl" id="xmasProgressLbl">Marca las semanas que ya depositaste</div>
+        </div>
+
+        <div class="xmas-tree-wrap">
+          <svg class="xmas-tree" id="xmasTree" viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg">
+            <polygon id="xmasStar" points="60,4 65,18 80,18 68,27 72,42 60,33 48,42 52,27 40,18 55,18" />
+            <polygon points="60,28 90,68 30,68" fill="#3E9C77"/>
+            <polygon points="60,50 96,96 24,96" fill="#1F7A5C"/>
+            <polygon points="60,74 102,130 18,130" fill="#166049"/>
+            <rect x="52" y="130" width="16" height="10" fill="#7a5230"/>
+          </svg>
+        </div>
+
+        <div class="xmas-streak-msg" id="xmasStreakMsg" style="display:none;"></div>
+
+        <div id="xmasWeeks" class="xmas-ornament-grid"></div>
+
+        <div class="xmas-footer-tips">
+          <p>💡 <strong>Tip:</strong> Para blindar tu reto de las tentaciones, abre una cuenta de ahorro aparte — ese dinero no se toca, salvo que sea una emergencia real de salud o de vida.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="pane-metas" class="tab-pane">
+      <div class="intro-block">
+        <h1>Metas & Progreso</h1>
+        <p class="sub">Una meta sin monto ni fecha es solo un deseo. Aquí la convertimos en un plan real — dinos qué quieres lograr, y te decimos exactamente cuánto separar cada mes para llegar.</p>
+      </div>
+
+      <div class="meta-card">
+        <div class="premium-badge-title">🛡️ TU ESCUDO FINANCIERO (FONDO DE EMERGENCIA)</div>
+        <p class="micro-sub">El dinero que te dará paz mental ante imprevistos. Se calcula en base a tus gastos fijos mensuales.</p>
+        <div style="margin-bottom: 12px;">
+          <div class="emergency-slider-row">
+            <span>Meses de cobertura:</span>
+            <span id="emergencyMonthsLabel" class="emergency-months-val">3 meses</span>
+          </div>
+          <input type="range" id="emergencySlider" min="3" max="6" value="3">
+        </div>
+        <div class="credit-result-row emergency-result">
+          <div style="text-align: center; width: 100%;">
+            <div class="emergency-result-lbl">Tu meta de Fondo de Emergencia</div>
+            <div id="emergencyTotalVal" class="emergency-result-val">RD$0</div>
+          </div>
+        </div>
+        <div class="credit-trick" style="background: rgba(45, 138, 206, 0.08); color: #2D8ACE;">
+          💡 <strong>Tip Dominicano:</strong> No dejes este dinero bajo el colchón perdiendo valor. Cuando tengas el equivalente a un mes, muévelo a un Certificado Financiero o cuenta de ahorro programado.
+        </div>
+      </div>
+
+      <div class="meta-card" style="margin-top: 16px;">
+        <div class="premium-badge-title">🎯 TU PRÓXIMO PASO (PLANIFICADOR)</div>
+
+        <div class="icon-select" id="iconSelect">
+          <div class="icon-btn active" data-icon="🏠">🏠</div>
+          <div class="icon-btn" data-icon="🚗">🚗</div>
+          <div class="icon-btn" data-icon="✈️">✈️</div>
+          <div class="icon-btn" data-icon="🎓">🎓</div>
+          <div class="icon-btn" data-icon="💍">💍</div>
+          <div class="icon-btn" data-icon="🎁">🎁</div>
+        </div>
+
+        <div class="goal-form">
+          <div>
+            <label>¿Qué quieres lograr?</label>
+            <input type="text" id="targetGoalName" placeholder="Ej. Inicial de un carro, viaje a Punta Cana">
+          </div>
+          <div class="goal-form-row">
+            <div>
+              <label>¿Cuánto necesitas? (RD$)</label>
+              <input type="number" id="targetGoalAmount" placeholder="Ej. 100000" inputmode="numeric">
+            </div>
+            <div>
+              <label>¿En cuántos meses?</label>
+              <input type="number" id="targetGoalMonths" placeholder="Ej. 10" inputmode="numeric">
+            </div>
+          </div>
+        </div>
+
+        <div id="ahorroLinkNote" class="ahorro-link-note" style="display:none;"></div>
+        <div id="coachAlertBox" style="display: none;"></div>
+      </div>
+
+      <div id="entrepreneurshipModule" class="meta-card" style="margin-top: 16px; display: none;">
+        <div class="premium-badge-title" style="color: #FD8C45;">💡 MOTOR DE INGRESOS EXTRA</div>
+        <p class="micro-sub" style="margin-bottom: 10px;">Estas son ideas, no obligaciones. Tú decides si alguna te sirve, cuál probar, o si prefieres cerrar la brecha ajustando gastos en vez de sumar ingresos. Nuestro trabajo es mostrarte que hay opciones — actuar o no, es completamente tuyo.</p>
+        <div id="ideasCatalogContainer"></div>
+        <div class="onapi-note">
+          📌 <strong>Nota de escala:</strong> si tu idea empieza a facturar de forma constante, puedes formalizarte fácilmente en RD vía registro de nombre comercial en <strong>ONAPI</strong> y el régimen simplificado (RST) en la DGII.
+        </div>
+      </div>
+    </section>
+
+    <section id="pane-academia" class="tab-pane">
+      <div class="intro-block">
+        <h1>Academia</h1>
+        <p class="sub">Aquí no solo armas tu presupuesto — aprendes a manejarlo de verdad. Clases cortas que puedes ver mientras esperas la guagua.</p>
+      </div>
+
+      <div class="course-card">
+        <div class="offer-header-badge">🎁 REGALO DE LANZAMIENTO · SOLO $9 <span class="old-price">$19/año</span></div>
+        <div class="premium-badge-title">🎓 MINICURSO: FINANZAS QUE SÍ APLICAN</div>
+
+        <div class="video-native-box">
+          <div class="video-embed-container" id="embed-curso">
+            <div class="video-placeholder-luxury"><span>▶ Rompe el ciclo del "no me da" · Gratis</span></div>
+          </div>
+        </div>
+
+        <div class="cause-box">
+          <p>Disfruta la clase de muestra gratis. Desbloquea las 4 clases completas con tu upgrade de solo $9.</p>
+          <div class="cause-divider"></div>
+          <div class="donation-row">
+            <div class="donation-logo-placeholder">🐾</div>
+            <p>🐾 <strong>Propósito miscuartos:</strong> por cada registro, donamos <strong>$3</strong> a Happy Animal Rescue (ChihuahualoversRD) para asegurar el alimento de los animales que rescatan. Tu educación también alimenta a alguien más.</p>
+          </div>
+        </div>
+
+        <div class="course-list-minimal">
+          <div class="course-item unlocked active"><div class="course-num">1</div><div class="course-info-text"><b>Rompe el ciclo del "no me da"</b> · Gratis</div></div>
+          <div class="course-item locked"><div class="course-num">2</div><div class="course-info-text"><b>Presupuesto real que sí se cumple</b> · 5 min 🔒</div></div>
+          <div class="course-item locked"><div class="course-num">3</div><div class="course-info-text"><b>Ahorro sin sufrimiento ni sacrificios</b> · 6 min 🔒</div></div>
+          <div class="course-item locked"><div class="course-num">4</div><div class="course-info-text"><b>Deudas: plan para salir sin ahogarte</b> · 7 min 🔒</div></div>
+          <div class="course-item locked"><div class="course-num">5</div><div class="course-info-text"><b>Dinero en pareja y finanzas en casa</b> · 8 min 🔒</div></div>
+        </div>
+      </div>
+
+      <div class="afp-card">
+        <div class="premium-badge-title">📚 TU AFP EXPLICADA</div>
+        <div class="video-native-box"><div class="video-embed-container" id="embed-afp"><div class="video-placeholder-luxury"><span>▶ Lo que nadie te dice de tu AFP</span></div></div></div>
+        <div class="afp-simulator-box">
+          <label>¿Cuánto es el 2.87% de tu sueldo bruto?</label>
+          <div class="afp-sim-row"><span class="amt-currency">$</span><input type="number" id="afpSalario" placeholder="Ingresa tu sueldo" inputmode="decimal"></div>
+          <div class="afp-sim-result" id="afpSimResult"></div>
+        </div>
+        <details class="luxury-accordion">
+          <summary>Ver verdades legales sobre tu dinero (SIPEN) ▾</summary>
+          <div class="accordion-content">
+            <p><b>¿Se pierde si falleces?</b> No. Es herencia 100% reclamable por tu familia.</p>
+            <p><b>¿Cuándo se saca?</b> A los 60 años con 360 cotizaciones, o por enfermedad terminal.</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="cat-card">
+        <div class="premium-badge-title">💳 CRÉDITO INTELIGENTE</div>
+        <p class="micro-sub">Dos fechas que casi nadie revisa, y que pueden costarte —o ahorrarte— miles de pesos.</p>
+        <div class="credit-dates-row">
+          <div class="credit-date-box">
+            <div class="credit-date-num">1</div>
+            <div class="credit-date-title">Fecha de Corte</div>
+            <div class="credit-date-desc">El día que cierra tu factura. Lo que compres después entra al próximo estado de cuenta.</div>
+          </div>
+          <div class="credit-date-box">
+            <div class="credit-date-num">2</div>
+            <div class="credit-date-title">Fecha Límite de Pago</div>
+            <div class="credit-date-desc">Tu último día para pagar el total sin intereses — suele ser 20-25 días después del corte.</div>
+          </div>
+        </div>
+        <div class="credit-trick">💡 <strong>El truco:</strong> compra los primeros días después de tu corte y ganas hasta 50 días para pagar sin intereses.</div>
+        <div class="credit-warning">⚠️ Solo funciona si pagaste tu balance completo el mes pasado. Con saldo pendiente, los intereses corren desde el día de cada compra nueva. Los adelantos de efectivo nunca tienen gracia.</div>
+        <div class="cause-divider" style="margin: 16px 0;"></div>
+        <div class="premium-badge-title" style="margin-bottom:4px;">SIMULADOR: ¿TOTALERO O MÍNIMO?</div>
+        <p class="micro-sub" style="margin-bottom:10px;">Balance de RD$25,000 al 52% anual (tasa promedio en RD). Arrastra para simular tu pago de este mes.</p>
+        <div class="credit-slider-row">
+          <span class="credit-slider-pct" id="creditPctLabel">30%</span>
+          <span class="credit-slider-tag" id="creditTag">Riesgo moderado</span>
+        </div>
+        <input type="range" class="credit-range" id="creditSlider" min="5" max="100" value="30">
+        <div class="credit-result-row">
+          <div class="credit-result-box"><div class="lbl">Pagas</div><div class="val" id="creditPaid">RD$7,500</div></div>
+          <div class="credit-result-box"><div class="lbl">Pendiente</div><div class="val" id="creditRemaining">RD$17,500</div></div>
+          <div class="credit-result-box"><div class="lbl">Interés/mes</div><div class="val" id="creditInterest">RD$758</div></div>
+        </div>
+        <div class="cause-divider" style="margin: 16px 0;"></div>
+        <div class="premium-badge-title" style="margin-bottom:6px;">CUÁNTO DE TU LÍMITE ESTÁS USANDO</div>
+        <div class="credit-util-gauge">
+          <div class="credit-util-seg" style="width:30%; background:#3E9C77;"></div>
+          <div class="credit-util-seg" style="width:20%; background:var(--brand-orange);"></div>
+          <div class="credit-util-seg" style="width:50%; background:#B4432A;"></div>
+        </div>
+        <div class="credit-util-caption"><span>0-30% ideal</span><span>31-50% moderado</span><span>51%+ riesgo</span></div>
+      </div>
+
+      <div class="leak-card">
+        <div class="premium-badge-title">🔍 DINERO OCULTO</div>
+        <p class="micro-sub">Selecciona tus hábitos diarios comunes:</p>
+        <div id="leakItems"></div>
+        <div class="leak-result" id="leakResult"><div class="amount" id="leakAmount">$0</div><div class="msg" id="leakMsg"></div></div>
+      </div>
+
+      <div class="kids-card">
+        <div class="upsell-pricing-tag">OFERTA ADICIONAL · SOLO $5 <span class="old-price">Precio regular $7</span></div>
+        <div class="premium-badge-title setup-upsell">🚀 NEGOCIOS PARA NIÑOS</div>
+
+        <div class="kids-preview" id="kidsPreview">
+          <p class="micro-sub" style="font-size: 13.5px; line-height: 1.45; color: var(--ink); margin-bottom: 12px;">
+            Enseñar a un niño a pensar como emprendedor no es enseñarle a hacer dinero — es enseñarle a resolver problemas, perder el miedo, y creer que sí puede. Este módulo lo hace jugando.
+          </p>
+          <p class="micro-sub" style="margin-bottom: 14px;">Agrega este módulo <strong>ahora mismo por solo $5</strong> junto a tu pago de la app (ahorras $2. Si lo compras después te costará $7 aparte).</p>
+          <button class="kids-unlock-btn" id="kidsUnlockBtn">Agregar al pago por $5 →</button>
+        </div>
+
+        <div class="kids-full" id="kidsFull">
+          <div class="video-native-box">
+            <div class="video-embed-container" id="embed-kids">
+              <div class="video-placeholder-luxury"><span>▶ Tu primer negocito · Gratis</span></div>
+            </div>
+          </div>
+          <div class="kids-progress" id="kidsProgress">0 de 6 retos completados</div>
+          <div class="course-list-minimal" style="margin-top: 12px; margin-bottom: 16px;">
+            <div class="course-item unlocked active"><div class="course-num">1</div><div class="course-info-text"><b>De dónde viene el dinero</b> · 5 min</div></div>
+            <div class="course-item unlocked"><div class="course-num">2</div><div class="course-info-text"><b>Ahorra como un campeón</b> · 5 min</div></div>
+            <div class="course-item unlocked"><div class="course-num">3</div><div class="course-info-text"><b>Ponle precio a tus ideas</b> · 6 min</div></div>
+            <div class="course-item unlocked"><div class="course-num">4</div><div class="course-info-text"><b>Vende sin miedo</b> · 5 min</div></div>
+            <div class="course-item unlocked"><div class="course-num">5</div><div class="course-info-text"><b>Trabaja en equipo</b> · 6 min</div></div>
+          </div>
+          <p class="micro-sub" style="font-size: 13px; font-weight: 600; margin-bottom: 8px;">Retos prácticos para hacer en familia:</p>
+          <div id="kidsTasks"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-tab="presupuesto"><span class="nav-icon">💰</span><span class="nav-label">Presupuesto</span></button>
+    <button class="nav-item" data-tab="reto"><span class="nav-icon">🎄</span><span class="nav-label">Reto Navidad</span></button>
+    <button class="nav-item" data-tab="metas"><span class="nav-icon">🎯</span><span class="nav-label">Metas</span></button>
+    <button class="nav-item" data-tab="academia"><span class="nav-icon">🎓</span><span class="nav-label">Academia</span></button>
+  </nav>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-sheet">
+    <div class="modal-top"><div class="modal-eyebrow">Tu resumen</div><button class="close-btn" id="closeModal">✕</button></div>
+    <div class="summary-total"><div class="num" id="summaryTotal">$0</div><div class="lbl">de presupuesto armado</div></div>
+    <div id="summaryRows"></div>
+    <a class="whatsapp-btn" id="whatsappBtn" href="#" target="_blank" rel="noopener">Compartir por WhatsApp</a>
+  </div>
+</div>
+
+<script src="app.js" defer></script>
 </body>
 </html>
