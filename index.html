@@ -8,7 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 
-  <!-- Estilos para el efecto del Haz de Luz animado -->
+  <!-- Estilos para el Haz de Luz y la estructura de Presupuesto Proactivo -->
   <style>
     @keyframes beamRotate {
       0% { transform: rotate(0deg); }
@@ -18,7 +18,7 @@
     .beam-card-container {
       position: relative;
       border-radius: 18px;
-      padding: 2px; /* Grosor de la luz */
+      padding: 2px;
       overflow: hidden;
       margin-bottom: 20px;
     }
@@ -41,7 +41,7 @@
 
     .beam-card-content {
       position: relative;
-      background: #181512; /* Fondo oscuro elegante */
+      background: #181512;
       color: #F8F9FA;
       border-radius: 16px;
       padding: 22px 20px;
@@ -108,6 +108,70 @@
       color: #FD8C45;
       margin-top: 14px;
     }
+
+    /* Estilos para los Pasos del Presupuesto */
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--ink, #1F2937);
+      margin-top: 20px;
+      margin-bottom: 4px;
+    }
+
+    .step-num {
+      background: #FD8C45;
+      color: #FFF;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .step-subtext {
+      font-size: 12.5px;
+      color: #6B7280;
+      margin-bottom: 12px;
+    }
+
+    .balance-card {
+      background: #0F172A;
+      color: #FFF;
+      border-radius: 14px;
+      padding: 16px;
+      margin-top: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      text-align: center;
+    }
+
+    .balance-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #94A3B8;
+      margin-bottom: 6px;
+    }
+
+    .balance-amount {
+      font-size: 26px;
+      font-weight: 700;
+      font-family: 'IBM Plex Mono', monospace;
+      color: #38BDF8;
+      margin-bottom: 6px;
+    }
+
+    .balance-msg {
+      font-size: 12.5px;
+      color: #CBD5E1;
+    }
   </style>
 </head>
 <body>
@@ -160,7 +224,7 @@
 
     <section id="pane-presupuesto" class="tab-pane active">
       
-      <!-- INICIO: TARJETA CON HAZ DE LUZ ANIMADO -->
+      <!-- TARJETA CON HAZ DE LUZ ANIMADO -->
       <div class="beam-card-container">
         <div class="beam-light-effect"></div>
         <div class="beam-card-content">
@@ -183,28 +247,50 @@
           </div>
         </div>
       </div>
-      <!-- FIN: TARJETA CON HAZ DE LUZ ANIMADO -->
 
+      <!-- VIDEO TUTORIAL -->
       <div class="video-native-box">
         <div class="video-embed-container" id="embed-tutorial">
           <div class="video-placeholder-luxury"><span>▶ Cómo sacarle el jugo a la app · 1 min</span></div>
         </div>
       </div>
 
-      <div class="intro-block" style="margin-top: 16px;">
-        <p class="sub" style="font-size: 13px;">Manejar tu dinero no tiene que ser complicado. Pon lo que ganas, anota lo que gastas, y te vamos guiando en el camino.</p>
+      <div class="intro-block" style="margin-top: 18px;">
+        <p class="sub" style="font-size: 13.5px; font-weight: 500;">
+          💡 <strong>El secreto del presupuesto:</strong> Se hace <u>antes de cobrar</u> para trazar la ruta de tu dinero, no después de gastarlo.
+        </p>
       </div>
 
+      <!-- PASO 1: INGRESO PROYECTADO -->
+      <div class="step-header"><span class="step-num">1</span> Tu Ingreso Esperado este Mes</div>
+      <div class="step-subtext">Anota todo lo que vas a recibir antes de que empiece el mes (sueldo, cobranzas, extras).</div>
       <div class="income-card" style="border: 2px solid #FD8C45;">
-        <label for="income" style="display: block; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Ingreso ganado este mes</label>
+        <label for="income" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Ingreso Total Esperado</label>
         <div class="income-input-row">
           <span class="currency" style="color: #FD8C45;">$</span>
           <input type="number" id="income" placeholder="Ej. 50,000" inputmode="decimal">
         </div>
       </div>
 
-      <div class="section-title">Tus gastos este mes <span class="count" id="countTag">0 con monto</span></div>
+      <!-- PASO 2: GASTOS FIJOS -->
+      <div class="step-header"><span class="step-num">2</span> Gastos Fijos & Compromisos</div>
+      <div class="step-subtext">Lo obligatorio que no cambia y pagas sí o sí (alquiler, préstamos, luz, colegios).</div>
+      <div id="fixedResults"></div>
+
+      <!-- PASO 3: GASTOS VARIABLES -->
+      <div class="step-header" style="margin-top: 24px;"><span class="step-num">3</span> Gastos Variables & Estilo de Vida</div>
+      <div class="step-subtext">Define tu límite de gasto en lo que sí puedes controlar (supermercado, salidas, imprevistos).</div>
       <div id="results"></div>
+
+      <!-- MARGEN Y BALANCE FINAL EN TIEMPO REAL -->
+      <div class="balance-card">
+        <div class="balance-title">Tu Margen de Maniobra Libre</div>
+        <div class="balance-amount" id="marginDisplay">RD$0</div>
+        <div class="balance-msg" id="marginMsg">
+          A medida que completes tus números, verás si estás logrando que cada peso tenga un propósito antes de cobrar.
+        </div>
+      </div>
+
     </section>
 
     <section id="pane-reto" class="tab-pane">
