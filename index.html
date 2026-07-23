@@ -7,6 +7,108 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+
+  <!-- Estilos para el efecto del Haz de Luz animado -->
+  <style>
+    @keyframes beamRotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .beam-card-container {
+      position: relative;
+      border-radius: 18px;
+      padding: 2px; /* Grosor de la luz */
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .beam-light-effect {
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: conic-gradient(
+        transparent 0deg,
+        transparent 280deg,
+        #FD8C45 320deg,
+        #FFD166 345deg,
+        transparent 360deg
+      );
+      animation: beamRotate 5s linear infinite;
+    }
+
+    .beam-card-content {
+      position: relative;
+      background: #181512; /* Fondo oscuro elegante */
+      color: #F8F9FA;
+      border-radius: 16px;
+      padding: 22px 20px;
+      z-index: 1;
+    }
+
+    .beam-card-content h1 {
+      font-family: 'Fraunces', serif;
+      font-size: 24px;
+      color: #FFFFFF;
+      margin-top: 10px;
+      margin-bottom: 12px;
+      line-height: 1.25;
+    }
+
+    .beam-card-content p {
+      font-size: 14.5px;
+      line-height: 1.5;
+      color: #D1D5DB;
+      margin-bottom: 12px;
+    }
+
+    .beam-card-content .highlight-text {
+      color: #FD8C45;
+      font-weight: 600;
+    }
+
+    .beam-topics-list {
+      background: rgba(253, 140, 69, 0.08);
+      border-left: 3px solid #FD8C45;
+      padding: 12px 14px;
+      border-radius: 0 10px 10px 0;
+      margin: 16px 0;
+    }
+
+    .beam-topics-list p {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #FFFFFF;
+      margin-bottom: 8px;
+    }
+
+    .beam-topics-list ul {
+      margin: 0;
+      padding-left: 18px;
+      color: #E5E7EB;
+      font-size: 13.5px;
+    }
+
+    .beam-topics-list li {
+      margin-bottom: 6px;
+    }
+
+    .beam-topics-list li:last-child {
+      margin-bottom: 0;
+    }
+
+    .beam-footer-action {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #FD8C45;
+      margin-top: 14px;
+    }
+  </style>
 </head>
 <body>
 
@@ -57,11 +159,31 @@
   <main class="app-content">
 
     <section id="pane-presupuesto" class="tab-pane active">
-      <div class="intro-block">
-        <div class="welcome-badge">¡Qué bueno tenerte aquí! 👋</div>
-        <h1>Tus cuartos, bajo tu control</h1>
-        <p class="sub">Esta app funciona mejor si sabes cómo sacarle el jugo. Antes de empezar, dale un minuto a este video — te va a ahorrar tiempo después.</p>
+      
+      <!-- INICIO: TARJETA CON HAZ DE LUZ ANIMADO -->
+      <div class="beam-card-container">
+        <div class="beam-light-effect"></div>
+        <div class="beam-card-content">
+          <div class="welcome-badge">¡Bienvenido a MisCuartos! 👋</div>
+          <h1>Tus cuartos, bajo tu control</h1>
+          <p>Esta no es la típica calculadora para anotar gastos. <strong class="highlight-text">MisCuartos</strong> es tu guía interactiva para tomar el control real de tu dinero, salir de la incertidumbre y empezar a construir la tranquilidad que buscas.</p>
+          <p>Para sacarle el máximo provecho desde hoy, regálate 1 minuto para ver este video corto. Te prometo que te ahorrará mucho tiempo y tropiezos en el camino.</p>
+          
+          <div class="beam-topics-list">
+            <p>En este video rápido verás:</p>
+            <ul>
+              <li>Qué es un presupuesto real y cómo usarlo a tu favor.</li>
+              <li>Cómo usar MisCuartos para liberarte de deudas sin ahogarte.</li>
+              <li>El secreto para gastar en lo que te gusta, sin culpa.</li>
+            </ul>
+          </div>
+
+          <div class="beam-footer-action">
+            <span>¡Dale play abajo y empecemos!</span> 👇
+          </div>
+        </div>
       </div>
+      <!-- FIN: TARJETA CON HAZ DE LUZ ANIMADO -->
 
       <div class="video-native-box">
         <div class="video-embed-container" id="embed-tutorial">
@@ -69,7 +191,7 @@
         </div>
       </div>
 
-      <div class="intro-block" style="margin-top: 4px;">
+      <div class="intro-block" style="margin-top: 16px;">
         <p class="sub" style="font-size: 13px;">Manejar tu dinero no tiene que ser complicado. Pon lo que ganas, anota lo que gastas, y te vamos guiando en el camino.</p>
       </div>
 
