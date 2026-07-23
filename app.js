@@ -1,15 +1,15 @@
-/* ============ DATOS ============ */
+/* ============ DATOS Y CATEGORÍAS ============ */
 const categories = {
-  vivienda:   { label: 'Vivienda',              color: '#1F7A5C', maxRec: 0.35, tip: 'Alquiler, hipoteca, mantenimiento del hogar.' },
-  comida:     { label: 'Comida',                color: '#3E9C77', maxRec: 0.20, tip: 'Mercado y compras fijas de alimentos.' },
+  vivienda:   { label: 'Vivienda',               color: '#1F7A5C', maxRec: 0.35, tip: 'Alquiler, hipoteca, mantenimiento del hogar.' },
+  comida:     { label: 'Comida',                 color: '#3E9C77', maxRec: 0.20, tip: 'Mercado y compras fijas de alimentos.' },
   servicios:  { label: 'Luz, agua y teléfono',  color: '#6BBE9A', maxRec: 0.10, tip: 'Electricidad, agua e internet/teléfono combinados.' },
-  escuela:    { label: 'Escuela',               color: '#2D8ACE', tip: 'Mensualidad, transporte escolar, materiales.' },
-  salud:      { label: 'Salud',                 color: '#3AA0A0', tip: 'Medicamentos y consultas médicas fijas.' },
-  transporte: { label: 'Transporte',            color: '#8AA6B8', maxRec: 0.15, tip: 'Combustible, concho y mantenimiento básico.' },
-  deudas:     { label: 'Deudas',                color: '#8B5CF6', maxRec: 0.20, tip: 'Tarjetas o préstamos. Ataca primero la de mayor interés.' },
-  ahorro:     { label: 'Ahorro',                color: '#B4432A', minRec: 0.10, minRecVariable: 0.15, tip: 'Tu colchón de tranquilidad. Trátalo como una factura obligatoria.' },
-  mascotas:   { label: 'Mascotas',              color: '#C2447A', tip: 'Comida y cuidados veterinarios — aunque no sea común anotarlo, es un gasto real.' },
-  donaciones: { label: 'Donaciones',            color: '#E8A33D', tip: 'Iglesia, fundaciones, causas que te importan — generosidad con intención, no con culpa.' },
+  escuela:    { label: 'Escuela',                color: '#2D8ACE', tip: 'Mensualidad, transporte escolar, materiales.' },
+  salud:      { label: 'Salud',                  color: '#3AA0A0', tip: 'Medicamentos y consultas médicas fijas.' },
+  transporte: { label: 'Transporte',             color: '#8AA6B8', maxRec: 0.15, tip: 'Combustible, concho y mantenimiento básico.' },
+  deudas:     { label: 'Deudas',                 color: '#8B5CF6', maxRec: 0.20, tip: 'Tarjetas o préstamos. Ataca primero la de mayor interés.' },
+  ahorro:     { label: 'Ahorro',                 color: '#B4432A', minRec: 0.10, minRecVariable: 0.15, tip: 'Tu colchón de tranquilidad. Trátalo como una factura obligatoria.' },
+  mascotas:   { label: 'Mascotas',               color: '#C2447A', tip: 'Comida y cuidados veterinarios — aunque no sea común anotarlo, es un gasto real.' },
+  donaciones: { label: 'Donaciones',             color: '#E8A33D', tip: 'Iglesia, fundaciones, causas que te importan — generosidad con intención, no con culpa.' },
   diversion:  { label: 'Diversión',              color: '#66766D', tip: 'Salidas y gustos. Pequeño pero necesario para no rendirte.' }
 };
 
@@ -168,16 +168,41 @@ function categoryAdvice(key, amount, income) {
   return null;
 }
 
+/* CÁLCULO DEL MARGEN DE MANIOBRA EN TIEMPO REAL */
+function updateMarginCard() {
+  const income = getIncome();
+  const expenses = getTotalExpenses();
+  const margin = income - expenses;
+
+  const display = document.getElementById('marginDisplay');
+  const msg = document.getElementById('marginMsg');
+
+  if (!display || !msg) return;
+
+  const formattedMargin = 'RD$' + fmt(Math.abs(margin));
+
+  if (income === 0 && expenses === 0) {
+    display.textContent = 'RD$0';
+    display.style.color = '#38BDF8';
+    msg.textContent = 'A medida que completes tus números, verás si estás logrando que cada peso tenga un propósito antes de cobrar.';
+  } else if (margin > 0) {
+    display.textContent = formattedMargin;
+    display.style.color = '#41BF93'; // Verde
+    msg.textContent = `¡Excelente! Te quedan ${formattedMargin} libres. Muévelos a tu meta de ahorro o fondo de emergencia antes de que empiece el mes.`;
+  } else if (margin === 0) {
+    display.textContent = 'RD$0';
+    display.style.color = '#38BDF8'; // Azul
+    msg.textContent = '¡Presupuesto base cero perfecto! Le diste un propósito exacto a cada peso antes de cobrar.';
+  } else {
+    display.textContent = '-' + formattedMargin;
+    display.style.color = '#FF6B6B'; // Rojo Alerta
+    msg.textContent = `🚨 Alerta: Estás planificando gastar ${formattedMargin} más de lo que vas a ingresar. Ajusta tus gastos variables antes de cobrar.`;
+  }
+}
+
 function buildCategoryRows() {
   if (!resultsEl) return;
-  let html = `
-    <div class="sticky-total-box">
-      <div class="sticky-total-num" id="stickyTotalNum">RD$0</div>
-      <div class="sticky-total-of" id="stickyTotalOf">de RD$0 ganado este mes</div>
-      <div class="bar" style="margin:8px 0 0;"><div class="bar-seg" id="totalBarSeg" style="width:0%; background:var(--accent-solid)"></div></div>
-      <div class="sticky-total-status" id="totalOverWarning" style="display:none;"></div>
-    </div>
-  `;
+  let html = '';
 
   Object.entries(categories).forEach(([key, cat]) => {
     html += `
@@ -202,6 +227,7 @@ function buildCategoryRows() {
       showActiveAdvice(key);
       updateCount();
       updateTotals(false);
+      updateMarginCard();
     });
     inp.addEventListener('focus', (e) => showActiveAdvice(e.target.dataset.key));
     inp.addEventListener('blur', () => updateTotals(true));
@@ -214,6 +240,7 @@ function buildCategoryRows() {
     Object.keys(categories).forEach(key => updateCategoryDot(key));
     updateCount();
     updateTotals(true);
+    updateMarginCard();
   }, 0);
 }
 
@@ -257,11 +284,12 @@ function updateTotals(showOverallStatus) {
   const numEl = document.getElementById('stickyTotalNum');
   const ofEl = document.getElementById('stickyTotalOf');
   const warnBox = document.getElementById('totalOverWarning');
-  if (!seg) return;
 
   const pct = income > 0 ? Math.min((total / income) * 100, 100) : 0;
-  seg.style.width = `${pct}%`;
-  seg.style.background = total > income && income > 0 ? '#B4432A' : 'var(--accent-solid)';
+  if (seg) {
+    seg.style.width = `${pct}%`;
+    seg.style.background = total > income && income > 0 ? '#B4432A' : 'var(--accent-solid)';
+  }
   if (numEl) numEl.textContent = `RD$${fmt(total)}`;
   if (ofEl) ofEl.textContent = `de RD$${fmt(income)} ganado este mes`;
 
@@ -361,7 +389,7 @@ function buildLeaks() {
 /* ============ RETO NAVIDEÑO ============ */
 let xmasLevel = 100;
 let xmasChecked = {};
-let xmasCheckedAt = {};        // fecha real en que se marcó cada semana
+let xmasCheckedAt = {};
 let xmasShownMilestones = new Set();
 let xmasConstancyShown = false;
 const xmasMonths = [['AGOSTO', 4], ['SEPTIEMBRE', 4], ['OCTUBRE', 5], ['NOVIEMBRE', 4], ['DICIEMBRE', 5]];
@@ -418,8 +446,6 @@ function toggleXmasWeek(w) {
   checkStreakMilestone();
 }
 
-// Si la semana que se marca ya venció hace más de 7 días Y la anterior
-// seguía sin marcar, es señal de que se está poniendo al día de golpe.
 function checkCatchUp(w) {
   if (w <= 1) return;
   const due = xmasWeekDueDate(w);
@@ -433,7 +459,6 @@ function checkCatchUp(w) {
   }
 }
 
-// Racha continua desde la semana 1 (no cuenta total marcado).
 function checkStreakMilestone() {
   let streak = 0;
   for (let w = 1; w <= totalXmasWeeks; w++) {
@@ -471,8 +496,6 @@ function showXmasMessage(text, type) {
 }
 
 function updateAllXmasLabels() {
-  // Los ornamentos no muestran monto individual (solo el número de semana),
-  // así que aquí solo se recalcula el progreso/meta general.
   renderXmasProgress();
 }
 
@@ -707,7 +730,12 @@ const initApp = () => {
   buildLeaks();
   buildXmas();
   buildCategoryRows();
-  if (incomeEl) incomeEl.addEventListener('input', () => updateTotals(true));
+  if (incomeEl) {
+    incomeEl.addEventListener('input', () => {
+      updateTotals(true);
+      updateMarginCard();
+    });
+  }
 };
 
 if (document.readyState === 'loading') {
