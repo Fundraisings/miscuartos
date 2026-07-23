@@ -39,7 +39,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, [tabindex]:focus-vis
 
 @media (prefers-reduced-motion: reduce) {
   .splash-compass { animation: none !important; }
-  .tab-pane, .splash-screen, .splash-btn { animation: none !important; transition: none !important; }
+  .tab-pane, .splash-screen, .splash-btn, .beam-light-effect { animation: none !important; transition: none !important; }
 }
 
 /* SPLASH */
@@ -77,6 +77,174 @@ a:focus-visible, button:focus-visible, input:focus-visible, [tabindex]:focus-vis
 .intro-block h1 { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 600; margin-bottom: 6px; letter-spacing: -0.02em; }
 .intro-block .sub { color: var(--muted); font-size: 14px; line-height: 1.45; }
 .intro-block .sub strong { color: var(--ink); font-weight: 600; }
+
+/* HAZ DE LUZ Y TARJETA BIENVENIDA */
+@keyframes beamRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.beam-card-container {
+  position: relative;
+  border-radius: var(--radius-lg);
+  padding: 2px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+
+.beam-light-effect {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    transparent 0deg,
+    transparent 280deg,
+    var(--brand-orange) 320deg,
+    #FFD166 345deg,
+    transparent 360deg
+  );
+  animation: beamRotate 5s linear infinite;
+}
+
+.beam-card-content {
+  position: relative;
+  background: #181512;
+  color: #F8F9FA;
+  border-radius: calc(var(--radius-lg) - 2px);
+  padding: 22px 20px;
+  z-index: 1;
+}
+
+.beam-card-content h1 {
+  font-family: 'Fraunces', serif;
+  font-size: 24px;
+  color: #FFFFFF;
+  margin-top: 10px;
+  margin-bottom: 12px;
+  line-height: 1.25;
+}
+
+.beam-card-content p {
+  font-size: 14.5px;
+  line-height: 1.5;
+  color: #D1D5DB;
+  margin-bottom: 12px;
+}
+
+.beam-card-content .highlight-text {
+  color: var(--brand-orange);
+  font-weight: 600;
+}
+
+.beam-topics-list {
+  background: var(--brand-orange-soft);
+  border-left: 3px solid var(--brand-orange);
+  padding: 12px 14px;
+  border-radius: 0 10px 10px 0;
+  margin: 16px 0;
+}
+
+.beam-topics-list p {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #FFFFFF;
+  margin-bottom: 8px;
+}
+
+.beam-topics-list ul {
+  margin: 0;
+  padding-left: 18px;
+  color: #E5E7EB;
+  font-size: 13.5px;
+}
+
+.beam-topics-list li {
+  margin-bottom: 6px;
+}
+
+.beam-topics-list li:last-child {
+  margin-bottom: 0;
+}
+
+.beam-footer-action {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--brand-orange);
+  margin-top: 14px;
+}
+
+/* PASOS DEL PRESUPUESTO PROACTIVO */
+.step-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ink);
+  margin-top: 10px;
+  margin-bottom: 2px;
+}
+
+.step-num {
+  background: var(--brand-orange);
+  color: #FFF;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.step-subtext {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+/* MARGEN LIBRE (BALANCE EN TIEMPO REAL) */
+.balance-card {
+  background: #0F172A;
+  color: #FFF;
+  border-radius: var(--radius-lg);
+  padding: 18px 16px;
+  margin-top: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.balance-title {
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #94A3B8;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.balance-amount {
+  font-size: 26px;
+  font-weight: 700;
+  font-family: 'IBM Plex Mono', monospace;
+  color: #38BDF8;
+  margin-bottom: 6px;
+}
+
+.balance-msg {
+  font-size: 12.5px;
+  color: #CBD5E1;
+  line-height: 1.4;
+}
 
 .offer-header-badge, .upsell-pricing-tag { background: var(--accent-soft); color: var(--accent-solid); font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 12px; letter-spacing: 0.02em; }
 .upsell-pricing-tag { background: var(--brand-orange-soft); color: var(--brand-orange); }
