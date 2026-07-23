@@ -7,172 +7,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-
-  <!-- Estilos para el Haz de Luz y la estructura de Presupuesto Proactivo -->
-  <style>
-    @keyframes beamRotate {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .beam-card-container {
-      position: relative;
-      border-radius: 18px;
-      padding: 2px;
-      overflow: hidden;
-      margin-bottom: 20px;
-    }
-
-    .beam-light-effect {
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: conic-gradient(
-        transparent 0deg,
-        transparent 280deg,
-        #FD8C45 320deg,
-        #FFD166 345deg,
-        transparent 360deg
-      );
-      animation: beamRotate 5s linear infinite;
-    }
-
-    .beam-card-content {
-      position: relative;
-      background: #181512;
-      color: #F8F9FA;
-      border-radius: 16px;
-      padding: 22px 20px;
-      z-index: 1;
-    }
-
-    .beam-card-content h1 {
-      font-family: 'Fraunces', serif;
-      font-size: 24px;
-      color: #FFFFFF;
-      margin-top: 10px;
-      margin-bottom: 12px;
-      line-height: 1.25;
-    }
-
-    .beam-card-content p {
-      font-size: 14.5px;
-      line-height: 1.5;
-      color: #D1D5DB;
-      margin-bottom: 12px;
-    }
-
-    .beam-card-content .highlight-text {
-      color: #FD8C45;
-      font-weight: 600;
-    }
-
-    .beam-topics-list {
-      background: rgba(253, 140, 69, 0.08);
-      border-left: 3px solid #FD8C45;
-      padding: 12px 14px;
-      border-radius: 0 10px 10px 0;
-      margin: 16px 0;
-    }
-
-    .beam-topics-list p {
-      font-size: 13.5px;
-      font-weight: 600;
-      color: #FFFFFF;
-      margin-bottom: 8px;
-    }
-
-    .beam-topics-list ul {
-      margin: 0;
-      padding-left: 18px;
-      color: #E5E7EB;
-      font-size: 13.5px;
-    }
-
-    .beam-topics-list li {
-      margin-bottom: 6px;
-    }
-
-    .beam-topics-list li:last-child {
-      margin-bottom: 0;
-    }
-
-    .beam-footer-action {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 14px;
-      font-weight: 700;
-      color: #FD8C45;
-      margin-top: 14px;
-    }
-
-    /* Estilos para los Pasos del Presupuesto */
-    .step-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--ink, #1F2937);
-      margin-top: 20px;
-      margin-bottom: 4px;
-    }
-
-    .step-num {
-      background: #FD8C45;
-      color: #FFF;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .step-subtext {
-      font-size: 12.5px;
-      color: #6B7280;
-      margin-bottom: 12px;
-    }
-
-    .balance-card {
-      background: #0F172A;
-      color: #FFF;
-      border-radius: 14px;
-      padding: 16px;
-      margin-top: 24px;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      text-align: center;
-    }
-
-    .balance-title {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: #94A3B8;
-      margin-bottom: 6px;
-    }
-
-    .balance-amount {
-      font-size: 26px;
-      font-weight: 700;
-      font-family: 'IBM Plex Mono', monospace;
-      color: #38BDF8;
-      margin-bottom: 6px;
-    }
-
-    .balance-msg {
-      font-size: 12.5px;
-      color: #CBD5E1;
-    }
-  </style>
 </head>
 <body>
 
@@ -224,65 +58,54 @@
 
     <section id="pane-presupuesto" class="tab-pane active">
       
-      <!-- TARJETA CON HAZ DE LUZ ANIMADO -->
-      <div class="beam-card-container">
+      <!-- TARJETA VIP COMPACTA: BIENVENIDA + HAZ DE LUZ + VIDEO -->
+      <div class="beam-card-container" id="introBeamCard">
         <div class="beam-light-effect"></div>
         <div class="beam-card-content">
-          <div class="welcome-badge">¡Bienvenido a MisCuartos! 👋</div>
-          <h1>Tus cuartos, bajo tu control</h1>
-          <p>Esta no es la típica calculadora para anotar gastos. <strong class="highlight-text">MisCuartos</strong> es tu guía interactiva para tomar el control real de tu dinero, salir de la incertidumbre y empezar a construir la tranquilidad que buscas.</p>
-          <p>Para sacarle el máximo provecho desde hoy, regálate 1 minuto para ver este video corto. Te prometo que te ahorrará mucho tiempo y tropiezos en el camino.</p>
+          <div class="beam-card-header">
+            <span class="welcome-badge">¡Bienvenido a MisCuartos! 👋</span>
+            <button class="beam-close-btn" id="dismissBeamBtn" title="Ocultar mensaje">✕</button>
+          </div>
+          <h1>Decide a dónde van tus cuartos <span class="highlight-text">antes de cobrar</span></h1>
+          <p class="beam-mini-desc">Un presupuesto real no es para anotar en qué se te fue el dinero, sino para tomar el control y liberarte de deudas.</p>
           
-          <div class="beam-topics-list">
-            <p>En este video rápido verás:</p>
-            <ul>
-              <li>Qué es un presupuesto real y cómo usarlo a tu favor.</li>
-              <li>Cómo usar MisCuartos para liberarte de deudas sin ahogarte.</li>
-              <li>El secreto para gastar en lo que te gusta, sin culpa.</li>
-            </ul>
-          </div>
-
-          <div class="beam-footer-action">
-            <span>¡Dale play abajo y empecemos!</span> 👇
+          <div class="video-native-box">
+            <div class="video-embed-container" id="embed-tutorial">
+              <div class="video-placeholder-luxury">
+                <span>▶ Aprende a usar la app en 1 minuto</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- VIDEO TUTORIAL -->
-      <div class="video-native-box">
-        <div class="video-embed-container" id="embed-tutorial">
-          <div class="video-placeholder-luxury"><span>▶ Cómo sacarle el jugo a la app · 1 min</span></div>
+      <!-- INGRESO ESPERADO -->
+      <div class="income-card-compact">
+        <div class="income-header-row">
+          <label for="income" class="income-label">1. ¿CUÁNTO ESPERAS COBRAR ESTE MES?</label>
+          <span class="income-hint">Sueldo + Extras</span>
         </div>
-      </div>
-
-      <div class="intro-block" style="margin-top: 18px;">
-  <p class="sub" style="font-size: 13.5px; font-weight: 500;">
-    🎯 <strong>Tu objetivo de este mes:</strong> Asigna el 100% de tu dinero antes de cobrar. Que no te quede un solo peso sin un propósito claro.
-  </p>
-</div>
-
-      <!-- PASO 1: INGRESO PROYECTADO -->
-      <div class="step-header"><span class="step-num">1</span> Tu Ingreso Esperado este Mes</div>
-      <div class="step-subtext">Anota todo lo que vas a recibir antes de que empiece el mes (sueldo, cobranzas, extras).</div>
-      <div class="income-card" style="border: 2px solid #FD8C45;">
-        <label for="income" style="display: block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Ingreso Total Esperado</label>
         <div class="income-input-row">
-          <span class="currency" style="color: #FD8C45;">$</span>
-          <input type="number" id="income" placeholder="Ej. 50,000" inputmode="decimal">
+          <span class="currency">RD$</span>
+          <input type="number" id="income" placeholder="0" inputmode="decimal">
         </div>
       </div>
 
-      <!-- PASO 2: GASTOS FIJOS -->
-      <div class="step-header"><span class="step-num">2</span> Gastos Fijos & Compromisos</div>
-      <div class="step-subtext">Lo obligatorio que no cambia y pagas sí o sí (alquiler, préstamos, luz, colegios).</div>
-      <div id="fixedResults"></div>
+      <!-- SEGMENTADOR COMPACTO (PILLS) -->
+      <div class="budget-section-header">
+        <div class="budget-title-wrap">
+          <span class="step-num">2</span>
+          <span>PLANIFICA TUS GASTOS</span>
+        </div>
+        <div class="filter-pills" id="budgetPills">
+          <button class="pill-btn active" data-filter="all">Todos</button>
+          <button class="pill-btn" data-filter="fijos">🔒 Fijos</button>
+          <button class="pill-btn" data-filter="variables">🎨 Variables</button>
+        </div>
+      </div>
 
-      <!-- PASO 3: GASTOS VARIABLES -->
-      <div class="step-header" style="margin-top: 24px;"><span class="step-num">3</span> Gastos Variables & Estilo de Vida</div>
-      <div class="step-subtext">Define tu límite de gasto en lo que sí puedes controlar (supermercado, salidas, imprevistos).</div>
+      <!-- LISTA DINÁMICA DE CATEGORÍAS -->
       <div id="results"></div>
-
-      
 
     </section>
 
