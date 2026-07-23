@@ -70,15 +70,12 @@ a:focus-visible, button:focus-visible, input:focus-visible, [tabindex]:focus-vis
 .brand-compass-icon { width: 24px; height: 24px; color: var(--ink); }
 .app-content { padding: 84px 18px 110px; flex-grow: 1; }
 .tab-pane { display: none; animation: fadeIn 0.3s ease; }
-.tab-pane.active { display: flex; flex-direction: column; gap: 20px; }
+.tab-pane.active { display: flex; flex-direction: column; gap: 16px; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-.welcome-badge { display: inline-block; background: var(--brand-orange-soft); color: var(--brand-orange); font-size: 11.5px; font-weight: 700; padding: 6px 12px; border-radius: 999px; margin-bottom: 12px; border: 1px solid rgba(253, 140, 69, 0.15); }
-.intro-block h1 { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 600; margin-bottom: 6px; letter-spacing: -0.02em; }
-.intro-block .sub { color: var(--muted); font-size: 14px; line-height: 1.45; }
-.intro-block .sub strong { color: var(--ink); font-weight: 600; }
+.welcome-badge { display: inline-block; background: var(--brand-orange-soft); color: var(--brand-orange); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; border: 1px solid rgba(253, 140, 69, 0.15); }
 
-/* HAZ DE LUZ Y TARJETA BIENVENIDA */
+/* HAZ DE LUZ Y TARJETA COMPACTA */
 @keyframes beamRotate {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
@@ -89,7 +86,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, [tabindex]:focus-vis
   border-radius: var(--radius-lg);
   padding: 2px;
   overflow: hidden;
-  margin-bottom: 4px;
+  transition: all 0.4s ease;
 }
 
 .beam-light-effect {
@@ -113,137 +110,154 @@ a:focus-visible, button:focus-visible, input:focus-visible, [tabindex]:focus-vis
   background: #181512;
   color: #F8F9FA;
   border-radius: calc(var(--radius-lg) - 2px);
-  padding: 22px 20px;
+  padding: 16px 16px 18px;
   z-index: 1;
 }
 
-.beam-card-content h1 {
-  font-family: 'Fraunces', serif;
-  font-size: 24px;
-  color: #FFFFFF;
-  margin-top: 10px;
-  margin-bottom: 12px;
-  line-height: 1.25;
-}
-
-.beam-card-content p {
-  font-size: 14.5px;
-  line-height: 1.5;
-  color: #D1D5DB;
-  margin-bottom: 12px;
-}
-
-.beam-card-content .highlight-text {
-  color: var(--brand-orange);
-  font-weight: 600;
-}
-
-.beam-topics-list {
-  background: var(--brand-orange-soft);
-  border-left: 3px solid var(--brand-orange);
-  padding: 12px 14px;
-  border-radius: 0 10px 10px 0;
-  margin: 16px 0;
-}
-
-.beam-topics-list p {
-  font-size: 13.5px;
-  font-weight: 600;
-  color: #FFFFFF;
+.beam-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 8px;
 }
 
-.beam-topics-list ul {
-  margin: 0;
-  padding-left: 18px;
-  color: #E5E7EB;
-  font-size: 13.5px;
+.beam-close-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #9CA3AF;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
 }
 
-.beam-topics-list li {
+.beam-close-btn:hover { background: rgba(255, 255, 255, 0.2); color: #FFF; }
+
+.beam-card-content h1 {
+  font-family: 'Fraunces', serif;
+  font-size: 19px;
+  color: #FFFFFF;
+  line-height: 1.3;
   margin-bottom: 6px;
 }
 
-.beam-topics-list li:last-child {
-  margin-bottom: 0;
+.beam-card-content .highlight-text { color: var(--brand-orange); font-weight: 600; }
+
+.beam-mini-desc {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: #9CA3AF;
+  margin-bottom: 12px;
 }
 
-.beam-footer-action {
+/* TARJETA INGRESO COMPACTA */
+.income-card-compact {
+  background: var(--card);
+  border: 2px solid var(--brand-orange);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  box-shadow: var(--shadow);
+}
+
+.income-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.income-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: var(--ink);
+}
+
+.income-hint { font-size: 11px; color: var(--muted); }
+
+.income-input-row {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--brand-orange);
-  margin-top: 14px;
+  background: var(--bg);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
 }
 
-/* PASOS DEL PRESUPUESTO PROACTIVO */
-.step-header {
+#income {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 22px;
+  font-weight: 700;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  width: 100%;
+  outline: none;
+}
+
+.currency { font-family: 'IBM Plex Mono', monospace; font-size: 18px; color: var(--brand-orange); font-weight: 700; }
+
+/* FILTROS PILLS Y ENCABEZADO DE PRESUPUESTO */
+.budget-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+  margin-bottom: 2px;
+}
+
+.budget-title-wrap {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 14px;
+  gap: 6px;
+  font-size: 12px;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
   color: var(--ink);
-  margin-top: 10px;
-  margin-bottom: 2px;
+  letter-spacing: 0.5px;
 }
 
 .step-num {
   background: var(--brand-orange);
   color: #FFF;
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
 }
 
-.step-subtext {
-  font-size: 12.5px;
-  color: var(--muted);
-  margin-bottom: 8px;
+.filter-pills {
+  display: flex;
+  gap: 4px;
+  background: var(--card);
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
 }
 
-/* MARGEN LIBRE (BALANCE EN TIEMPO REAL) */
-.balance-card {
-  background: #0F172A;
-  color: #FFF;
-  border-radius: var(--radius-lg);
-  padding: 18px 16px;
-  margin-top: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  text-align: center;
-  box-shadow: var(--shadow);
-}
-
-.balance-title {
-  font-size: 11.5px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #94A3B8;
-  margin-bottom: 6px;
+.pill-btn {
+  border: none;
+  background: transparent;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 11px;
   font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.balance-amount {
-  font-size: 26px;
-  font-weight: 700;
-  font-family: 'IBM Plex Mono', monospace;
-  color: #38BDF8;
-  margin-bottom: 6px;
-}
-
-.balance-msg {
-  font-size: 12.5px;
-  color: #CBD5E1;
-  line-height: 1.4;
+.pill-btn.active {
+  background: var(--brand-orange);
+  color: #FFF;
 }
 
 .offer-header-badge, .upsell-pricing-tag { background: var(--accent-soft); color: var(--accent-solid); font-size: 11px; font-weight: 700; padding: 6px 12px; border-radius: 6px; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 12px; letter-spacing: 0.02em; }
@@ -255,21 +269,22 @@ a:focus-visible, button:focus-visible, input:focus-visible, [tabindex]:focus-vis
 .micro-sub { font-size: 12.5px; color: var(--muted); }
 
 /* TOTAL STICKY */
-.sticky-total-box { position: sticky; top: 72px; z-index: 50; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-md); padding: 12px 16px; box-shadow: 0 8px 24px -6px rgba(17, 24, 20, 0.12); margin-bottom: 12px; }
+.sticky-total-box { position: sticky; top: 68px; z-index: 50; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-md); padding: 12px 14px; box-shadow: 0 8px 20px -6px rgba(17, 24, 20, 0.1); margin-bottom: 12px; }
 .sticky-total-num { font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 700; }
 .sticky-total-of { font-size: 11.5px; color: var(--muted); }
 .sticky-total-status { font-size: 11.5px; margin-top: 6px; line-height: 1.4; padding: 6px 8px; border-radius: 8px; }
 
-/* FILAS DE CATEGORÍA */
-.cat-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-md); margin-bottom: 8px; }
-.cat-row-label { display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; }
+/* FILAS DE CATEGORÍA COMPACTAS */
+.cat-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-md); margin-bottom: 6px; transition: all 0.2s ease; }
+.cat-row.hidden { display: none; }
+.cat-row-label { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; }
 .cat-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--line); flex-shrink: 0; }
 .cat-dot.green { background: var(--accent-solid); }
 .cat-dot.amber { background: var(--brand-orange); }
 .cat-dot.red { background: #B4432A; }
-.cat-row-input-wrap { display: flex; align-items: center; gap: 4px; background: var(--bg); border-radius: var(--radius-sm); padding: 6px 10px; }
-.cat-row-input-wrap .amt-currency { font-size: 13px; }
-.cat-row .amt-input { font-size: 15px; width: 90px; text-align: right; }
+.cat-row-input-wrap { display: flex; align-items: center; gap: 4px; background: var(--bg); border-radius: var(--radius-sm); padding: 5px 8px; }
+.cat-row-input-wrap .amt-currency { font-size: 12px; font-weight: 600; }
+.cat-row .amt-input { font-size: 14px; width: 85px; text-align: right; }
 
 .cause-box { background: var(--brand-orange-soft); border-radius: var(--radius-md); padding: 16px; margin-bottom: 18px; border: 1px solid rgba(253, 140, 69, 0.1); }
 .cause-box p { font-size: 12.5px; color: var(--muted); line-height: 1.45; }
@@ -278,9 +293,9 @@ a:focus-visible, button:focus-visible, input:focus-visible, [tabindex]:focus-vis
 .donation-row { display: flex; align-items: flex-start; gap: 10px; }
 .donation-logo-placeholder { width: 40px; height: 40px; border-radius: 10px; background: var(--card); border: 1px dashed rgba(253, 140, 69, 0.4); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
 
-.income-input-row, .afp-sim-row, .cat-bottom { display: flex; align-items: center; gap: 8px; background: var(--bg); padding: 12px 16px; border-radius: var(--radius-md); margin: 10px 0; }
-#income, .amt-input, #afpSalario { font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 600; border: none; background: transparent; color: var(--ink); width: 100%; outline: none; }
-.currency, .amt-currency { font-family: 'IBM Plex Mono', monospace; font-size: 22px; color: var(--muted); }
+.afp-sim-row, .cat-bottom { display: flex; align-items: center; gap: 8px; background: var(--bg); padding: 12px 16px; border-radius: var(--radius-md); margin: 10px 0; }
+.amt-input, #afpSalario { font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 600; border: none; background: transparent; color: var(--ink); width: 100%; outline: none; }
+.amt-currency { font-family: 'IBM Plex Mono', monospace; font-size: 16px; color: var(--muted); }
 
 .variable-banner, .afp-sim-result { display: none; font-size: 12px; line-height: 1.5; color: var(--muted); margin-top: 8px; }
 .variable-banner.show, .afp-sim-result.show { display: block; }
@@ -292,10 +307,10 @@ a:focus-visible, button:focus-visible, input:focus-visible, [tabindex]:focus-vis
 .bar-seg { height: 100%; }
 .bar-caption { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--muted); }
 
-.video-native-box { width: 100%; margin-bottom: 4px; border-radius: var(--radius-md); overflow: hidden; }
+.video-native-box { width: 100%; border-radius: var(--radius-md); overflow: hidden; }
 .video-embed-container { position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; }
 .video-embed-container iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
-.video-placeholder-luxury { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #0A120E; color: #FFF; font-size: 13px; font-weight: 500; cursor: pointer; text-align: center; }
+.video-placeholder-luxury { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: #0A120E; color: #FFF; font-size: 12.5px; font-weight: 500; cursor: pointer; text-align: center; }
 
 .course-list-minimal, .leak-item, .kids-task { display: flex; flex-direction: column; gap: 2px; margin-top: 8px; }
 .course-item, .leak-item, .kids-task { display: flex; flex-direction: row; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
@@ -387,7 +402,7 @@ a:focus-visible, button:focus-visible, input:focus-visible, [tabindex]:focus-vis
 .nav-icon { font-size: 20px; }
 .nav-label { font-size: 11px; font-weight: 600; }
 
-.summary-btn { width: 100%; padding: 14px; background: var(--accent-solid); color: #fff; border: none; border-radius: var(--radius-md); font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 12px; }
+.summary-btn { width: 100%; padding: 12px; background: var(--accent-solid); color: #fff; border: none; border-radius: var(--radius-md); font-size: 13.5px; font-weight: 600; cursor: pointer; margin-top: 8px; }
 .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); z-index: 200; align-items: flex-end; justify-content: center; }
 .modal-overlay.show { display: flex; }
 .modal-sheet { background: var(--card); width: 100%; max-width: 480px; border-radius: 20px 20px 0 0; padding: 24px 20px 34px; max-height: 80vh; overflow-y: auto; }
