@@ -1,16 +1,16 @@
 /* ============ DATOS Y CATEGORÍAS ============ */
 const categories = {
-  vivienda:   { label: 'Vivienda',               color: '#1F7A5C', maxRec: 0.35, tip: 'Alquiler, hipoteca, mantenimiento del hogar.' },
-  comida:     { label: 'Comida',                 color: '#3E9C77', maxRec: 0.20, tip: 'Mercado y compras fijas de alimentos.' },
-  servicios:  { label: 'Luz, agua y teléfono',  color: '#6BBE9A', maxRec: 0.10, tip: 'Electricidad, agua e internet/teléfono combinados.' },
-  escuela:    { label: 'Escuela',                color: '#2D8ACE', tip: 'Mensualidad, transporte escolar, materiales.' },
-  salud:      { label: 'Salud',                  color: '#3AA0A0', tip: 'Medicamentos y consultas médicas fijas.' },
-  transporte: { label: 'Transporte',             color: '#8AA6B8', maxRec: 0.15, tip: 'Combustible, concho y mantenimiento básico.' },
-  deudas:     { label: 'Deudas',                 color: '#8B5CF6', maxRec: 0.20, tip: 'Tarjetas o préstamos. Ataca primero la de mayor interés.' },
-  ahorro:     { label: 'Ahorro',                 color: '#B4432A', minRec: 0.10, minRecVariable: 0.15, tip: 'Tu colchón de tranquilidad. Trátalo como una factura obligatoria.' },
-  mascotas:   { label: 'Mascotas',               color: '#C2447A', tip: 'Comida y cuidados veterinarios — aunque no sea común anotarlo, es un gasto real.' },
-  donaciones: { label: 'Donaciones',             color: '#E8A33D', tip: 'Iglesia, fundaciones, causas que te importan — generosidad con intención, no con culpa.' },
-  diversion:  { label: 'Diversión',              color: '#66766D', tip: 'Salidas y gustos. Pequeño pero necesario para no rendirte.' }
+  vivienda:   { label: 'Vivienda',               type: 'fijo',     color: '#1F7A5C', maxRec: 0.35, tip: 'Alquiler, hipoteca, mantenimiento del hogar.' },
+  comida:     { label: 'Comida',                 type: 'variable', color: '#3E9C77', maxRec: 0.20, tip: 'Mercado y compras fijas de alimentos.' },
+  servicios:  { label: 'Luz, agua y teléfono',  type: 'fijo',     color: '#6BBE9A', maxRec: 0.10, tip: 'Electricidad, agua e internet/teléfono combinados.' },
+  escuela:    { label: 'Escuela',                type: 'fijo',     color: '#2D8ACE', tip: 'Mensualidad, transporte escolar, materiales.' },
+  salud:      { label: 'Salud',                  type: 'variable', color: '#3AA0A0', tip: 'Medicamentos y consultas médicas fijas.' },
+  transporte: { label: 'Transporte',             type: 'variable', color: '#8AA6B8', maxRec: 0.15, tip: 'Combustible, concho y mantenimiento básico.' },
+  deudas:     { label: 'Deudas',                 type: 'fijo',     color: '#8B5CF6', maxRec: 0.20, tip: 'Tarjetas o préstamos. Ataca primero la de mayor interés.' },
+  ahorro:     { label: 'Ahorro',                 type: 'fijo',     color: '#B4432A', minRec: 0.10, minRecVariable: 0.15, tip: 'Tu colchón de tranquilidad. Trátalo como una factura obligatoria.' },
+  mascotas:   { label: 'Mascotas',               type: 'variable', color: '#C2447A', tip: 'Comida y cuidados veterinarios — aunque no sea común anotarlo, es un gasto real.' },
+  donaciones: { label: 'Donaciones',             type: 'variable', color: '#E8A33D', tip: 'Iglesia, fundaciones, causas que te importan — generosidad con intención, no con culpa.' },
+  diversion:  { label: 'Diversión',              type: 'variable', color: '#66766D', tip: 'Salidas y gustos. Pequeño pero necesario para no rendirte.' }
 };
 
 let amounts = {};
@@ -117,7 +117,6 @@ function lazyLoadVideos() {
 /* ============ PRESUPUESTO ============ */
 const resultsEl = document.getElementById('results');
 const incomeEl = document.getElementById('income');
-const countTag = document.getElementById('countTag');
 
 function fmt(n) { return Math.round(n).toLocaleString('en-US', { maximumFractionDigits: 0 }); }
 
@@ -168,45 +167,20 @@ function categoryAdvice(key, amount, income) {
   return null;
 }
 
-/* CÁLCULO DEL MARGEN DE MANIOBRA EN TIEMPO REAL */
-function updateMarginCard() {
-  const income = getIncome();
-  const expenses = getTotalExpenses();
-  const margin = income - expenses;
-
-  const display = document.getElementById('marginDisplay');
-  const msg = document.getElementById('marginMsg');
-
-  if (!display || !msg) return;
-
-  const formattedMargin = 'RD$' + fmt(Math.abs(margin));
-
-  if (income === 0 && expenses === 0) {
-    display.textContent = 'RD$0';
-    display.style.color = '#38BDF8';
-    msg.textContent = 'A medida que completes tus números, verás si estás logrando que cada peso tenga un propósito antes de cobrar.';
-  } else if (margin > 0) {
-    display.textContent = formattedMargin;
-    display.style.color = '#41BF93'; // Verde
-    msg.textContent = `¡Excelente! Te quedan ${formattedMargin} libres. Muévelos a tu meta de ahorro o fondo de emergencia antes de que empiece el mes.`;
-  } else if (margin === 0) {
-    display.textContent = 'RD$0';
-    display.style.color = '#38BDF8'; // Azul
-    msg.textContent = '¡Presupuesto base cero perfecto! Le diste un propósito exacto a cada peso antes de cobrar.';
-  } else {
-    display.textContent = '-' + formattedMargin;
-    display.style.color = '#FF6B6B'; // Rojo Alerta
-    msg.textContent = `🚨 Alerta: Estás planificando gastar ${formattedMargin} más de lo que vas a ingresar. Ajusta tus gastos variables antes de cobrar.`;
-  }
-}
-
 function buildCategoryRows() {
   if (!resultsEl) return;
-  let html = '';
+  let html = `
+    <div class="sticky-total-box">
+      <div class="sticky-total-num" id="stickyTotalNum">RD$0</div>
+      <div class="sticky-total-of" id="stickyTotalOf">de RD$0 ganado este mes</div>
+      <div class="bar" style="margin:8px 0 0;"><div class="bar-seg" id="totalBarSeg" style="width:0%; background:var(--accent-solid)"></div></div>
+      <div class="sticky-total-status" id="totalOverWarning" style="display:none;"></div>
+    </div>
+  `;
 
   Object.entries(categories).forEach(([key, cat]) => {
     html += `
-      <div class="cat-row">
+      <div class="cat-row" data-type="${cat.type}" id="row-${key}">
         <div class="cat-row-label"><span class="cat-dot" id="dot-${key}"></span>${cat.label}</div>
         <div class="cat-row-input-wrap">
           <span class="amt-currency">RD$</span>
@@ -225,9 +199,7 @@ function buildCategoryRows() {
       amounts[key] = isNaN(val) ? 0 : val;
       updateCategoryDot(key);
       showActiveAdvice(key);
-      updateCount();
       updateTotals(false);
-      updateMarginCard();
     });
     inp.addEventListener('focus', (e) => showActiveAdvice(e.target.dataset.key));
     inp.addEventListener('blur', () => updateTotals(true));
@@ -238,16 +210,8 @@ function buildCategoryRows() {
 
   setTimeout(() => {
     Object.keys(categories).forEach(key => updateCategoryDot(key));
-    updateCount();
     updateTotals(true);
-    updateMarginCard();
   }, 0);
-}
-
-function updateCount() {
-  if (!countTag) return;
-  const withAmount = Object.values(amounts).filter(v => v > 0).length;
-  countTag.textContent = `${withAmount} con monto`;
 }
 
 function updateCategoryDot(key) {
@@ -359,6 +323,39 @@ if (document.getElementById('closeModal')) {
   document.getElementById('closeModal').addEventListener('click', () => {
     const modalOverlay = document.getElementById('modalOverlay');
     if (modalOverlay) modalOverlay.classList.remove('show');
+  });
+}
+
+/* LÓGICA DE INTERACCIÓN DE FILTROS (PILLS) Y CERRAR BANNER VIP */
+function initFilterPills() {
+  const pillsContainer = document.getElementById('budgetPills');
+  if (!pillsContainer) return;
+
+  pillsContainer.querySelectorAll('.pill-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      pillsContainer.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const filter = btn.dataset.filter;
+      document.querySelectorAll('.cat-row').forEach(row => {
+        if (filter === 'all' || row.dataset.type === filter) {
+          row.classList.remove('hidden');
+        } else {
+          row.classList.add('hidden');
+        }
+      });
+    });
+  });
+}
+
+if (document.getElementById('dismissBeamBtn')) {
+  document.getElementById('dismissBeamBtn').addEventListener('click', () => {
+    const beamCard = document.getElementById('introBeamCard');
+    if (beamCard) {
+      beamCard.style.opacity = '0';
+      beamCard.style.transform = 'scale(0.95)';
+      setTimeout(() => { beamCard.style.display = 'none'; }, 400);
+    }
   });
 }
 
@@ -730,10 +727,10 @@ const initApp = () => {
   buildLeaks();
   buildXmas();
   buildCategoryRows();
+  initFilterPills();
   if (incomeEl) {
     incomeEl.addEventListener('input', () => {
       updateTotals(true);
-      updateMarginCard();
     });
   }
 };
