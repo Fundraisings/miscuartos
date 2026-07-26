@@ -57,56 +57,37 @@
   <main class="app-content">
 
     <section id="pane-presupuesto" class="tab-pane active">
-      
-      <!-- TARJETA VIP COMPACTA: BIENVENIDA + HAZ DE LUZ + VIDEO -->
-      <div class="beam-card-container" id="introBeamCard">
-        <div class="beam-light-effect"></div>
-        <div class="beam-card-content">
-          <div class="beam-card-header">
-            <span class="welcome-badge">¡Bienvenido a MisCuartos! 👋</span>
-            <button class="beam-close-btn" id="dismissBeamBtn" title="Ocultar mensaje">✕</button>
-          </div>
-          <h1>Decide a dónde van tus cuartos <span class="highlight-text">antes de cobrar</span></h1>
-          <p class="beam-mini-desc">Un presupuesto real no es para anotar en qué se te fue el dinero, sino para tomar el control y liberarte de deudas.</p>
-          
-          <div class="video-native-box">
-            <div class="video-embed-container" id="embed-tutorial">
-              <div class="video-placeholder-luxury">
-                <span>▶ Aprende a usar la app en 1 minuto</span>
-              </div>
-            </div>
-          </div>
+      <div class="intro-block">
+        <div class="welcome-badge">¡Qué bueno tenerte aquí! 👋</div>
+        <h1>Tus cuartos, bajo tu control</h1>
+        <p class="sub">Esta app funciona mejor si sabes cómo sacarle el jugo. Antes de empezar, dale un minuto a este video — te va a ahorrar tiempo después.</p>
+      </div>
+
+      <div class="video-native-box">
+        <div class="video-embed-container" id="embed-tutorial">
+          <div class="video-placeholder-luxury"><span>▶ Cómo sacarle el jugo a la app · 1 min</span></div>
         </div>
       </div>
 
-      <!-- INGRESO ESPERADO -->
-      <div class="income-card-compact">
-        <div class="income-header-row">
-          <label for="income" class="income-label">1. ¿CUÁNTO ESPERAS COBRAR ESTE MES?</label>
-          <span class="income-hint">Sueldo + Extras</span>
+      <div class="intro-block" style="margin-top: 4px;">
+        <p class="sub" style="font-size: 13px;">Manejar tu dinero no tiene que ser complicado. Pon lo que ganas, anota lo que gastas, y te vamos guiando en el camino.</p>
+      </div>
+
+      <div class="income-card" style="border: 2px solid #FD8C45;">
+        <div class="period-toggle" id="periodToggle">
+          <div class="period-btn active" data-period="mensual">Mensual</div>
+          <div class="period-btn" data-period="quincenal">Quincenal</div>
         </div>
+        <div class="period-tip" id="periodTip" style="display:none;">💡 Si cobras cada 15 días, pensar tu presupuesto por quincena te ayuda a no gastarte todo antes de que llegue la próxima entrada.</div>
+        <label for="income" id="incomeLabel" style="display: block; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin: 12px 0 8px;">Ingreso ganado este mes</label>
         <div class="income-input-row">
-          <span class="currency">RD$</span>
-          <input type="number" id="income" placeholder="0" inputmode="decimal">
+          <span class="currency" style="color: #FD8C45;">$</span>
+          <input type="number" id="income" placeholder="Ej. 50,000" inputmode="decimal">
         </div>
       </div>
 
-      <!-- SEGMENTADOR COMPACTO (PILLS) -->
-      <div class="budget-section-header">
-        <div class="budget-title-wrap">
-          <span class="step-num">2</span>
-          <span>PLANIFICA TUS GASTOS</span>
-        </div>
-        <div class="filter-pills" id="budgetPills">
-          <button class="pill-btn active" data-filter="all">Todos</button>
-          <button class="pill-btn" data-filter="fijos">🔒 Fijos</button>
-          <button class="pill-btn" data-filter="variables">🎨 Variables</button>
-        </div>
-      </div>
-
-      <!-- LISTA DINÁMICA DE CATEGORÍAS -->
+      <div class="section-title">Tus gastos este mes <span class="count" id="countTag">0 con monto</span></div>
       <div id="results"></div>
-
     </section>
 
     <section id="pane-reto" class="tab-pane">
@@ -160,19 +141,20 @@
           <div class="lbl" id="xmasProgressLbl">Marca las semanas que ya depositaste</div>
         </div>
 
-        <div class="xmas-tree-wrap">
-          <svg class="xmas-tree" id="xmasTree" viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg">
-            <polygon id="xmasStar" points="60,4 65,18 80,18 68,27 72,42 60,33 48,42 52,27 40,18 55,18" />
-            <polygon points="60,28 90,68 30,68" fill="#3E9C77"/>
-            <polygon points="60,50 96,96 24,96" fill="#1F7A5C"/>
-            <polygon points="60,74 102,130 18,130" fill="#166049"/>
-            <rect x="52" y="130" width="16" height="10" fill="#7a5230"/>
-          </svg>
-        </div>
-
         <div class="xmas-streak-msg" id="xmasStreakMsg" style="display:none;"></div>
 
-        <div id="xmasWeeks" class="xmas-ornament-grid"></div>
+        <div class="xmas-layout">
+          <div id="xmasWeeks" class="xmas-ornament-grid"></div>
+          <div class="xmas-tree-wrap">
+            <svg class="xmas-tree" id="xmasTree" viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg">
+              <polygon id="xmasStar" points="60,4 65,18 80,18 68,27 72,42 60,33 48,42 52,27 40,18 55,18" />
+              <polygon points="60,28 90,68 30,68" fill="#3E9C77"/>
+              <polygon points="60,50 96,96 24,96" fill="#1F7A5C"/>
+              <polygon points="60,74 102,130 18,130" fill="#166049"/>
+              <rect x="52" y="130" width="16" height="10" fill="#7a5230"/>
+            </svg>
+          </div>
+        </div>
 
         <div class="xmas-footer-tips">
           <p>💡 <strong>Tip:</strong> Para blindar tu reto de las tentaciones, abre una cuenta de ahorro aparte — ese dinero no se toca, salvo que sea una emergencia real de salud o de vida.</p>
@@ -183,32 +165,50 @@
     <section id="pane-metas" class="tab-pane">
       <div class="intro-block">
         <h1>Metas & Progreso</h1>
-        <p class="sub">Una meta sin monto ni fecha es solo un deseo. Aquí la convertimos en un plan real — dinos qué quieres lograr, y te decimos exactamente cuánto separar cada mes para llegar.</p>
+        <p class="sub">El objetivo real de manejar tu dinero no es "tener más" — es comprarte tranquilidad y libertad de elegir. Esta sección te ayuda en las 4 cosas que de verdad importan: dormir tranquilo, tener opciones, cuidar tu futuro, y disfrutar el presente sin culpa.</p>
       </div>
 
+      <div class="pillar-nav">
+        <div class="pillar-chip">🛡️ Tranquilidad</div>
+        <div class="pillar-chip">🔑 Libertad</div>
+        <div class="pillar-chip">🌅 Futuro</div>
+        <div class="pillar-chip">🎯 Presente</div>
+      </div>
+
+      <!-- PILAR 1: TRANQUILIDAD -->
       <div class="meta-card">
-        <div class="premium-badge-title">🛡️ TU ESCUDO FINANCIERO (FONDO DE EMERGENCIA)</div>
-        <p class="micro-sub">El dinero que te dará paz mental ante imprevistos. Se calcula en base a tus gastos fijos mensuales.</p>
-        <div style="margin-bottom: 12px;">
-          <div class="emergency-slider-row">
-            <span>Meses de cobertura:</span>
-            <span id="emergencyMonthsLabel" class="emergency-months-val">3 meses</span>
-          </div>
-          <input type="range" id="emergencySlider" min="3" max="6" value="3">
+        <div class="pillar-tag">🛡️ PILAR: TRANQUILIDAD</div>
+        <div class="premium-badge-title">MI COLCHÓN DE PAZ</div>
+        <p class="micro-sub">No hace falta tener miles guardados para dormir tranquilo. Un colchón de paz empieza con lo que puedas, aunque sea poco — lo que importa es que exista.</p>
+
+        <div class="emergency-choices" id="emergencyChoices">
+          <div class="emergency-choice" data-amount="1000">RD$1,000</div>
+          <div class="emergency-choice" data-amount="3000">RD$3,000</div>
+          <div class="emergency-choice" data-amount="5000">RD$5,000</div>
+          <div class="emergency-choice" data-amount="custom">A tu medida</div>
         </div>
+        <div id="emergencyCustomRow" style="display:none;">
+          <span>RD$</span>
+          <input type="number" id="emergencyCustomAmount" placeholder="Ej. 2,000" inputmode="numeric">
+        </div>
+
         <div class="credit-result-row emergency-result">
           <div style="text-align: center; width: 100%;">
-            <div class="emergency-result-lbl">Tu meta de Fondo de Emergencia</div>
+            <div class="emergency-result-lbl">Tu colchón de paz</div>
             <div id="emergencyTotalVal" class="emergency-result-val">RD$0</div>
+            <div id="emergencyRefText" class="emergency-ref-text"></div>
           </div>
         </div>
         <div class="credit-trick" style="background: rgba(45, 138, 206, 0.08); color: #2D8ACE;">
-          💡 <strong>Tip Dominicano:</strong> No dejes este dinero bajo el colchón perdiendo valor. Cuando tengas el equivalente a un mes, muévelo a un Certificado Financiero o cuenta de ahorro programado.
+          💡 <strong>Tip Dominicano:</strong> No dejes este dinero bajo el colchón perdiendo valor. Cuando puedas, muévelo a un Certificado Financiero o cuenta de ahorro programado.
         </div>
       </div>
 
+      <!-- PILAR 2: LIBERTAD -->
       <div class="meta-card" style="margin-top: 16px;">
-        <div class="premium-badge-title">🎯 TU PRÓXIMO PASO (PLANIFICADOR)</div>
+        <div class="pillar-tag">🔑 PILAR: LIBERTAD DE ELECCIÓN</div>
+        <div class="premium-badge-title">TU PRÓXIMO PASO</div>
+        <p class="micro-sub" style="margin-bottom: 12px;">Cuando vives de quincena en quincena, cuesta decir que no a un mal trabajo o a un mal negocio porque necesitas el próximo pago. Cada meta que logras te devuelve un poco más esa libertad de elegir. Antes del número, piensa en el para qué.</p>
 
         <div class="icon-select" id="iconSelect">
           <div class="icon-btn active" data-icon="🏠">🏠</div>
@@ -240,9 +240,27 @@
         <div id="coachAlertBox" style="display: none;"></div>
       </div>
 
-      <div id="entrepreneurshipModule" class="meta-card" style="margin-top: 16px; display: none;">
-        <div class="premium-badge-title" style="color: #FD8C45;">💡 MOTOR DE INGRESOS EXTRA</div>
-        <p class="micro-sub" style="margin-bottom: 10px;">Estas son ideas, no obligaciones. Tú decides si alguna te sirve, cuál probar, o si prefieres cerrar la brecha ajustando gastos en vez de sumar ingresos. Nuestro trabajo es mostrarte que hay opciones — actuar o no, es completamente tuyo.</p>
+      <!-- PILAR 3: FUTURO -->
+      <div class="meta-card" style="margin-top: 16px;">
+        <div class="pillar-tag">🌅 PILAR: SOSTENER TU FUTURO</div>
+        <div class="premium-badge-title">TU YO DEL FUTURO</div>
+        <p class="micro-sub">Tu capacidad de trabajar y ganar tiene fecha de vencimiento — no por pesimismo, es solo la realidad. Ya viste en la Academia cómo funciona tu AFP y qué te toca por ley. Más allá de eso, empezar a construir ingresos que no dependan solo de tus horas trabajadas (un negocio, una renta, una inversión) es lo que sostiene tu calidad de vida cuando decidas — o necesites — bajar el ritmo. No dejamos consejos específicos de inversión aquí — eso siempre con un asesor certificado — pero sí queremos que tengas la idea clara desde ya.</p>
+        <button class="afp-link-btn" id="afpLinkBtn">Ver tu AFP en la Academia →</button>
+      </div>
+
+      <!-- PILAR 4: PRESENTE -->
+      <div class="meta-card" style="margin-top: 16px;">
+        <div class="pillar-tag">🎯 PILAR: PRESENTE CON PROPÓSITO</div>
+        <div class="premium-badge-title">TU RACHA ESTA SEMANA</div>
+        <p class="micro-sub" style="margin-bottom: 12px;">No se trata de privarte de todo — se trata de gastar en lo que de verdad te importa, y soltar lo que no. Marca lo que hiciste esta semana.</p>
+        <div id="streakChecks"></div>
+        <div class="streak-counter" id="streakCounter">🔥 Aún no empiezas tu racha esta semana.</div>
+      </div>
+
+      <!-- MOTOR DE INGRESOS (conecta Libertad + Futuro) -->
+      <div id="entrepreneurshipModule" class="meta-card" style="margin-top: 16px;">
+        <div class="premium-badge-title" style="color: #FD8C45;">💡 AHORRAR TE PROTEGE. GENERAR MÁS, TE ACELERA.</div>
+        <p class="micro-sub" style="margin-bottom: 10px;">Cuidar lo que ganas es la base — pero también puedes hacer crecer lo que entra. Abajo tienes ideas reales de negocio para explorar cuando quieras. Y si te llama el mundo de invertir, es un camino real para construir con el tiempo — aquí no damos consejos específicos de inversión (eso siempre con un asesor certificado), pero pronto vas a encontrar contenido para aprender los conceptos en la Academia.</p>
         <div id="ideasCatalogContainer"></div>
         <div class="onapi-note">
           📌 <strong>Nota de escala:</strong> si tu idea empieza a facturar de forma constante, puedes formalizarte fácilmente en RD vía registro de nombre comercial en <strong>ONAPI</strong> y el régimen simplificado (RST) en la DGII.
