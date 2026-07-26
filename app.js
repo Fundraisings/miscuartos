@@ -1,20 +1,21 @@
-/* ============ DATOS Y CATEGORÍAS ============ */
+/* ============ DATOS ============ */
 const categories = {
-  vivienda:   { label: 'Vivienda',               type: 'fijo',     color: '#1F7A5C', maxRec: 0.35, tip: 'Alquiler, hipoteca, mantenimiento del hogar.' },
-  comida:     { label: 'Comida',                 type: 'variable', color: '#3E9C77', maxRec: 0.20, tip: 'Mercado y compras fijas de alimentos.' },
-  servicios:  { label: 'Luz, agua y teléfono',  type: 'fijo',     color: '#6BBE9A', maxRec: 0.10, tip: 'Electricidad, agua e internet/teléfono combinados.' },
-  escuela:    { label: 'Escuela',                type: 'fijo',     color: '#2D8ACE', tip: 'Mensualidad, transporte escolar, materiales.' },
-  salud:      { label: 'Salud',                  type: 'variable', color: '#3AA0A0', tip: 'Medicamentos y consultas médicas fijas.' },
-  transporte: { label: 'Transporte',             type: 'variable', color: '#8AA6B8', maxRec: 0.15, tip: 'Combustible, concho y mantenimiento básico.' },
-  deudas:     { label: 'Deudas',                 type: 'fijo',     color: '#8B5CF6', maxRec: 0.20, tip: 'Tarjetas o préstamos. Ataca primero la de mayor interés.' },
-  ahorro:     { label: 'Ahorro',                 type: 'fijo',     color: '#B4432A', minRec: 0.10, minRecVariable: 0.15, tip: 'Tu colchón de tranquilidad. Trátalo como una factura obligatoria.' },
-  mascotas:   { label: 'Mascotas',               type: 'variable', color: '#C2447A', tip: 'Comida y cuidados veterinarios — aunque no sea común anotarlo, es un gasto real.' },
-  donaciones: { label: 'Donaciones',             type: 'variable', color: '#E8A33D', tip: 'Iglesia, fundaciones, causas que te importan — generosidad con intención, no con culpa.' },
-  diversion:  { label: 'Diversión',              type: 'variable', color: '#66766D', tip: 'Salidas y gustos. Pequeño pero necesario para no rendirte.' }
+  vivienda:   { label: 'Vivienda',              color: '#1F7A5C', maxRec: 0.35, tip: 'Alquiler, hipoteca, mantenimiento del hogar.' },
+  comida:     { label: 'Comida',                color: '#3E9C77', maxRec: 0.20, tip: 'Mercado y compras fijas de alimentos.' },
+  servicios:  { label: 'Luz, agua y teléfono',  color: '#6BBE9A', maxRec: 0.10, tip: 'Electricidad, agua e internet/teléfono combinados.' },
+  escuela:    { label: 'Escuela',               color: '#2D8ACE', tip: 'Mensualidad, transporte escolar, materiales.' },
+  salud:      { label: 'Salud',                 color: '#3AA0A0', tip: 'Medicamentos y consultas médicas fijas.' },
+  transporte: { label: 'Transporte',            color: '#8AA6B8', maxRec: 0.15, tip: 'Combustible, concho y mantenimiento básico.' },
+  deudas:     { label: 'Deudas',                color: '#8B5CF6', maxRec: 0.20, tip: 'Tarjetas o préstamos. Ataca primero la de mayor interés.' },
+  ahorro:     { label: 'Ahorro',                color: '#B4432A', minRec: 0.10, minRecVariable: 0.15, tip: 'Tu colchón de tranquilidad. Trátalo como una factura obligatoria.' },
+  mascotas:   { label: 'Mascotas',              color: '#C2447A', tip: 'Comida y cuidados veterinarios — aunque no sea común anotarlo, es un gasto real.' },
+  donaciones: { label: 'Donaciones',            color: '#E8A33D', tip: 'Iglesia, fundaciones, causas que te importan — generosidad con intención, no con culpa.' },
+  diversion:  { label: 'Diversión',              color: '#66766D', tip: 'Salidas y gustos. Pequeño pero necesario para no rendirte.' }
 };
 
 let amounts = {};
 let incomeType = 'fijo';
+let budgetPeriod = 'mensual';
 let totalXmasWeeks = 0;
 let selectedGoalIcon = '🏠';
 
@@ -83,6 +84,8 @@ document.querySelectorAll('.nav-item').forEach(btn => {
     if (btn.dataset.tab === 'metas') {
       calculateEmergencyFund();
       calculateTargetGoal();
+      buildStreakChecks();
+      renderBusinessCatalog();
     }
   });
 });
@@ -117,8 +120,39 @@ function lazyLoadVideos() {
 /* ============ PRESUPUESTO ============ */
 const resultsEl = document.getElementById('results');
 const incomeEl = document.getElementById('income');
+const countTag = document.getElementById('countTag');
 
 function fmt(n) { return Math.round(n).toLocaleString('en-US', { maximumFractionDigits: 0 }); }
+
+const PERIOD_LABELS = {
+  mensual:   { income: 'Ingreso ganado este mes',   gastos: 'Tus gastos este mes',   of: 'ganado este mes',   wa: 'este mes' },
+  quincenal: { income: 'Ingreso de esta quincena',  gastos: 'Tus gastos esta quincena', of: 'ganado esta quincena', wa: 'esta quincena' }
+};
+
+document.querySelectorAll('.period-btn').forEach(btn => {
+  makeKeyboardActivatable(btn);
+  btn.addEventListener('click', () => {
+    budgetPeriod = btn.dataset.period;
+    document.querySelectorAll('.period-btn').forEach(b => b.classList.toggle('active', b === btn));
+    applyPeriodLabels();
+    const tip = document.getElementById('periodTip');
+    if (tip) tip.style.display = budgetPeriod === 'quincenal' ? 'block' : 'none';
+    updateTotals(true);
+    saveState();
+  });
+});
+
+function applyPeriodLabels() {
+  const lbl = PERIOD_LABELS[budgetPeriod];
+  const incomeLabelEl = document.getElementById('incomeLabel');
+  const sectionTitleEl = document.querySelector('#pane-presupuesto .section-title');
+  if (incomeLabelEl) incomeLabelEl.textContent = lbl.income;
+  if (sectionTitleEl) {
+    const countSpan = document.getElementById('countTag');
+    sectionTitleEl.firstChild.textContent = lbl.gastos + ' ';
+    if (countSpan) sectionTitleEl.appendChild(countSpan);
+  }
+}
 
 function getIncome() {
   if (!incomeEl) return 0;
@@ -171,16 +205,35 @@ function buildCategoryRows() {
   if (!resultsEl) return;
   let html = `
     <div class="sticky-total-box">
-      <div class="sticky-total-num" id="stickyTotalNum">RD$0</div>
-      <div class="sticky-total-of" id="stickyTotalOf">de RD$0 ganado este mes</div>
-      <div class="bar" style="margin:8px 0 0;"><div class="bar-seg" id="totalBarSeg" style="width:0%; background:var(--accent-solid)"></div></div>
+      <div class="sticky-total-row">
+        <div class="sticky-total-text">
+          <div class="sticky-total-num" id="stickyTotalNum">RD$0</div>
+          <div class="sticky-total-of" id="stickyTotalOf">de RD$0 ganado este mes</div>
+        </div>
+        <div class="compass-gauge-wrap">
+          <svg class="compass-gauge" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Indicador de cuánto llevas asignado">
+            <circle cx="50" cy="50" r="42" stroke="var(--line)" stroke-width="5" fill="none"/>
+            <line x1="50" y1="4" x2="50" y2="12" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/>
+            <line x1="50" y1="88" x2="50" y2="96" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/>
+            <line x1="4" y1="50" x2="12" y2="50" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/>
+            <line x1="88" y1="50" x2="96" y2="50" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/>
+            <g id="gaugeNeedle" class="gauge-needle">
+              <polygon points="50,14 58,50 50,50" fill="var(--brand-orange)"/>
+              <polygon points="50,14 42,50 50,50" fill="var(--brand-orange)" opacity="0.9"/>
+              <polygon points="50,86 58,50 50,50" fill="var(--ink)"/>
+              <polygon points="50,86 42,50 50,50" fill="var(--ink)" opacity="0.95"/>
+            </g>
+            <circle cx="50" cy="50" r="6" fill="var(--card)" stroke="var(--ink)" stroke-width="2.5"/>
+          </svg>
+        </div>
+      </div>
       <div class="sticky-total-status" id="totalOverWarning" style="display:none;"></div>
     </div>
   `;
 
   Object.entries(categories).forEach(([key, cat]) => {
     html += `
-      <div class="cat-row" data-type="${cat.type}" id="row-${key}">
+      <div class="cat-row">
         <div class="cat-row-label"><span class="cat-dot" id="dot-${key}"></span>${cat.label}</div>
         <div class="cat-row-input-wrap">
           <span class="amt-currency">RD$</span>
@@ -197,8 +250,10 @@ function buildCategoryRows() {
       const key = e.target.dataset.key;
       const val = parseFloat(e.target.value);
       amounts[key] = isNaN(val) ? 0 : val;
+      saveState();
       updateCategoryDot(key);
       showActiveAdvice(key);
+      updateCount();
       updateTotals(false);
     });
     inp.addEventListener('focus', (e) => showActiveAdvice(e.target.dataset.key));
@@ -210,8 +265,15 @@ function buildCategoryRows() {
 
   setTimeout(() => {
     Object.keys(categories).forEach(key => updateCategoryDot(key));
+    updateCount();
     updateTotals(true);
   }, 0);
+}
+
+function updateCount() {
+  if (!countTag) return;
+  const withAmount = Object.values(amounts).filter(v => v > 0).length;
+  countTag.textContent = `${withAmount} con monto`;
 }
 
 function updateCategoryDot(key) {
@@ -244,18 +306,20 @@ function updateTotals(showOverallStatus) {
   const income = getIncome();
   let total = getTotalExpenses();
 
-  const seg = document.getElementById('totalBarSeg');
+  const needle = document.getElementById('gaugeNeedle');
   const numEl = document.getElementById('stickyTotalNum');
   const ofEl = document.getElementById('stickyTotalOf');
   const warnBox = document.getElementById('totalOverWarning');
+  if (!needle) return;
 
-  const pct = income > 0 ? Math.min((total / income) * 100, 100) : 0;
-  if (seg) {
-    seg.style.width = `${pct}%`;
-    seg.style.background = total > income && income > 0 ? '#B4432A' : 'var(--accent-solid)';
-  }
+  const rawPct = income > 0 ? (total / income) : 0;
+  // La aguja va de N (0%) a E (100%) y sigue un poco más allá si te pasas, hasta un tope de 150%.
+  const rotationDeg = Math.min(rawPct, 1.5) * 90;
+  needle.style.transform = `rotate(${rotationDeg}deg)`;
+  needle.classList.toggle('over', total > income && income > 0);
+
   if (numEl) numEl.textContent = `RD$${fmt(total)}`;
-  if (ofEl) ofEl.textContent = `de RD$${fmt(income)} ganado este mes`;
+  if (ofEl) ofEl.textContent = `de RD$${fmt(income)} ${PERIOD_LABELS[budgetPeriod].of}`;
 
   if (!showOverallStatus) return;
 
@@ -291,7 +355,7 @@ function openSummary() {
   if (summaryTotalEl) summaryTotalEl.textContent = `RD$${fmt(total)}`;
 
   let rows = '';
-  let waText = `📋 Los números de la casa este mes:\n\n`;
+  let waText = `📋 Los números de la casa ${PERIOD_LABELS[budgetPeriod].wa}:\n\n`;
   usedKeys.forEach(key => {
     const amt = amounts[key] || 0;
     const advice = categoryAdvice(key, amt, income);
@@ -306,7 +370,7 @@ function openSummary() {
   if (income > 0 && total > income) {
     waText += `\n⚠️ Nos pasamos por RD$${fmt(total - income)} — hay que ajustar algo.`;
   }
-  waText += `\n\nAsí quedamos este mes 🤝`;
+  waText += `\n\nAsí quedamos ${PERIOD_LABELS[budgetPeriod].wa} 🤝`;
 
   const summaryRowsEl = document.getElementById('summaryRows');
   if (summaryRowsEl) summaryRowsEl.innerHTML = rows;
@@ -323,39 +387,6 @@ if (document.getElementById('closeModal')) {
   document.getElementById('closeModal').addEventListener('click', () => {
     const modalOverlay = document.getElementById('modalOverlay');
     if (modalOverlay) modalOverlay.classList.remove('show');
-  });
-}
-
-/* LÓGICA DE INTERACCIÓN DE FILTROS (PILLS) Y CERRAR BANNER VIP */
-function initFilterPills() {
-  const pillsContainer = document.getElementById('budgetPills');
-  if (!pillsContainer) return;
-
-  pillsContainer.querySelectorAll('.pill-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      pillsContainer.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-
-      const filter = btn.dataset.filter;
-      document.querySelectorAll('.cat-row').forEach(row => {
-        if (filter === 'all' || row.dataset.type === filter) {
-          row.classList.remove('hidden');
-        } else {
-          row.classList.add('hidden');
-        }
-      });
-    });
-  });
-}
-
-if (document.getElementById('dismissBeamBtn')) {
-  document.getElementById('dismissBeamBtn').addEventListener('click', () => {
-    const beamCard = document.getElementById('introBeamCard');
-    if (beamCard) {
-      beamCard.style.opacity = '0';
-      beamCard.style.transform = 'scale(0.95)';
-      setTimeout(() => { beamCard.style.display = 'none'; }, 400);
-    }
   });
 }
 
@@ -386,7 +417,7 @@ function buildLeaks() {
 /* ============ RETO NAVIDEÑO ============ */
 let xmasLevel = 100;
 let xmasChecked = {};
-let xmasCheckedAt = {};
+let xmasCheckedAt = {};        // fecha real en que se marcó cada semana
 let xmasShownMilestones = new Set();
 let xmasConstancyShown = false;
 const xmasMonths = [['AGOSTO', 4], ['SEPTIEMBRE', 4], ['OCTUBRE', 5], ['NOVIEMBRE', 4], ['DICIEMBRE', 5]];
@@ -441,8 +472,11 @@ function toggleXmasWeek(w) {
 
   renderXmasProgress();
   checkStreakMilestone();
+  saveState();
 }
 
+// Si la semana que se marca ya venció hace más de 7 días Y la anterior
+// seguía sin marcar, es señal de que se está poniendo al día de golpe.
 function checkCatchUp(w) {
   if (w <= 1) return;
   const due = xmasWeekDueDate(w);
@@ -456,6 +490,7 @@ function checkCatchUp(w) {
   }
 }
 
+// Racha continua desde la semana 1 (no cuenta total marcado).
 function checkStreakMilestone() {
   let streak = 0;
   for (let w = 1; w <= totalXmasWeeks; w++) {
@@ -493,6 +528,8 @@ function showXmasMessage(text, type) {
 }
 
 function updateAllXmasLabels() {
+  // Los ornamentos no muestran monto individual (solo el número de semana),
+  // así que aquí solo se recalcula el progreso/meta general.
   renderXmasProgress();
 }
 
@@ -533,6 +570,7 @@ document.querySelectorAll('.xmas-level').forEach(el => {
       xmasLevel = parseInt(levelVal);
     }
     updateAllXmasLabels();
+    saveState();
   });
 });
 
@@ -541,19 +579,69 @@ if (xmasCustomInput) {
   xmasCustomInput.addEventListener('input', () => {
     xmasLevel = parseInt(xmasCustomInput.value) || 0;
     updateAllXmasLabels();
+    saveState();
   });
 }
 
 /* ============ METAS & PROGRESO ============ */
+
+// Convierte ingreso/gastos a su equivalente MENSUAL sin importar el
+// periodo elegido en Presupuesto (mensual x1, quincenal x2).
+function getMonthlyEquivalentIncome() {
+  const v = getIncome();
+  return budgetPeriod === 'quincenal' ? v * 2 : v;
+}
+function getMonthlyEquivalentExpenses() {
+  const v = getTotalExpenses();
+  return budgetPeriod === 'quincenal' ? v * 2 : v;
+}
+
+let emergencyAmount = 0;
+
+document.querySelectorAll('.emergency-choice').forEach(btn => {
+  makeKeyboardActivatable(btn);
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.emergency-choice').forEach(b => b.classList.toggle('active', b === btn));
+    const customRow = document.getElementById('emergencyCustomRow');
+    if (btn.dataset.amount === 'custom') {
+      if (customRow) customRow.style.display = 'flex';
+      const customInputEl = document.getElementById('emergencyCustomAmount');
+      emergencyAmount = customInputEl ? (parseFloat(customInputEl.value) || 0) : 0;
+    } else {
+      if (customRow) customRow.style.display = 'none';
+      emergencyAmount = parseFloat(btn.dataset.amount);
+    }
+    calculateEmergencyFund();
+    saveState();
+  });
+});
+const emergencyCustomAmountEl = document.getElementById('emergencyCustomAmount');
+if (emergencyCustomAmountEl) {
+  emergencyCustomAmountEl.addEventListener('input', () => {
+    emergencyAmount = parseFloat(emergencyCustomAmountEl.value) || 0;
+    calculateEmergencyFund();
+    saveState();
+  });
+}
+
 function calculateEmergencyFund() {
-  const slider = document.getElementById('emergencySlider');
-  const label = document.getElementById('emergencyMonthsLabel');
   const totalVal = document.getElementById('emergencyTotalVal');
-  if (!slider || !label || !totalVal) return;
-  const months = parseInt(slider.value);
-  label.textContent = `${months} meses`;
-  const totalFundRequired = getTotalExpenses() * months;
-  totalVal.textContent = `RD$${fmt(totalFundRequired)}`;
+  const refText = document.getElementById('emergencyRefText');
+  if (!totalVal) return;
+  totalVal.textContent = `RD$${fmt(emergencyAmount)}`;
+
+  if (refText) {
+    if (emergencyAmount > 0) {
+      const monthlyExpenses = getMonthlyEquivalentExpenses();
+      let msg = `Con RD$${fmt(emergencyAmount)}, ya tienes un colchón real para un imprevisto chico — un dolor de cabeza menos.`;
+      if (monthlyExpenses > 0) {
+        msg += ` La meta "de libro" son 3-6 meses de gastos (RD$${fmt(monthlyExpenses * 3)} a RD$${fmt(monthlyExpenses * 6)}) — pero eso se construye con el tiempo. Lo que ya separaste, ya cuenta.`;
+      }
+      refText.textContent = msg;
+    } else {
+      refText.textContent = '';
+    }
+  }
 }
 
 document.querySelectorAll('.icon-btn').forEach(btn => {
@@ -570,7 +658,6 @@ function calculateTargetGoal() {
   const goalAmountInp = document.getElementById('targetGoalAmount');
   const goalMonthsInp = document.getElementById('targetGoalMonths');
   const coachBox = document.getElementById('coachAlertBox');
-  const entrepreneurModule = document.getElementById('entrepreneurshipModule');
   const ahorroNote = document.getElementById('ahorroLinkNote');
 
   if (!goalAmountInp || !goalMonthsInp || !coachBox) return;
@@ -581,14 +668,13 @@ function calculateTargetGoal() {
 
   if (amount <= 0 || months <= 0) {
     coachBox.style.display = 'none';
-    if (entrepreneurModule) entrepreneurModule.style.display = 'none';
     if (ahorroNote) ahorroNote.style.display = 'none';
     return;
   }
 
   const monthlySavingsRequired = amount / months;
-  const income = getIncome();
-  const expenses = getTotalExpenses();
+  const income = getMonthlyEquivalentIncome();
+  const expenses = getMonthlyEquivalentExpenses();
   const actualSavingsCapacity = income - expenses;
   const ahorroYaAsignado = amounts['ahorro'] || 0;
 
@@ -609,14 +695,12 @@ function calculateTargetGoal() {
     coachBox.style.background = 'rgba(253, 140, 69, 0.08)';
     coachBox.style.color = '#B4432A';
     coachBox.style.border = '1px solid rgba(253, 140, 69, 0.3)';
-    coachBox.innerHTML = `⚠️ Para lograr <b>${goalLabel}</b> necesitas ahorrar <b>RD$${fmt(monthlySavingsRequired)}/mes</b>. Tu presupuesto actual solo dispone de RD$${fmt(Math.max(0, actualSavingsCapacity))}/mes. ¡Te faltan <b>RD$${fmt(deficit)} al mes</b>! Mira abajo cómo cerrar esa brecha.`;
-    if (entrepreneurModule) { entrepreneurModule.style.display = 'block'; renderBusinessCatalog(); }
+    coachBox.innerHTML = `Para lograr <b>${goalLabel}</b> necesitas RD$${fmt(monthlySavingsRequired)}/mes. Hoy tu presupuesto te permite RD$${fmt(Math.max(0, actualSavingsCapacity))}/mes — te faltan RD$${fmt(deficit)}. No es un no, es un "todavía no": abajo tienes ideas reales para cerrar esa diferencia.`;
   } else {
     coachBox.style.background = 'var(--accent-soft)';
     coachBox.style.color = 'var(--accent-solid)';
     coachBox.style.border = '1px solid rgba(31, 122, 92, 0.2)';
-    coachBox.innerHTML = `🎉 ¡Excelentes noticias! Para lograr <b>${goalLabel}</b> requieres <b>RD$${fmt(monthlySavingsRequired)}/mes</b> y tu capacidad de ahorro actual soporta este plan perfectamente. ¡Dale con todo!`;
-    if (entrepreneurModule) entrepreneurModule.style.display = 'none';
+    coachBox.innerHTML = `🎉 Con lo que ya ganas, <b>${goalLabel}</b> es alcanzable. Cada meta cumplida es más libertad para elegir.`;
   }
 }
 
@@ -631,13 +715,92 @@ function renderBusinessCatalog() {
   });
 }
 
-const emergencySlider = document.getElementById('emergencySlider');
-if (emergencySlider) emergencySlider.addEventListener('input', calculateEmergencyFund);
+// Botón "Ver tu AFP en la Academia" — cambia de pestaña y lleva la vista al card de AFP.
+const afpLinkBtn = document.getElementById('afpLinkBtn');
+if (afpLinkBtn) {
+  afpLinkBtn.addEventListener('click', () => {
+    const academiaNav = document.querySelector('.nav-item[data-tab="academia"]');
+    if (academiaNav) academiaNav.click();
+    setTimeout(() => {
+      const afpCard = document.querySelector('.afp-card');
+      if (afpCard) afpCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 150);
+  });
+}
 
 ['targetGoalAmount', 'targetGoalMonths', 'targetGoalName'].forEach(id => {
   const el = document.getElementById(id);
-  if (el) el.addEventListener('input', calculateTargetGoal);
+  if (el) el.addEventListener('input', () => { calculateTargetGoal(); saveState(); });
 });
+
+/* ============ RACHA SEMANAL (Pilar Presente) ============ */
+const STREAK_HABITS = [
+  { id: 'ahorro', text: 'Separé mi ahorro antes de gastar' },
+  { id: 'impulso', text: 'Evité un gasto por impulso' },
+  { id: 'plan', text: 'Revisé mi plan de la semana' }
+];
+let streakData = {}; // { 'YYYY-MM-DD' (lunes de esa semana): { ahorro:bool, impulso:bool, plan:bool } }
+
+function getWeekKey(date) {
+  const d = new Date(date || new Date());
+  const day = d.getDay();
+  const diffToMonday = (day === 0 ? -6 : 1 - day);
+  d.setDate(d.getDate() + diffToMonday);
+  d.setHours(0, 0, 0, 0);
+  return d.toISOString().slice(0, 10);
+}
+
+function buildStreakChecks() {
+  const box = document.getElementById('streakChecks');
+  if (!box) return;
+  box.innerHTML = '';
+  const weekKey = getWeekKey();
+  if (!streakData[weekKey]) streakData[weekKey] = {};
+
+  STREAK_HABITS.forEach(h => {
+    const row = document.createElement('div');
+    row.className = 'streak-check';
+    row.innerHTML = `<span class="streak-check-box" id="streak-${h.id}"></span><span class="streak-check-text">${h.text}</span>`;
+    makeKeyboardActivatable(row);
+    row.addEventListener('click', () => {
+      streakData[weekKey][h.id] = !streakData[weekKey][h.id];
+      const box2 = document.getElementById(`streak-${h.id}`);
+      if (box2) { box2.classList.toggle('checked', streakData[weekKey][h.id]); box2.textContent = streakData[weekKey][h.id] ? '✓' : ''; }
+      renderStreakCounter();
+      saveState();
+    });
+    box.appendChild(row);
+
+    const boxEl = row.querySelector(`#streak-${h.id}`);
+    if (streakData[weekKey][h.id]) { boxEl.classList.add('checked'); boxEl.textContent = '✓'; }
+  });
+
+  renderStreakCounter();
+}
+
+function weekFullyChecked(weekKey) {
+  const w = streakData[weekKey];
+  if (!w) return false;
+  return STREAK_HABITS.every(h => w[h.id]);
+}
+
+function renderStreakCounter() {
+  const counterEl = document.getElementById('streakCounter');
+  if (!counterEl) return;
+
+  let streak = 0;
+  let cursor = getWeekKey();
+  while (weekFullyChecked(cursor)) {
+    streak++;
+    const d = new Date(cursor);
+    d.setDate(d.getDate() - 7);
+    cursor = getWeekKey(d);
+  }
+
+  counterEl.textContent = streak > 0
+    ? `🔥 Llevas ${streak} semana${streak === 1 ? '' : 's'} seguida${streak === 1 ? '' : 's'} cuidando tus cuartos.`
+    : '🔥 Aún no empiezas tu racha esta semana.';
+}
 
 /* ============ SIMULADOR AFP ============ */
 if (document.getElementById('afpSalario')) {
@@ -721,18 +884,123 @@ document.querySelectorAll('.course-item.locked').forEach(item => {
   });
 });
 
+/* ============ PERSISTENCIA (localStorage) ============ */
+const STORAGE_KEY = 'miscuartos_data_v1';
+
+function saveState() {
+  try {
+    const data = {
+      amounts,
+      budgetPeriod,
+      incomeValue: incomeEl ? incomeEl.value : '',
+      xmasLevel,
+      xmasChecked,
+      xmasCheckedAt: Object.fromEntries(Object.entries(xmasCheckedAt).map(([k, v]) => [k, v.toISOString()])),
+      xmasShownMilestones: Array.from(xmasShownMilestones),
+      xmasConstancyShown,
+      emergencyAmount,
+      streakData,
+      selectedGoalIcon,
+      goalName: (document.getElementById('targetGoalName') || {}).value || '',
+      goalAmount: (document.getElementById('targetGoalAmount') || {}).value || '',
+      goalMonths: (document.getElementById('targetGoalMonths') || {}).value || ''
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch (e) {
+    console.warn('Miscuartos: no se pudo guardar localmente.', e);
+  }
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+
+    if (data.amounts) amounts = data.amounts;
+    if (data.budgetPeriod) budgetPeriod = data.budgetPeriod;
+    if (data.xmasLevel != null) xmasLevel = data.xmasLevel;
+    if (data.xmasChecked) xmasChecked = data.xmasChecked;
+    if (data.xmasCheckedAt) {
+      xmasCheckedAt = Object.fromEntries(Object.entries(data.xmasCheckedAt).map(([k, v]) => [k, new Date(v)]));
+    }
+    if (data.xmasShownMilestones) xmasShownMilestones = new Set(data.xmasShownMilestones);
+    if (data.xmasConstancyShown) xmasConstancyShown = data.xmasConstancyShown;
+    if (data.emergencyAmount != null) emergencyAmount = data.emergencyAmount;
+    if (data.streakData) streakData = data.streakData;
+    if (data.selectedGoalIcon) selectedGoalIcon = data.selectedGoalIcon;
+
+    if (incomeEl && data.incomeValue) incomeEl.value = data.incomeValue;
+
+    const goalNameEl = document.getElementById('targetGoalName');
+    const goalAmountEl = document.getElementById('targetGoalAmount');
+    const goalMonthsEl = document.getElementById('targetGoalMonths');
+    if (goalNameEl && data.goalName) goalNameEl.value = data.goalName;
+    if (goalAmountEl && data.goalAmount) goalAmountEl.value = data.goalAmount;
+    if (goalMonthsEl && data.goalMonths) goalMonthsEl.value = data.goalMonths;
+  } catch (e) {
+    console.warn('Miscuartos: no se pudo cargar el guardado local.', e);
+  }
+}
+
+function applyLoadedUIState() {
+  // Periodo
+  document.querySelectorAll('.period-btn').forEach(b => b.classList.toggle('active', b.dataset.period === budgetPeriod));
+  applyPeriodLabels();
+  const tip = document.getElementById('periodTip');
+  if (tip) tip.style.display = budgetPeriod === 'quincenal' ? 'block' : 'none';
+
+  // Reto Navideño: nivel activo
+  const levelMatch = document.querySelector(`.xmas-level[data-level="${xmasLevel}"]`);
+  document.querySelectorAll('.xmas-level').forEach(l => l.classList.remove('active'));
+  if (levelMatch) {
+    levelMatch.classList.add('active');
+  } else {
+    const customBtn = document.querySelector('.xmas-level[data-level="custom"]');
+    if (customBtn) {
+      customBtn.classList.add('active');
+      const customRow = document.getElementById('xmasCustomInputRow');
+      if (customRow) customRow.style.display = 'block';
+      const customInputEl = document.getElementById('xmasCustomAmount');
+      if (customInputEl) customInputEl.value = xmasLevel;
+    }
+  }
+
+  // Colchón de paz: elección activa
+  const emergencyMatch = document.querySelector(`.emergency-choice[data-amount="${emergencyAmount}"]`);
+  document.querySelectorAll('.emergency-choice').forEach(b => b.classList.remove('active'));
+  if (emergencyAmount > 0) {
+    if (emergencyMatch) {
+      emergencyMatch.classList.add('active');
+    } else {
+      const customBtn = document.querySelector('.emergency-choice[data-amount="custom"]');
+      if (customBtn) {
+        customBtn.classList.add('active');
+        const customRow = document.getElementById('emergencyCustomRow');
+        if (customRow) customRow.style.display = 'flex';
+        const customInputEl = document.getElementById('emergencyCustomAmount');
+        if (customInputEl) customInputEl.value = emergencyAmount;
+      }
+    }
+  }
+
+  // Ícono de meta activo
+  document.querySelectorAll('.icon-btn').forEach(b => b.classList.toggle('active', b.dataset.icon === selectedGoalIcon));
+}
+
 /* ============ INICIALIZADOR SEGURO ============ */
 const initApp = () => {
+  loadState();
   Object.keys(categories).forEach(key => { if (amounts[key] == null) amounts[key] = 0; });
   buildLeaks();
   buildXmas();
   buildCategoryRows();
-  initFilterPills();
-  if (incomeEl) {
-    incomeEl.addEventListener('input', () => {
-      updateTotals(true);
-    });
-  }
+  buildStreakChecks();
+  renderBusinessCatalog();
+  calculateEmergencyFund();
+  calculateTargetGoal();
+  applyLoadedUIState();
+  if (incomeEl) incomeEl.addEventListener('input', () => { updateTotals(true); saveState(); });
 };
 
 if (document.readyState === 'loading') {
