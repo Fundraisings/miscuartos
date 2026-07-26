@@ -177,19 +177,20 @@ a:focus-visible, button:focus-visible, input:focus-visible, [tabindex]:focus-vis
 .xmas-goal .num { font-family: 'IBM Plex Mono', monospace; font-size: 18px; font-weight: 700; color: var(--brand-orange); }
 .xmas-goal .lbl { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
 
-.xmas-tree-wrap { display: flex; justify-content: center; margin-bottom: 8px; }
-.xmas-tree { width: 90px; height: 105px; }
+.xmas-layout { display: flex; gap: 10px; align-items: flex-start; }
+.xmas-tree-wrap { flex-shrink: 0; width: 96px; display: flex; justify-content: center; padding-top: 4px; }
+.xmas-tree { width: 96px; height: 112px; }
 #xmasStar { fill: #6b6f5a; transition: fill 0.4s ease, filter 0.4s ease; }
 .xmas-tree.lit #xmasStar { fill: #FFD34D; filter: drop-shadow(0 0 6px rgba(255, 211, 77, 0.9)); }
 
 .xmas-streak-msg { background: var(--accent-soft); color: var(--accent-solid); border-radius: var(--radius-md); padding: 12px 14px; font-size: 13px; line-height: 1.5; margin-bottom: 14px; text-align: center; }
 .xmas-streak-msg.constancy { background: var(--brand-orange-soft); color: var(--brand-orange); }
 
-.xmas-ornament-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
-.xmas-month-label { grid-column: 1 / -1; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; color: var(--brand-orange); margin-top: 12px; margin-bottom: 2px; }
+.xmas-ornament-grid { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; align-content: start; }
+.xmas-month-label { grid-column: 1 / -1; font-size: 10px; font-weight: 700; letter-spacing: 0.05em; color: var(--brand-orange); margin-top: 8px; margin-bottom: 2px; }
 .xmas-ornament { aspect-ratio: 1; border-radius: 50%; background: var(--bg); border: 2px solid var(--line); display: flex; align-items: center; justify-content: center; flex-direction: column; cursor: pointer; transition: all 0.25s ease; }
-.xmas-ornament .week-num { font-size: 10px; font-weight: 700; color: var(--muted); }
-.xmas-ornament.lit { background: linear-gradient(145deg, var(--brand-orange), #E8703A); border-color: var(--brand-orange); box-shadow: 0 0 10px rgba(253, 140, 69, 0.6); }
+.xmas-ornament .week-num { font-size: 9px; font-weight: 700; color: var(--muted); }
+.xmas-ornament.lit { background: linear-gradient(145deg, var(--brand-orange), #E8703A); border-color: var(--brand-orange); box-shadow: 0 0 8px rgba(253, 140, 69, 0.6); }
 .xmas-ornament.lit .week-num { color: #fff; }
 
 .xmas-footer-tips { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--muted); line-height: 1.5; }
