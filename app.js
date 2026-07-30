@@ -82,7 +82,7 @@ document.querySelectorAll('.nav-item').forEach(btn => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
     lazyLoadVideos();
     if (btn.dataset.tab === 'metas') {
-      calculateEmergencyFund();
+      renderPlanProgress();
       calculateTargetGoal();
       buildStreakChecks();
       renderBusinessCatalog();
@@ -596,52 +596,125 @@ function getMonthlyEquivalentExpenses() {
   return budgetPeriod === 'quincenal' ? v * 2 : v;
 }
 
-let emergencyAmount = 0;
+let planDuration = 6;
+let planMonthlyAmount = 200;
+let planChecked = {};
 
-document.querySelectorAll('.emergency-choice').forEach(btn => {
+document.querySelectorAll('.plan-duration-btn').forEach(btn => {
   makeKeyboardActivatable(btn);
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.emergency-choice').forEach(b => b.classList.toggle('active', b === btn));
-    const customRow = document.getElementById('emergencyCustomRow');
-    if (btn.dataset.amount === 'custom') {
-      if (customRow) customRow.style.display = 'flex';
-      const customInputEl = document.getElementById('emergencyCustomAmount');
-      emergencyAmount = customInputEl ? (parseFloat(customInputEl.value) || 0) : 0;
-    } else {
-      if (customRow) customRow.style.display = 'none';
-      emergencyAmount = parseFloat(btn.dataset.amount);
-    }
-    calculateEmergencyFund();
+    planDuration = parseInt(btn.dataset.duration);
+    document.querySelectorAll('.plan-duration-btn').forEach(b => b.classList.toggle('active', b === btn));
+    buildPlanMonths();
     saveState();
   });
 });
-const emergencyCustomAmountEl = document.getElementById('emergencyCustomAmount');
-if (emergencyCustomAmountEl) {
-  emergencyCustomAmountEl.addEventListener('input', () => {
-    emergencyAmount = parseFloat(emergencyCustomAmountEl.value) || 0;
-    calculateEmergencyFund();
+
+document.querySelectorAll('.plan-intensity-btn').forEach(btn => {
+  makeKeyboardActivatable(btn);
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.plan-intensity-btn').forEach(b => b.classList.toggle('active', b === btn));
+    const customRow = document.getElementById('planCustomRow');
+    if (btn.dataset.amount === 'custom') {
+      if (customRow) customRow.style.display = 'flex';
+      const customInputEl = document.getElementById('planCustomAmount');
+      planMonthlyAmount = customInputEl ? (parseFloat(customInputEl.value) || 0) : 0;
+    } else {
+      if (customRow) customRow.style.display = 'none';
+      planMonthlyAmount = parseFloat(btn.dataset.amount);
+    }
+    renderPlanProgress();
+    saveState();
+  });
+});
+const planCustomAmountEl = document.getElementById('planCustomAmount');
+if (planCustomAmountEl) {
+  planCustomAmountEl.addEventListener('input', () => {
+    planMonthlyAmount = parseFloat(planCustomAmountEl.value) || 0;
+    renderPlanProgress();
     saveState();
   });
 }
 
-function calculateEmergencyFund() {
-  const totalVal = document.getElementById('emergencyTotalVal');
-  const refText = document.getElementById('emergencyRefText');
-  if (!totalVal) return;
-  totalVal.textContent = `RD$${fmt(emergencyAmount)}`;
+function buildPlanMonths() {
+  const grid = document.getElementById('planMonthsGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  for (let m = 1; m <= planDuration; m++) {
+    const tile = document.createElement('div');
+    tile.className = 'plan-month-tile' + (planChecked[m] ? ' lit' : '');
+    tile.id = `plan-m-${m}`;
+    tile.textContent = `M${m}`;
+    makeKeyboardActivatable(tile);
+    tile.addEventListener('click', () => {
+      planChecked[m] = !planChecked[m];
+      tile.classList.toggle('lit', planChecked[m]);
+      renderPlanProgress();
+      saveState();
+    });
+    grid.appendChild(tile);
+  }
+  renderPlanProgress();
+}
 
-  if (refText) {
-    if (emergencyAmount > 0) {
+function renderPlanProgress() {
+  const valEl = document.getElementById('planProgressVal');
+  const refEl = document.getElementById('planProgressRef');
+  if (!valEl) return;
+
+  let mesesCumplidos = 0;
+  for (let m = 1; m <= planDuration; m++) { if (planChecked[m]) mesesCumplidos++; }
+  const total = mesesCumplidos * planMonthlyAmount;
+  const meta = planDuration * planMonthlyAmount;
+  valEl.textContent = `RD$${fmt(total)} de RD$${fmt(meta)}`;
+
+  if (refEl) {
+    if (total > 0) {
       const monthlyExpenses = getMonthlyEquivalentExpenses();
-      let msg = `Con RD$${fmt(emergencyAmount)}, ya tienes un colchón real para un imprevisto chico — un dolor de cabeza menos.`;
+      let msg = `Llevas ${mesesCumplidos} de ${planDuration} meses cumplidos.`;
       if (monthlyExpenses > 0) {
-        msg += ` La meta "de libro" son 3-6 meses de gastos (RD$${fmt(monthlyExpenses * 3)} a RD$${fmt(monthlyExpenses * 6)}) — pero eso se construye con el tiempo. Lo que ya separaste, ya cuenta.`;
+        const mesesDePaz = total / monthlyExpenses;
+        msg += ` Eso ya son ${mesesDePaz.toFixed(1)} meses de tranquilidad comprados si algo pasa.`;
       }
-      refText.textContent = msg;
+      refEl.textContent = msg;
     } else {
-      refText.textContent = '';
+      refEl.textContent = `Tu meta: RD$${fmt(meta)} en ${planDuration} meses.`;
     }
   }
+}
+
+// Genera un archivo .ics (recordatorio de calendario) — esto SÍ es 100% real
+// y no requiere servidor, a diferencia de un "WhatsApp automático" que no existe sin backend.
+const planReminderBtn = document.getElementById('planReminderBtn');
+if (planReminderBtn) {
+  planReminderBtn.addEventListener('click', () => {
+    const now = new Date();
+    const start = new Date(now.getFullYear(), now.getMonth() + 1, 1, 9, 0, 0);
+    const pad = (n) => String(n).padStart(2, '0');
+    const dtStart = `${start.getFullYear()}${pad(start.getMonth() + 1)}${pad(start.getDate())}T090000`;
+    const ics = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//Miscuartos//Plan de Paz//ES',
+      'BEGIN:VEVENT',
+      `UID:miscuartos-plandepaz-${Date.now()}@miscuartos.app`,
+      `DTSTART:${dtStart}`,
+      `RRULE:FREQ=MONTHLY;COUNT=${planDuration}`,
+      `SUMMARY:Separar cuota del Plan de Paz - RD$${fmt(planMonthlyAmount)}`,
+      'DESCRIPTION:Hoy toca separar tu cuota para tu Plan de Paz en Miscuartos. Un pasito a la vez para cuidar tus cuartos y tu tranquilidad.',
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].join('\r\n');
+    const blob = new Blob([ics], { type: 'text/calendar' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'plan-de-paz-miscuartos.ics';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
 }
 
 document.querySelectorAll('.icon-btn').forEach(btn => {
@@ -898,7 +971,9 @@ function saveState() {
       xmasCheckedAt: Object.fromEntries(Object.entries(xmasCheckedAt).map(([k, v]) => [k, v.toISOString()])),
       xmasShownMilestones: Array.from(xmasShownMilestones),
       xmasConstancyShown,
-      emergencyAmount,
+      planDuration,
+      planMonthlyAmount,
+      planChecked,
       streakData,
       selectedGoalIcon,
       goalName: (document.getElementById('targetGoalName') || {}).value || '',
@@ -926,7 +1001,9 @@ function loadState() {
     }
     if (data.xmasShownMilestones) xmasShownMilestones = new Set(data.xmasShownMilestones);
     if (data.xmasConstancyShown) xmasConstancyShown = data.xmasConstancyShown;
-    if (data.emergencyAmount != null) emergencyAmount = data.emergencyAmount;
+    if (data.planDuration != null) planDuration = data.planDuration;
+    if (data.planMonthlyAmount != null) planMonthlyAmount = data.planMonthlyAmount;
+    if (data.planChecked) planChecked = data.planChecked;
     if (data.streakData) streakData = data.streakData;
     if (data.selectedGoalIcon) selectedGoalIcon = data.selectedGoalIcon;
 
@@ -966,20 +1043,23 @@ function applyLoadedUIState() {
     }
   }
 
-  // Colchón de paz: elección activa
-  const emergencyMatch = document.querySelector(`.emergency-choice[data-amount="${emergencyAmount}"]`);
-  document.querySelectorAll('.emergency-choice').forEach(b => b.classList.remove('active'));
-  if (emergencyAmount > 0) {
-    if (emergencyMatch) {
-      emergencyMatch.classList.add('active');
+  // Plan de Paz: duración activa
+  document.querySelectorAll('.plan-duration-btn').forEach(b => b.classList.toggle('active', parseInt(b.dataset.duration) === planDuration));
+
+  // Plan de Paz: intensidad activa
+  const intensityMatch = document.querySelector(`.plan-intensity-btn[data-amount="${planMonthlyAmount}"]`);
+  document.querySelectorAll('.plan-intensity-btn').forEach(b => b.classList.remove('active'));
+  if (planMonthlyAmount > 0) {
+    if (intensityMatch) {
+      intensityMatch.classList.add('active');
     } else {
-      const customBtn = document.querySelector('.emergency-choice[data-amount="custom"]');
+      const customBtn = document.querySelector('.plan-intensity-btn[data-amount="custom"]');
       if (customBtn) {
         customBtn.classList.add('active');
-        const customRow = document.getElementById('emergencyCustomRow');
+        const customRow = document.getElementById('planCustomRow');
         if (customRow) customRow.style.display = 'flex';
-        const customInputEl = document.getElementById('emergencyCustomAmount');
-        if (customInputEl) customInputEl.value = emergencyAmount;
+        const customInputEl = document.getElementById('planCustomAmount');
+        if (customInputEl) customInputEl.value = planMonthlyAmount;
       }
     }
   }
@@ -997,7 +1077,7 @@ const initApp = () => {
   buildCategoryRows();
   buildStreakChecks();
   renderBusinessCatalog();
-  calculateEmergencyFund();
+  buildPlanMonths();
   calculateTargetGoal();
   applyLoadedUIState();
   if (incomeEl) incomeEl.addEventListener('input', () => { updateTotals(true); saveState(); });
