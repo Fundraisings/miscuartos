@@ -178,30 +178,47 @@
       <!-- PILAR 1: TRANQUILIDAD -->
       <div class="meta-card">
         <div class="pillar-tag">🛡️ PILAR: TRANQUILIDAD</div>
-        <div class="premium-badge-title">MI COLCHÓN DE PAZ</div>
-        <p class="micro-sub">No hace falta tener miles guardados para dormir tranquilo. Un colchón de paz empieza con lo que puedas, aunque sea poco — lo que importa es que exista.</p>
+        <div class="premium-badge-title">TU PLAN DE PAZ</div>
+        <p class="micro-sub">No hace falta tener miles guardados para dormir tranquilo — hace falta un plan con fecha de inicio y fin. Elige tu ritmo, y ve marcando cada mes que cumplas. Esto no es teoría, es tu plan real de los próximos meses.</p>
 
-        <div class="emergency-choices" id="emergencyChoices">
-          <div class="emergency-choice" data-amount="1000">RD$1,000</div>
-          <div class="emergency-choice" data-amount="3000">RD$3,000</div>
-          <div class="emergency-choice" data-amount="5000">RD$5,000</div>
-          <div class="emergency-choice" data-amount="custom">A tu medida</div>
-        </div>
-        <div id="emergencyCustomRow" style="display:none;">
-          <span>RD$</span>
-          <input type="number" id="emergencyCustomAmount" placeholder="Ej. 2,000" inputmode="numeric">
+        <div class="plan-duration-toggle" id="planDurationToggle">
+          <div class="plan-duration-btn active" data-duration="6">6 meses</div>
+          <div class="plan-duration-btn" data-duration="12">12 meses</div>
         </div>
 
-        <div class="credit-result-row emergency-result">
-          <div style="text-align: center; width: 100%;">
-            <div class="emergency-result-lbl">Tu colchón de paz</div>
-            <div id="emergencyTotalVal" class="emergency-result-val">RD$0</div>
-            <div id="emergencyRefText" class="emergency-ref-text"></div>
+        <div class="plan-intensity" id="planIntensity">
+          <div class="plan-intensity-btn active" data-amount="200">
+            <div class="plan-intensity-name">🌱 Paso Suave</div>
+            <div class="plan-intensity-amt">RD$200/mes</div>
+          </div>
+          <div class="plan-intensity-btn" data-amount="1000">
+            <div class="plan-intensity-name">🔥 Paso Firme</div>
+            <div class="plan-intensity-amt">RD$1,000/mes</div>
+          </div>
+          <div class="plan-intensity-btn" data-amount="3000">
+            <div class="plan-intensity-name">🚀 Paso Acelerado</div>
+            <div class="plan-intensity-amt">RD$3,000/mes</div>
+          </div>
+          <div class="plan-intensity-btn" data-amount="custom">
+            <div class="plan-intensity-name">⚙️ A tu medida</div>
+            <div class="plan-intensity-amt">Tú eliges</div>
           </div>
         </div>
-        <div class="credit-trick" style="background: rgba(45, 138, 206, 0.08); color: #2D8ACE;">
-          💡 <strong>Tip Dominicano:</strong> No dejes este dinero bajo el colchón perdiendo valor. Cuando puedas, muévelo a un Certificado Financiero o cuenta de ahorro programado.
+        <div id="planCustomRow" style="display:none;">
+          <span>RD$</span>
+          <input type="number" id="planCustomAmount" placeholder="Ej. 500" inputmode="numeric">
         </div>
+
+        <div class="plan-progress-box">
+          <div id="planProgressVal" class="plan-progress-val">RD$0 de RD$1,200</div>
+          <div id="planProgressRef" class="plan-progress-ref"></div>
+        </div>
+
+        <p class="micro-sub" style="margin: 12px 0 6px;">Toca cada mes cuando ya hayas separado tu cuota:</p>
+        <div id="planMonthsGrid" class="plan-months-grid"></div>
+
+        <button class="plan-reminder-btn" id="planReminderBtn">🔔 Agregar recordatorio mensual a mi calendario</button>
+        <p class="plan-reminder-note">Cada mes, tu teléfono te avisa que toca separar tu cuota — sin depender de la app abierta.</p>
       </div>
 
       <!-- PILAR 2: LIBERTAD -->
